@@ -31,10 +31,10 @@ class BinaryOperationParsingTest : FunSpec({
         parseExpression("1 + 2") shouldBeSuccess { expr, _ ->
             expr.shouldBeInstanceOf<BinaryOperation>()
             val left = expr.left.shouldBeInstanceOf<IntLiteral>()
-            left shouldBe 1
+            left.value shouldBe 1
             expr.operator shouldBe PLUS
             val right = expr.right.shouldBeInstanceOf<IntLiteral>()
-            right shouldBe 2
+            right.value shouldBe 2
         }
     }
 
@@ -51,7 +51,6 @@ class BinaryOperationParsingTest : FunSpec({
             }
             expr.operator shouldBe PLUS
             val right = expr.right.shouldBeInstanceOf<IntLiteral>()
-            // TODO: this fails with expected:<3> but was:<3> ???
             right.value shouldBe 3
         }
     }
