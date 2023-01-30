@@ -24,6 +24,7 @@ import net.ormr.jukkas.parser.Precedence.ADDITIVE
 import net.ormr.jukkas.parser.Precedence.CONJUNCTION
 import net.ormr.jukkas.parser.Precedence.DISJUNCTION
 import net.ormr.jukkas.parser.Precedence.EQUALITY
+import net.ormr.jukkas.parser.Precedence.MULTIPLICATIVE
 import net.ormr.jukkas.parser.parselets.infix.AssignmentParselet
 import net.ormr.jukkas.parser.parselets.infix.BinaryOperationParselet
 import net.ormr.jukkas.parser.parselets.infix.CallParselet
@@ -61,6 +62,7 @@ internal object Grammar {
 
         infix<Call>(CallParselet) // 14
         infix(LEFT_PAREN, FunctionInvocationParselet) // 14
+        infix<Multiplicative>(BinaryOperationParselet(MULTIPLICATIVE)) // 11
         infix<Additive>(BinaryOperationParselet(ADDITIVE)) // 10
         infix<IdentifierLike>(InfixInvocationParselet) // 8
         infix<Equality>(BinaryOperationParselet(EQUALITY)) // 4

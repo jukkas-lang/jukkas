@@ -179,6 +179,8 @@ TemplateStart = \\\{
 "." { return DOT.INSTANCE; }
 "+" { return PLUS.INSTANCE; }
 "-" { return MINUS.INSTANCE; }
+"*" { return STAR.INSTANCE; }
+"/" { return SLASH.INSTANCE; }
 ";" { return SEMICOLON.INSTANCE; }
 ":" { return COLON.INSTANCE; }
 "," { return COMMA.INSTANCE; }

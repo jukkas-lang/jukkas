@@ -21,7 +21,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import net.ormr.jukkas.ast.BinaryOperation
-import net.ormr.jukkas.ast.BinaryOperator.PLUS
+import net.ormr.jukkas.ast.BinaryOperator.*
 import net.ormr.jukkas.ast.IntLiteral
 import net.ormr.jukkas.parseExpression
 import net.ormr.jukkas.shouldBeSuccess
@@ -52,6 +52,29 @@ class BinaryOperationParsingTest : FunSpec({
             expr.operator shouldBe PLUS
             val right = expr.right.shouldBeInstanceOf<IntLiteral>()
             right.value shouldBe 3
+        }
+    }
+
+    test("'1 - 2 * 3 / 4' -> (+ 1 (/ (* 2 3) 4)") {
+        parseExpression("1 - 2 * 3 / 4") shouldBeSuccess { expr, _ ->
+            expr.shouldBeInstanceOf<BinaryOperation>()
+            val left = expr.left.shouldBeInstanceOf<IntLiteral>()
+            left.value shouldBe 1
+            expr.operator shouldBe MINUS
+            expr.right.should { expr2 ->
+                expr2.shouldBeInstanceOf<BinaryOperation>()
+                val left2 = expr2.left.shouldBeInstanceOf<BinaryOperation>()
+                left2.should { expr3 ->
+                    val left3 = expr3.left.shouldBeInstanceOf<IntLiteral>()
+                    left3.value shouldBe 2
+                    expr3.operator shouldBe MULTIPLICATION
+                    val right3 = expr3.right.shouldBeInstanceOf<IntLiteral>()
+                    right3.value shouldBe 3
+                }
+                expr2.operator shouldBe DIVISION
+                val right2 = expr2.right.shouldBeInstanceOf<IntLiteral>()
+                right2.value shouldBe 4
+            }
         }
     }
 })

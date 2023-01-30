@@ -61,6 +61,10 @@ sealed interface TokenType {
     object MINUS : AbstractTokenType("-"), Additive
     sealed interface Additive : TokenType
 
+    object STAR : AbstractTokenType("*"), Multiplicative
+    object SLASH : AbstractTokenType("/"), Multiplicative
+    sealed interface Multiplicative : TokenType
+
     object EQUAL_EQUAL : AbstractTokenType("=="), Equality
     object BANG_EQUAL : AbstractTokenType("!="), Equality
     sealed interface Equality : TokenType

@@ -35,6 +35,9 @@ enum class BinaryOperator(override val symbol: String) : Operator {
     PLUS("+"),
     MINUS("-"),
 
+    MULTIPLICATION("*"),
+    DIVISION("/"),
+
     EQUALS("=="),
     NOT_EQUALS("!=="),
 
