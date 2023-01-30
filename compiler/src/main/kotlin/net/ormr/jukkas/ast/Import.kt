@@ -18,4 +18,6 @@ package net.ormr.jukkas.ast
 
 class Import : Statement() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImport(this)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean = other is Import
 }

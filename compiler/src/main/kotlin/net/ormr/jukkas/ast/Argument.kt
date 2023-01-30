@@ -27,10 +27,19 @@ sealed class NamedArgument : Argument(), Definition {
     abstract override var type: Type
 }
 
-class BasicArgument(override val name: String, override var type: Type) : NamedArgument()
+class BasicArgument(override val name: String, override var type: Type) : NamedArgument() {
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is BasicArgument
+        && name == other.name
+}
 
 class DefaultArgument(override val name: String, override var type: Type, default: Expression) : NamedArgument() {
     var default: Expression by child(default)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is DefaultArgument
+        && name == other.name
+        && default.isStructurallyEquivalent(other.default)
 }
 
 // TODO: we probably don't want to support arbitrary pattern matching for arguments,
@@ -38,4 +47,8 @@ class DefaultArgument(override val name: String, override var type: Type, defaul
 //       destructuring is probably the safest
 class PatternArgument(pattern: Pattern) : Argument() {
     var pattern: Pattern by child(pattern)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is PatternArgument
+        && pattern.isStructurallyEquivalent(other.pattern)
 }

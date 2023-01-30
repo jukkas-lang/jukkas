@@ -26,6 +26,12 @@ class BinaryOperation(left: Expression, val operator: BinaryOperator, right: Exp
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBinaryOperation(this)
 
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is BinaryOperation
+        && operator == other.operator
+        && left.isStructurallyEquivalent(other.left)
+        && right.isStructurallyEquivalent(other.right)
+
     override fun toString(): String = "(${operator.symbol} $left $right)"
 }
 

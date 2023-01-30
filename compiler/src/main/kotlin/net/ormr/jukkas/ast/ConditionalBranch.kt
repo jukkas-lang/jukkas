@@ -18,6 +18,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.utils.bothNullOrEquivalent
 
 class ConditionalBranch(condition: Expression, thenBranch: Expression, elseBranch: Expression?) : Expression() {
     var condition: Expression by child(condition)
@@ -26,4 +27,10 @@ class ConditionalBranch(condition: Expression, thenBranch: Expression, elseBranc
     override var type: Type = UnknownType
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitConditionalBranch(this)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is ConditionalBranch
+        && condition.isStructurallyEquivalent(other.condition)
+        && thenBranch.isStructurallyEquivalent(other.thenBranch)
+        && bothNullOrEquivalent(elseBranch, other.elseBranch) { a, b -> a.isStructurallyEquivalent(b) }
 }

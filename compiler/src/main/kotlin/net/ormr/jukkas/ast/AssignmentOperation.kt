@@ -26,6 +26,12 @@ class AssignmentOperation(left: Expression, val operator: AssignmentOperator, va
     override var type: Type = UnknownType
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitAssignmentOperation(this)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is AssignmentOperation
+        && operator == other.operator
+        && left.isStructurallyEquivalent(other.left)
+        && value.isStructurallyEquivalent(other.value)
 }
 
 enum class AssignmentOperator(override val symbol: String) : Operator {

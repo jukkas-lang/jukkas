@@ -25,4 +25,8 @@ class DefinitionReference(val name: String) : Expression() {
     fun find(table: Table): Definition? = table.find(name)
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitIdentifierReference(this)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is DefinitionReference
+        && name == other.name
 }

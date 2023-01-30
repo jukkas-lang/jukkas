@@ -27,6 +27,10 @@ sealed class Literal : Expression() {
 
 class SymbolLiteral(val text: String) : Literal() {
     override lateinit var type: Type
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is SymbolLiteral
+        && text == other.text
 }
 
 class IntLiteral(val value: Int) : Literal() {
@@ -34,6 +38,10 @@ class IntLiteral(val value: Int) : Literal() {
         get() = JvmType.BOOLEAN // TODO: INT
 
     override fun toString(): String = value.toString()
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is IntLiteral
+        && value == other.value
 }
 
 class BooleanLiteral(val value: Boolean) : Literal() {
@@ -41,4 +49,8 @@ class BooleanLiteral(val value: Boolean) : Literal() {
         get() = JvmType.BOOLEAN
 
     override fun toString(): String = value.toString()
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is BooleanLiteral
+        && value == other.value
 }

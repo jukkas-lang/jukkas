@@ -18,4 +18,6 @@ package net.ormr.jukkas.ast
 
 class Pattern : ChildNode() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitPattern(this)
+
+    override fun isStructurallyEquivalent(other: Node): Boolean = other is Pattern
 }

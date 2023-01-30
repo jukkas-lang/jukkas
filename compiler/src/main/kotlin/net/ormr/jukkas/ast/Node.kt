@@ -35,6 +35,8 @@ abstract class Node : Positionable {
 
     abstract val compilationUnit: CompilationUnit
 
+    abstract fun isStructurallyEquivalent(other: Node): Boolean
+
     override fun findPosition(): Position = closestPosition ?: error("Could not find any position for $this")
 
     override fun findPositionOrNull(): Position? = position
