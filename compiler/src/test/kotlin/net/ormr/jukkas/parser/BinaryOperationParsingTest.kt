@@ -17,64 +17,53 @@
 package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.should
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import net.ormr.jukkas.ast.BinaryOperation
 import net.ormr.jukkas.ast.BinaryOperator.*
 import net.ormr.jukkas.ast.IntLiteral
 import net.ormr.jukkas.parseExpression
+import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
 
 class BinaryOperationParsingTest : FunSpec({
     test("'1 + 2' -> (+ 1 2)") {
         parseExpression("1 + 2") shouldBeSuccess { expr, _ ->
-            expr.shouldBeInstanceOf<BinaryOperation>()
-            val left = expr.left.shouldBeInstanceOf<IntLiteral>()
-            left.value shouldBe 1
-            expr.operator shouldBe PLUS
-            val right = expr.right.shouldBeInstanceOf<IntLiteral>()
-            right.value shouldBe 2
+            expr shouldBeStructurallyEquivalentTo BinaryOperation(
+                IntLiteral(1),
+                PLUS,
+                IntLiteral(2),
+            )
         }
     }
 
     test("'1 + 2 + 3' -> (+ (+ 1 2) 3)") {
         parseExpression("1 + 2 + 3") shouldBeSuccess { expr, _ ->
-            expr.shouldBeInstanceOf<BinaryOperation>()
-            expr.left.should {
-                it.shouldBeInstanceOf<BinaryOperation>()
-                val left = it.left.shouldBeInstanceOf<IntLiteral>()
-                left.value shouldBe 1
-                it.operator shouldBe PLUS
-                val right = it.right.shouldBeInstanceOf<IntLiteral>()
-                right.value shouldBe 2
-            }
-            expr.operator shouldBe PLUS
-            val right = expr.right.shouldBeInstanceOf<IntLiteral>()
-            right.value shouldBe 3
+            expr shouldBeStructurallyEquivalentTo BinaryOperation(
+                BinaryOperation(
+                    IntLiteral(1),
+                    PLUS,
+                    IntLiteral(2),
+                ),
+                PLUS,
+                IntLiteral(3),
+            )
         }
     }
 
     test("'1 - 2 * 3 / 4' -> (+ 1 (/ (* 2 3) 4)") {
         parseExpression("1 - 2 * 3 / 4") shouldBeSuccess { expr, _ ->
-            expr.shouldBeInstanceOf<BinaryOperation>()
-            val left = expr.left.shouldBeInstanceOf<IntLiteral>()
-            left.value shouldBe 1
-            expr.operator shouldBe MINUS
-            expr.right.should { expr2 ->
-                expr2.shouldBeInstanceOf<BinaryOperation>()
-                val left2 = expr2.left.shouldBeInstanceOf<BinaryOperation>()
-                left2.should { expr3 ->
-                    val left3 = expr3.left.shouldBeInstanceOf<IntLiteral>()
-                    left3.value shouldBe 2
-                    expr3.operator shouldBe MULTIPLICATION
-                    val right3 = expr3.right.shouldBeInstanceOf<IntLiteral>()
-                    right3.value shouldBe 3
-                }
-                expr2.operator shouldBe DIVISION
-                val right2 = expr2.right.shouldBeInstanceOf<IntLiteral>()
-                right2.value shouldBe 4
-            }
+            expr shouldBeStructurallyEquivalentTo BinaryOperation(
+                IntLiteral(1),
+                MINUS,
+                BinaryOperation(
+                    BinaryOperation(
+                        IntLiteral(2),
+                        MULTIPLICATION,
+                        IntLiteral(3),
+                    ),
+                    DIVISION,
+                    IntLiteral(4),
+                ),
+            )
         }
     }
 })

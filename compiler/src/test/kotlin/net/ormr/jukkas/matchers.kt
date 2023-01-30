@@ -19,9 +19,22 @@ package net.ormr.jukkas
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
+import net.ormr.jukkas.ast.Node
 import net.ormr.jukkas.reporter.Message
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+
+infix fun Node.shouldBeStructurallyEquivalentTo(other: Node) {
+    this should beStructurallyEquivalentTo(other)
+}
+
+fun beStructurallyEquivalentTo(other: Node) = object : Matcher<Node> {
+    override fun test(value: Node): MatcherResult = MatcherResult(
+        value.isStructurallyEquivalent(other),
+        { "<$value> is should equivalent to <$other>" },
+        { "<$value> is not structurally equivalent to <$other>" },
+    )
+}
 
 // JukkasResult.Failure
 inline infix fun JukkasResult<*>.shouldBeFailure(fn: (messages: List<Message>) -> Unit) {
