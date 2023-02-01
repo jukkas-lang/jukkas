@@ -36,11 +36,13 @@ class InfixInvocation(left: Expression, val name: String, right: Expression) : I
         && right.isStructurallyEquivalent(other.right)
 }
 
-class FunctionInvocation(arguments: List<InvocationArgument>) : Invocation() {
+class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) : Invocation() {
+    var left: Expression by child(left)
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is FunctionInvocation
+        && left.isStructurallyEquivalent(other.left)
         && arguments.size == other.arguments.size
         && (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) }
 }

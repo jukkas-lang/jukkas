@@ -22,9 +22,9 @@ import net.ormr.jukkas.parser.JukkasParser
 import org.intellij.lang.annotations.Language
 
 inline fun <T : Node> parseNode(
-    @Language("jukkas") source: String,
+    source: String,
     crossinline fn: (JukkasParser) -> T,
 ): JukkasResult<T> = JukkasParser.parse(Source.Text(source), fn)
 
-fun parseExpression(@Language("jukkas") source: String): JukkasResult<Expression> =
+fun parseExpression(source: String): JukkasResult<Expression> =
     JukkasParser.parse(Source.Text(source), JukkasParser::parseExpression)

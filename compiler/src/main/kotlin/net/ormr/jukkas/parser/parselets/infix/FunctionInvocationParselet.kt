@@ -34,6 +34,6 @@ object FunctionInvocationParselet : InfixParselet {
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseInvocationArgument)
         val end = consume(RIGHT_PAREN)
         // TODO: verify amount of arguments passed in at a later stage
-        FunctionInvocation(arguments) withPosition createSpan(token, end)
+        FunctionInvocation(left, arguments) withPosition createSpan(token, end)
     }
 }

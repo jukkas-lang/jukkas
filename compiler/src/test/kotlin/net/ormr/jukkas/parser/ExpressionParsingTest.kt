@@ -17,19 +17,55 @@
 package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
-import net.ormr.jukkas.ast.BinaryOperation
-import net.ormr.jukkas.ast.BinaryOperator.*
-import net.ormr.jukkas.ast.IntLiteral
+import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.parseExpression
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
 
-class BinaryOperationParsingTest : FunSpec({
+class ExpressionParsingTest : FunSpec({
+    test("'false' should parse to BooleanLiteral(false)") {
+        parseExpression("false") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo BooleanLiteral(false)
+        }
+    }
+
+    test("'true' should parse to BooleanLiteral(true)") {
+        parseExpression("true") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo BooleanLiteral(true)
+        }
+    }
+
+
+    test("'12345' should parse to IntLiteral(true)") {
+        parseExpression("12345") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo IntLiteral(12345)
+        }
+    }
+
+    test("'foo' should parse to DefinitionReference('foo')") {
+        parseExpression("foo") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo DefinitionReference("foo")
+        }
+    }
+
+    test("'foo(1, bar = 2, 3)' should parse to FunctionInvocation(...)") {
+        parseExpression("foo(1, bar = 2, 3)") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo FunctionInvocation(
+                DefinitionReference("foo"),
+                listOf(
+                    InvocationArgument(null, IntLiteral(1)),
+                    InvocationArgument("bar", IntLiteral(2)),
+                    InvocationArgument(null, IntLiteral(3)),
+                ),
+            )
+        }
+    }
+
     test("'1 + 2' -> (+ 1 2)") {
         parseExpression("1 + 2") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo BinaryOperation(
                 IntLiteral(1),
-                PLUS,
+                BinaryOperator.PLUS,
                 IntLiteral(2),
             )
         }
@@ -40,10 +76,10 @@ class BinaryOperationParsingTest : FunSpec({
             expr shouldBeStructurallyEquivalentTo BinaryOperation(
                 BinaryOperation(
                     IntLiteral(1),
-                    PLUS,
+                    BinaryOperator.PLUS,
                     IntLiteral(2),
                 ),
-                PLUS,
+                BinaryOperator.PLUS,
                 IntLiteral(3),
             )
         }
@@ -53,14 +89,14 @@ class BinaryOperationParsingTest : FunSpec({
         parseExpression("1 - 2 * 3 / 4") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo BinaryOperation(
                 IntLiteral(1),
-                MINUS,
+                BinaryOperator.MINUS,
                 BinaryOperation(
                     BinaryOperation(
                         IntLiteral(2),
-                        MULTIPLICATION,
+                        BinaryOperator.MULTIPLICATION,
                         IntLiteral(3),
                     ),
-                    DIVISION,
+                    BinaryOperator.DIVISION,
                     IntLiteral(4),
                 ),
             )
