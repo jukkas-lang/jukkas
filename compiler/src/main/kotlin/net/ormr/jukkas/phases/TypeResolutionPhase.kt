@@ -112,6 +112,10 @@ internal class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisi
         TODO("Not yet implemented")
     }
 
+    override fun visitStringTemplateExpression(variable: StringTemplateExpression) {
+        TODO("Not yet implemented")
+    }
+
     // nothing to resolve
     override fun visitPattern(pattern: Pattern) {}
 }

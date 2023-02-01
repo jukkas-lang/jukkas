@@ -54,3 +54,14 @@ class BooleanLiteral(val value: Boolean) : Literal() {
         other is BooleanLiteral
         && value == other.value
 }
+
+class StringLiteral(val value: String) : Literal() {
+    override val type: Type
+        get() = JvmType.STRING
+
+    override fun toString(): String = "\"$value\""
+
+    override fun isStructurallyEquivalent(other: Node): Boolean =
+        other is StringLiteral
+        && value == other.value
+}

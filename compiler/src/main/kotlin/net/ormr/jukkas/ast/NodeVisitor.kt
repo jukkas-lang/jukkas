@@ -36,4 +36,16 @@ interface NodeVisitor<T> {
     fun visitProperty(property: Property): T
     fun visitReturn(expr: Return): T
     fun visitVariable(variable: Variable): T
+    fun visitStringTemplateExpression(variable: StringTemplateExpression): T
+    fun visitExpression(expression: Expression): T = when (expression) {
+        is Literal -> visitLiteral(expression)
+        is BinaryOperation -> visitBinaryOperation(expression)
+        is Invocation -> visitInvocation(expression)
+        is Call -> visitCall(expression)
+        is Return -> visitReturn(expression)
+        is ConditionalBranch -> visitConditionalBranch(expression)
+        is DefinitionReference -> visitIdentifierReference(expression)
+        is StringTemplateExpression -> visitStringTemplateExpression(expression)
+        else -> error("Can not visit <${expression}> as an expression.")
+    }
 }

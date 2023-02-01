@@ -9,3 +9,7 @@ fun <T> bothNullOrEquivalent(first: T?, second: T?, predicate: (first: T, second
     }
     return predicate(first, second)
 }
+
+fun String.unescapeUnicode() = replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {
+    String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
+}

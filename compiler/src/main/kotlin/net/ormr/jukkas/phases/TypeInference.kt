@@ -45,6 +45,7 @@ object TypeInference {
         is InvocationArgument -> TODO()
         is Literal -> expr.type
         is Return -> expr.type
+        is StringTemplateExpression -> expr.type
     }
 
     fun findDefinitionType(def: Definition): Type = when (def) {

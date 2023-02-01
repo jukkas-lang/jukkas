@@ -48,6 +48,32 @@ class ExpressionParsingTest : FunSpec({
         }
     }
 
+    test("\"foo\" should parse to StringLiteral(\"foo\")") {
+        parseExpression("\"foo\"") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo StringLiteral("foo")
+        }
+    }
+
+    test("Parse string literal with unicode") {
+        parseExpression("\"\\u0000\\u0000\\u0000\"") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo StringLiteral("\u0000\u0000\u0000")
+        }
+    }
+
+    test("\"foo {1 + 2} bar\" should parse to StringExpression(...)") {
+        parseExpression("\"foo \\{1 + 2} bar\"") shouldBeSuccess { expr, _ ->
+            expr shouldBeStructurallyEquivalentTo StringTemplateExpression(listOf(
+                StringTemplatePart.LiteralPart(StringLiteral("foo ")),
+                StringTemplatePart.ExpressionPart(BinaryOperation(
+                    IntLiteral(1),
+                    BinaryOperator.PLUS,
+                    IntLiteral(2),
+                )),
+                StringTemplatePart.LiteralPart(StringLiteral(" bar")),
+            ))
+        }
+    }
+
     test("'foo(1, bar = 2, 3)' should parse to FunctionInvocation(...)") {
         parseExpression("foo(1, bar = 2, 3)") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo FunctionInvocation(
