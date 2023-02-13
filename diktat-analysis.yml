@@ -34,6 +34,10 @@
 - name: FILE_NAME_INCORRECT
   enabled: false
 
+# generates false positives for factory functions which are allowed to be named using pascal case
+- name: FUNCTION_NAME_INCORRECT_CASE
+  enabled: false
+
 # this generates false positives for any function named 'print' / 'println'
 - name: DEBUG_PRINT
   enabled: false

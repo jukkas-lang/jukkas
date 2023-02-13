@@ -62,12 +62,16 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
 
     private fun createTree(node: Statement): Tree = when (node) {
         is Block -> Tree("block") {
-            for (child in node.statements) addChild(createTree(child))
+            for (child in node.statements) {
+                addChild(createTree(child))
+            }
         }
         is Function -> Tree("fun ${node.name ?: ""}") {
             if (node.arguments.isNotEmpty()) {
                 addChild("parameters") {
-                    for (arg in node.arguments) addChild(createTree(arg))
+                    for (arg in node.arguments) {
+                        addChild(createTree(arg))
+                    }
                 }
             }
             val body = node.body
@@ -78,7 +82,9 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         is DefinitionReference -> Tree(node.name)
         is Return -> Tree("return") {
             val expr = node.value
-            if (expr != null) addChild(createTree(expr))
+            if (expr != null) {
+                addChild(createTree(expr))
+            }
         }
         is ExpressionStatement -> createTree(node.expression)
         is Argument -> when (node) {
