@@ -19,3 +19,9 @@ sourceSets {
         }
     }
 }
+
+tasks {
+    compileKotlin {
+        dependsOn(named("generateJflex"))
+    }
+}
