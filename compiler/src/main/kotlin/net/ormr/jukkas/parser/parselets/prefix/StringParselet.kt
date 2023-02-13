@@ -16,7 +16,11 @@
 
 package net.ormr.jukkas.parser.parselets.prefix
 
-import net.ormr.jukkas.ast.*
+import net.ormr.jukkas.ast.Expression
+import net.ormr.jukkas.ast.StringLiteral
+import net.ormr.jukkas.ast.StringTemplateExpression
+import net.ormr.jukkas.ast.StringTemplatePart
+import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.lexer.TokenType
@@ -25,7 +29,7 @@ import net.ormr.jukkas.utils.unescapeUnicode
 
 object StringParselet : PrefixParselet {
     override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
-        val parts = buildList{
+        val parts = buildList {
             while (!check(TokenType.STRING_END) && hasMore()) {
                 add(parseLiteralOrTemplate(parser))
             }

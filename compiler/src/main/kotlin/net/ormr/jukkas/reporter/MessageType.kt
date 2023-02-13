@@ -17,9 +17,7 @@
 package net.ormr.jukkas.reporter
 
 sealed interface MessageType {
-    enum class Warning : MessageType {
-
-    }
+    enum class Warning : MessageType
 
     enum class Error : MessageType {
         SYNTAX,
