@@ -32,7 +32,11 @@ class TypeCache internal constructor(private val unit: CompilationUnit) {
         }
     }
 
-    private fun addType(position: Positionable, name: String, type: ResolvedType) {
+    private fun addType(
+        position: Positionable,
+        name: String,
+        type: ResolvedType,
+    ) {
         if (name in entries) {
             unit.reportSemanticError(position, "Redefining name: $name")
         } else {

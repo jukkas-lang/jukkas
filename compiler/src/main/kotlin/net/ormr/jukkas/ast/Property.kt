@@ -18,11 +18,13 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
-class Property(val kind: PropertyKind, val name: String, override var type: Type) : Statement(), Definition {
+class Property(
+    val kind: PropertyKind,
+    val name: String,
+    override var type: Type,
+) : Statement(), Definition {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Property
-        && kind == other.kind
-        && name == other.name
+        other is Property && kind == other.kind && name == other.name
 }

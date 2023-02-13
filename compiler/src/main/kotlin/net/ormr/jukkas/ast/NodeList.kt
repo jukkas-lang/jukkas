@@ -16,32 +16,7 @@
 
 package net.ormr.jukkas.ast
 
-fun <T : Node> emptyNodeList(): NodeList<T> = EmptyNodeList
-
-fun <T : Node> Iterable<T>.toNodeList(parent: Node): NodeList<T> = when (this) {
-    is Collection -> toNodeList(parent)
-    else -> MutableNodeListImpl<T>(parent).also { it.addAll(this) }
-}
-
-fun <T : Node> Collection<T>.toNodeList(parent: Node): NodeList<T> =
-    if (isEmpty()) EmptyNodeList else MutableNodeListImpl<T>(parent).also { it.addAll(this) }
-
-fun <T : Node> Iterable<T>.toMutableNodeList(
-    parent: Node,
-    onAdd: ((index: Int, node: T) -> Unit)? = null,
-    onRemove: ((index: Int, node: T) -> Unit)? = null,
-): MutableNodeList<T> {
-    val list = when (this) {
-        is Collection -> MutableNodeListImpl<T>(parent, size)
-        else -> MutableNodeListImpl(parent)
-    }.observe(onAdd, onRemove)
-    list.addAll(this)
-    return list
-}
-
 sealed interface NodeList<out T : Node> : List<T>
-
-private object EmptyNodeList : NodeList<Nothing>, List<Nothing> by emptyList()
 
 sealed interface MutableNodeList<T : Node> : NodeList<T>, MutableList<T> {
     fun observe(
@@ -49,6 +24,8 @@ sealed interface MutableNodeList<T : Node> : NodeList<T>, MutableList<T> {
         onRemove: ((index: Int, node: T) -> Unit)? = null,
     ): MutableNodeList<T>
 }
+
+private object EmptyNodeList : NodeList<Nothing>, List<Nothing> by emptyList()
 
 private class MutableNodeListImpl<T : Node>(
     private val parent: Node,
@@ -92,3 +69,26 @@ private class MutableNodeListImpl<T : Node>(
         return previous
     }
 }
+
+fun <T : Node> Iterable<T>.toNodeList(parent: Node): NodeList<T> = when (this) {
+    is Collection -> toNodeList(parent)
+    else -> MutableNodeListImpl<T>(parent).also { it.addAll(this) }
+}
+
+fun <T : Node> Collection<T>.toNodeList(parent: Node): NodeList<T> =
+    if (isEmpty()) EmptyNodeList else MutableNodeListImpl<T>(parent).also { it.addAll(this) }
+
+fun <T : Node> Iterable<T>.toMutableNodeList(
+    parent: Node,
+    onAdd: ((index: Int, node: T) -> Unit)? = null,
+    onRemove: ((index: Int, node: T) -> Unit)? = null,
+): MutableNodeList<T> {
+    val list = when (this) {
+        is Collection -> MutableNodeListImpl<T>(parent, size)
+        else -> MutableNodeListImpl(parent)
+    }.observe(onAdd, onRemove)
+    list.addAll(this)
+    return list
+}
+
+fun <T : Node> emptyNodeList(): NodeList<T> = EmptyNodeList

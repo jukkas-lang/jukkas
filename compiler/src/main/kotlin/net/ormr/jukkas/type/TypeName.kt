@@ -35,7 +35,7 @@ class TypeName(val position: Position, val name: String) : Type, Positionable {
         JvmType(info)
     }
 
-    override fun toDescriptor(): String = "L${jvmName};"
+    override fun toDescriptor(): String = "L$jvmName;"
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true

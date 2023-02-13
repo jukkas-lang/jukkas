@@ -19,7 +19,6 @@ package net.ormr.jukkas
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.Node
 import net.ormr.jukkas.parser.JukkasParser
-import org.intellij.lang.annotations.Language
 
 inline fun <T : Node> parseNode(
     source: String,

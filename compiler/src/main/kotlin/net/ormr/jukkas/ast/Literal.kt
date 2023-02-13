@@ -29,8 +29,7 @@ class SymbolLiteral(val text: String) : Literal() {
     override lateinit var type: Type
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is SymbolLiteral
-        && text == other.text
+        other is SymbolLiteral && text == other.text
 }
 
 class IntLiteral(val value: Int) : Literal() {
@@ -40,8 +39,7 @@ class IntLiteral(val value: Int) : Literal() {
     override fun toString(): String = value.toString()
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is IntLiteral
-        && value == other.value
+        other is IntLiteral && value == other.value
 }
 
 class BooleanLiteral(val value: Boolean) : Literal() {
@@ -51,8 +49,7 @@ class BooleanLiteral(val value: Boolean) : Literal() {
     override fun toString(): String = value.toString()
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is BooleanLiteral
-        && value == other.value
+        other is BooleanLiteral && value == other.value
 }
 
 class StringLiteral(val value: String) : Literal() {
@@ -62,6 +59,5 @@ class StringLiteral(val value: String) : Literal() {
     override fun toString(): String = "\"$value\""
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is StringLiteral
-        && value == other.value
+        other is StringLiteral && value == other.value
 }

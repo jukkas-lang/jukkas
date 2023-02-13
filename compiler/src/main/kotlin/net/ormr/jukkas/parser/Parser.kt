@@ -133,6 +133,7 @@ abstract class Parser(private val tokens: TokenStream) : Closeable {
     }
 
     // TODO: better name
+
     /**
      * Returns the most recently [consume]d token back to the [buffer] and removes it from [consumed].
      */
@@ -140,7 +141,7 @@ abstract class Parser(private val tokens: TokenStream) : Closeable {
         buffer.add(0, consumed.removeFirst())
     }
 
-    fun previous(n: Int = 0): Token =
+    fun previous(@Suppress("IDENTIFIER_LENGTH") n: Int = 0): Token =
         consumed.getOrElse(n) { throw IllegalArgumentException("No previous token found at index $n") }
 
     fun isAtEnd(): Boolean = !hasMore()
@@ -158,7 +159,11 @@ abstract class Parser(private val tokens: TokenStream) : Closeable {
 
     infix fun Positionable.syntaxError(message: String): Nothing = error(MessageType.Error.SYNTAX, this, message)
 
-    fun error(type: MessageType.Error, position: Positionable, message: String): Nothing {
+    fun error(
+        type: MessageType.Error,
+        position: Positionable,
+        message: String,
+    ): Nothing {
         val error = reporter.reportError(source, type, position, message)
         throw JukkasParseException(error)
     }

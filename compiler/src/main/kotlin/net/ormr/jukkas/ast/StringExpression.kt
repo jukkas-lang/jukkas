@@ -8,16 +8,14 @@ sealed class StringTemplatePart : ChildNode() {
         override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLiteral(literal)
 
         override fun isStructurallyEquivalent(other: Node): Boolean =
-            other is LiteralPart
-            && literal.isStructurallyEquivalent(other.literal)
+            other is LiteralPart && literal.isStructurallyEquivalent(other.literal)
     }
 
     class ExpressionPart(val expression: Expression) : StringTemplatePart() {
         override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitExpression(expression)
 
         override fun isStructurallyEquivalent(other: Node): Boolean =
-            other is ExpressionPart
-            && expression.isStructurallyEquivalent(other.expression)
+            other is ExpressionPart && expression.isStructurallyEquivalent(other.expression)
     }
 }
 
@@ -30,7 +28,7 @@ class StringTemplateExpression(parts: List<StringTemplatePart>) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitStringTemplateExpression(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is StringTemplateExpression
-        && parts.size == other.parts.size
-        && (parts zip other.parts).all { (first, second) -> first.isStructurallyEquivalent(second) }
+        other is StringTemplateExpression &&
+                parts.size == other.parts.size &&
+                (parts zip other.parts).all { (first, second) -> first.isStructurallyEquivalent(second) }
 }

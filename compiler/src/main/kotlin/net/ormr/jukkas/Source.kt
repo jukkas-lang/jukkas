@@ -31,6 +31,13 @@ sealed class Source {
 
     final override fun toString(): String = description
 
+    class Text(private val content: String) : Source() {
+        override val description: String
+            get() = "<text>"
+
+        override fun readContent(): String = content
+    }
+
     data class File(val path: Path) : Source() {
         override val description: String
             get() = path.pathString
@@ -43,13 +50,6 @@ sealed class Source {
     class Repl(private val content: String) : Source() {
         override val description: String
             get() = "<repl>"
-
-        override fun readContent(): String = content
-    }
-
-    class Text(private val content: String) : Source() {
-        override val description: String
-            get() = "<text>"
 
         override fun readContent(): String = content
     }

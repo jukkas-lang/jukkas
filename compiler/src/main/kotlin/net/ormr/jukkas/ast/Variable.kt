@@ -30,8 +30,8 @@ class Variable(
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitVariable(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Variable
-        && kind == other.kind
-        && name == other.name
-        && bothNullOrEquivalent(initializer, other.initializer) { a, b -> a.isStructurallyEquivalent(b) }
+        other is Variable &&
+                kind == other.kind &&
+                name == other.name &&
+                bothNullOrEquivalent(initializer, other.initializer) { a, b -> a.isStructurallyEquivalent(b) }
 }

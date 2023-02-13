@@ -17,6 +17,10 @@
     typeParameter: true
     destructuringDeclaration: true
 
+# weird false positives
+- name: WRONG_WHITESPACE
+  enabled: false
+
 - name: ENUMS_SEPARATED
   enabled: false
 
@@ -32,6 +36,10 @@
   enabled: false
 
 - name: FILE_NAME_INCORRECT
+  enabled: false
+
+# generates false positives for factory functions which are allowed to be named using pascal case
+- name: FUNCTION_NAME_INCORRECT_CASE
   enabled: false
 
 # this generates false positives for any function named 'print' / 'println'
@@ -58,6 +66,39 @@
 
 # seems to be generating some weird false positives
 - name: WRONG_INDENTATION
+  enabled: false
+
+- name: BLANK_LINE_BETWEEN_PROPERTIES
+  enabled: false
+
+- name: IDENTIFIER_LENGTH
+  enabled: false
+
+- name: EXTENSION_FUNCTION_WITH_CLASS
+  enabled: false
+
+# false positives galore
+- name: WRONG_NAME_OF_VARIABLE_INSIDE_ACCESSOR
+  enabled: false
+
+- name: COMMENT_WHITE_SPACE
+  enabled: true
+  configuration:
+    maxSpaces: 7 # to allow for aligning TO-DO comments properly
+
+# way too harsh about things
+- name: NO_BRACES_IN_CONDITIONALS_AND_LOOPS
+  enabled: false
+
+- name: EMPTY_BLOCK_STRUCTURE_ERROR
+  enabled: false
+
+# incredibly naive and some weird false positives
+- name: WRONG_OVERLOADING_FUNCTION_ARGUMENTS
+  enabled: false
+
+# too many false positives for properties where SCREAMING_SNAKE_CASE is actually valid
+- name: VARIABLE_NAME_INCORRECT_FORMAT
   enabled: false
 
 - name: GENERIC_VARIABLE_WRONG_DECLARATION

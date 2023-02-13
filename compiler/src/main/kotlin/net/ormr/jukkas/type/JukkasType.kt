@@ -17,10 +17,6 @@
 package net.ormr.jukkas.type
 
 class JukkasType private constructor(val name: String) : ResolvedType {
-    companion object {
-        val UNIT = JukkasType("jukkas.Unit")
-    }
-
     override val packageName: String
         get() = TODO("Not yet implemented")
     override val simpleName: String
@@ -40,4 +36,7 @@ class JukkasType private constructor(val name: String) : ResolvedType {
     }
 
     override fun hashCode(): Int = name.hashCode()
+    companion object {
+        val UNIT = JukkasType("jukkas.Unit")
+    }
 }

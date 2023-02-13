@@ -31,9 +31,9 @@ class Function(
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitFunction(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Function
-        && name == other.name
-        && arguments.size == other.arguments.size
-        && (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) }
-        && bothNullOrEquivalent(body, other.body) { a, b -> a.isStructurallyEquivalent(b) }
+        other is Function &&
+                name == other.name &&
+                arguments.size == other.arguments.size &&
+                (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) } &&
+                bothNullOrEquivalent(body, other.body) { a, b -> a.isStructurallyEquivalent(b) }
 }

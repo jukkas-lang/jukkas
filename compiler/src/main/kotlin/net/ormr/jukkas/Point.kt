@@ -21,12 +21,6 @@ data class Point(
     val column: Int,
     val indices: IntRange,
 ) : Comparable<Point>, Position {
-    companion object {
-        @JvmStatic
-        fun of(line: Int, column: Int, startIndex: Int, endIndex: Int): Point =
-            Point(line, column, startIndex..endIndex)
-    }
-
     init {
         require(line >= 0) { "'line' must be positive" }
         require(column >= 0) { "'column' must be positive" }
@@ -39,6 +33,14 @@ data class Point(
         column < other.column -> -1
         else -> 0
     }
-
-    //override fun toString(): String = "[${line + 1}:${column + 1}]"
+    companion object {
+        @JvmStatic
+        fun of(
+line: Int,
+ column: Int,
+ startIndex: Int,
+ endIndex: Int,
+): Point =
+            Point(line, column, startIndex..endIndex)
+    }
 }

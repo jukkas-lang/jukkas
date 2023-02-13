@@ -20,18 +20,18 @@ import net.ormr.jukkas.JukkasResult.Failure
 import net.ormr.jukkas.JukkasResult.Success
 import net.ormr.jukkas.reporter.Message
 
-sealed interface JukkasResult<out T> {
-    data class Failure(val messages: List<Message>) : JukkasResult<Nothing>
-
-    data class Success<T>(val value: T, val messages: List<Message>) : JukkasResult<T>
-}
-
 val Failure.groupedMessages: Map<Source, List<Message>>
     get() = buildMap<Source, MutableList<Message>> {
         for (message in messages) {
             getOrPut(message.source) { mutableListOf() }.add(message)
         }
     }
+
+sealed interface JukkasResult<out T> {
+    data class Failure(val messages: List<Message>) : JukkasResult<Nothing>
+
+    data class Success<T>(val value: T, val messages: List<Message>) : JukkasResult<T>
+}
 
 inline fun <T, R> JukkasResult<T>.fold(failure: (Failure) -> R, success: (Success<T>) -> R): R = when (this) {
     is Failure -> failure(this)

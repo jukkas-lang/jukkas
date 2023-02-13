@@ -21,8 +21,8 @@ import com.github.ajalt.clikt.core.subcommands
 import net.ormr.jukkas.cli.ast.Ast
 import net.ormr.jukkas.cli.repl.Repl
 
-fun main(args: Array<String>) = Jukkas().subcommands(Ast(), Repl()).main(args)
-
 private class Jukkas : CliktCommand(printHelpOnEmptyArgs = false) {
     override fun run() = Unit
 }
+
+fun main(args: Array<String>) = Jukkas().subcommands(Ast(), Repl()).main(args)

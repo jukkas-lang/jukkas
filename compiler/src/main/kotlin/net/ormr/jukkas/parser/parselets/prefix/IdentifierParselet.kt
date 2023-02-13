@@ -22,5 +22,6 @@ import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.parser.JukkasParser
 
 object IdentifierParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): DefinitionReference = DefinitionReference(token.text) withPosition token
+    override fun parse(parser: JukkasParser, token: Token): DefinitionReference =
+        DefinitionReference(token.text) withPosition token
 }

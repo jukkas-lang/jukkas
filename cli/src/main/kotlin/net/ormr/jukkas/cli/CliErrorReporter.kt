@@ -31,19 +31,19 @@ import net.ormr.jukkas.startPoint
 import kotlin.system.exitProcess
 
 class CliErrorReporter {
-    private companion object {
-        private const val INDENT = "    "
-    }
-
     private val fileSources = hashMapOf<Source, List<String>>()
 
-    fun printErrors(t: Terminal, failure: JukkasResult.Failure): Nothing {
+    fun printErrors(terminal: Terminal, failure: JukkasResult.Failure): Nothing {
         val errors = failure.messages
-        t.println(bold("${errors.size} ${red("errors")}"))
+        terminal.println(bold("${errors.size} ${red("errors")}"))
         failure.groupedMessages.forEach { (file, messages) ->
-            t.println(bold("${file.description}:"))
-            messages.forEach { if (it is Message.Error) t.printError(file, it) }
-            t.println()
+            terminal.println(bold("${file.description}:"))
+            messages.forEach {
+                if (it is Message.Error) {
+                    terminal.printError(file, it)
+                }
+            }
+            terminal.println()
         }
         exitProcess(1)
     }
@@ -72,5 +72,9 @@ class CliErrorReporter {
         print(INDENT)
         print(" ".repeat(start.column))
         println(bold(cyan("^".repeat((end.column - start.column) + 1))))
+    }
+
+    private companion object {
+        private const val INDENT = "    "
     }
 }

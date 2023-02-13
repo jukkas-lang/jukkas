@@ -20,6 +20,5 @@ class ExpressionStatement(val expression: Expression) : Statement() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitExpressionStatement(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is ExpressionStatement
-        && expression.isStructurallyEquivalent(other.expression)
+        other is ExpressionStatement && expression.isStructurallyEquivalent(other.expression)
 }

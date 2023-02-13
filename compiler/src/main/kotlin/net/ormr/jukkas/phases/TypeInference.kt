@@ -55,7 +55,11 @@ object TypeInference {
         is Variable -> resolve(def, def.type, def.initializer)
     }
 
-    private fun resolve(parent: Node, first: Type, fallback: Expression?): Type =
+    private fun resolve(
+        parent: Node,
+        first: Type,
+        fallback: Expression?,
+    ): Type =
         fold(first) { findNullableType(fallback, parent) }
 
     private fun findNullableType(expr: Expression?, parent: Node): Type =

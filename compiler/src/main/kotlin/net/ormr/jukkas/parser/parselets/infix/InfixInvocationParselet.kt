@@ -28,7 +28,11 @@ object InfixInvocationParselet : InfixParselet {
     override val precedence: Int
         get() = Precedence.INFIX
 
-    override fun parse(parser: JukkasParser, left: Expression, token: Token): InfixInvocation = parser with {
+    override fun parse(
+        parser: JukkasParser,
+        left: Expression,
+        token: Token,
+    ): InfixInvocation = parser with {
         val right = parseExpression(precedence)
         InfixInvocation(left, token.text, right) withPosition createSpan(left, right)
     }
