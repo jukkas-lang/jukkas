@@ -17,7 +17,6 @@
 package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.nulls.shouldNotBeNull
 import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.Import
