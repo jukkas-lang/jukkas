@@ -37,10 +37,10 @@ object AssignmentParselet : InfixParselet {
         get() = Precedence.ASSIGNMENT
 
     override fun parse(
-parser: JukkasParser,
- left: Expression,
- token: Token,
-): AssignmentOperation = parser with {
+        parser: JukkasParser,
+        left: Expression,
+        token: Token,
+    ): AssignmentOperation = parser with {
         val operator =
             AssignmentOperator.fromSymbolOrNull(token.text) ?: (token syntaxError "Unknown assignment operator")
         val value = parseExpression()

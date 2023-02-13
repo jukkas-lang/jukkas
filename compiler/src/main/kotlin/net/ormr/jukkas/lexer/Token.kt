@@ -20,9 +20,9 @@ import net.ormr.jukkas.Point
 import net.ormr.jukkas.Positionable
 
 data class Token(
-val type: TokenType,
- val text: String,
- val point: Point,
+    val type: TokenType,
+    val text: String,
+    val point: Point,
 ) : Positionable {
     override fun toString(): String = "$point: $text (${type.image})"
 

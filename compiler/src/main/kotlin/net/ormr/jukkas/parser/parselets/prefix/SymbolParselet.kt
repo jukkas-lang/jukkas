@@ -23,5 +23,5 @@ import net.ormr.jukkas.parser.JukkasParser
 
 object SymbolParselet : PrefixParselet {
     override fun parse(parser: JukkasParser, token: Token): SymbolLiteral =
- SymbolLiteral(token.text.drop(1)) withPosition token
+        SymbolLiteral(token.text.drop(1)) withPosition token
 }

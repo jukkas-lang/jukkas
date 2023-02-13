@@ -35,6 +35,7 @@ class TokenStream private constructor(private val lexer: Lexer, val source: Sour
     override fun close() {
         lexer.close()
     }
+
     companion object {
         fun from(source: Source): TokenStream = TokenStream(Lexer(source.reader()), source)
     }

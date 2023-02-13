@@ -33,9 +33,9 @@ class BasicArgument(override val name: String, override var type: Type) : NamedA
 }
 
 class DefaultArgument(
-override val name: String,
- override var type: Type,
- default: Expression,
+    override val name: String,
+    override var type: Type,
+    default: Expression,
 ) : NamedArgument() {
     var default: Expression by child(default)
 

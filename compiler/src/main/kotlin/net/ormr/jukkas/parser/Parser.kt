@@ -134,7 +134,7 @@ abstract class Parser(private val tokens: TokenStream) : Closeable {
 
     // TODO: better name
 
-/**
+    /**
      * Returns the most recently [consume]d token back to the [buffer] and removes it from [consumed].
      */
     fun unconsume() {
@@ -160,10 +160,10 @@ abstract class Parser(private val tokens: TokenStream) : Closeable {
     infix fun Positionable.syntaxError(message: String): Nothing = error(MessageType.Error.SYNTAX, this, message)
 
     fun error(
-type: MessageType.Error,
- position: Positionable,
- message: String,
-): Nothing {
+        type: MessageType.Error,
+        position: Positionable,
+        message: String,
+    ): Nothing {
         val error = reporter.reportError(source, type, position, message)
         throw JukkasParseException(error)
     }

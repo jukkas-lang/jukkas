@@ -19,9 +19,9 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.type.Type
 
 class Property(
-val kind: PropertyKind,
- val name: String,
- override var type: Type,
+    val kind: PropertyKind,
+    val name: String,
+    override var type: Type,
 ) : Statement(), Definition {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
 

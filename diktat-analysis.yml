@@ -17,6 +17,10 @@
     typeParameter: true
     destructuringDeclaration: true
 
+# weird false positives
+- name: WRONG_WHITESPACE
+  enabled: false
+
 - name: ENUMS_SEPARATED
   enabled: false
 

@@ -56,10 +56,10 @@ object TypeInference {
     }
 
     private fun resolve(
-parent: Node,
- first: Type,
- fallback: Expression?,
-): Type =
+        parent: Node,
+        first: Type,
+        fallback: Expression?,
+    ): Type =
         fold(first) { findNullableType(fallback, parent) }
 
     private fun findNullableType(expr: Expression?, parent: Node): Type =

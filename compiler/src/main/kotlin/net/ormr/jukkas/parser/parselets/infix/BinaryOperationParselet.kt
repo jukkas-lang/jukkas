@@ -26,10 +26,10 @@ import net.ormr.jukkas.parser.JukkasParser
 
 class BinaryOperationParselet(override val precedence: Int) : InfixParselet {
     override fun parse(
-parser: JukkasParser,
- left: Expression,
- token: Token,
-): BinaryOperation = parser with {
+        parser: JukkasParser,
+        left: Expression,
+        token: Token,
+    ): BinaryOperation = parser with {
         val operator = BinaryOperator.fromSymbolOrNull(token.text) ?: (token syntaxError "Unknown binary operator")
         val right = parseExpression(precedence)
         // TODO: createSpan(left, right) could probably end creating a too long span?

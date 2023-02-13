@@ -90,7 +90,8 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
 
     private fun parseImports(): List<Import> = TODO()
 
-    private fun parseTopLevel(): Statement? = withSynchronization({ check<TopSynch>() },
+    private fun parseTopLevel(): Statement? = withSynchronization(
+        { check<TopSynch>() },
         { null },
     ) {
         when {
@@ -202,6 +203,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     }
 
     inline infix fun <R> with(block: JukkasParser.() -> R): R = run(block)
+
     companion object {
         internal val IDENTIFIERS = TokenType.setOf<IdentifierLike>()
         internal val PROPERTIES = hashSetOf(VAL, VAR)

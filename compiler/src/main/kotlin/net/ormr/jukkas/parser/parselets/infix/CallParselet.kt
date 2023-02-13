@@ -30,10 +30,10 @@ object CallParselet : InfixParselet {
         get() = Precedence.POSTFIX
 
     override fun parse(
-parser: JukkasParser,
- left: Expression,
- token: Token,
-): Call = parser with {
+        parser: JukkasParser,
+        left: Expression,
+        token: Token,
+    ): Call = parser with {
         val isSafe = when (token.type) {
             TokenType.DOT -> false
             TokenType.HOOK_DOT -> true

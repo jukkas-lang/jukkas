@@ -48,11 +48,11 @@ class MessageReporter {
     }
 
     fun reportError(
-source: Source,
- type: MessageType.Error,
- position: Positionable,
- message: String,
-): Message.Error {
+        source: Source,
+        type: MessageType.Error,
+        position: Positionable,
+        message: String,
+    ): Message.Error {
         val error = Message.Error(source, type, position.findPosition(), message)
         _messages += error
         return error

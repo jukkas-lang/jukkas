@@ -21,9 +21,9 @@ import net.ormr.jukkas.type.UnknownType
 
 // assignments are *not* expressions
 class AssignmentOperation(
-left: Expression,
- val operator: AssignmentOperator,
- value: Expression,
+    left: Expression,
+    val operator: AssignmentOperator,
+    value: Expression,
 ) : Expression() {
     var left: Expression by child(left)
     var value: Expression by child(value)
@@ -32,8 +32,10 @@ left: Expression,
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitAssignmentOperation(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is AssignmentOperation && operator == other.operator && left.isStructurallyEquivalent(other.left) &&
- value.isStructurallyEquivalent(other.value)
+        other is AssignmentOperation &&
+                operator == other.operator &&
+                left.isStructurallyEquivalent(other.left) &&
+                value.isStructurallyEquivalent(other.value)
 }
 
 enum class AssignmentOperator(override val symbol: String) : Operator {

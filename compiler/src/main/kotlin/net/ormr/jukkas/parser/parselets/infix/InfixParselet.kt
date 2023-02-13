@@ -24,8 +24,8 @@ interface InfixParselet {
     val precedence: Int
 
     fun parse(
-parser: JukkasParser,
- left: Expression,
- token: Token,
-): Expression
+        parser: JukkasParser,
+        left: Expression,
+        token: Token,
+    ): Expression
 }
