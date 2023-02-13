@@ -20,34 +20,31 @@ import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.utils.scanForClass
 
-class TypeName(val position: Position, val name: String) : Type, Positionable {
-    override val jvmName: String
-        get() = name.replace('.', '/')
-
+class TypeName(val position: Position, override val internalName: String) : Type, Positionable {
     override fun findPositionOrNull(): Position = position
 
     // TODO: handle jukkas classes
-    override fun resolve(context: TypeResolutionContext): ResolvedType = context.cache.find(name) ?: run {
-        val info = scanForClass(name) ?: return@run run {
-            context.reportSemanticError(position, "Can't find type '$name'")
-            ErrorType("Can't find type '$name'")
+    override fun resolve(context: TypeResolutionContext): ResolvedType = context.cache.find(internalName) ?: run {
+        val info = scanForClass(jvmName) ?: return@run run {
+            context.reportSemanticError(position, "Can't find type '$internalName'")
+            ErrorType("Can't find type '$internalName'")
         }
         JvmType(info)
     }
 
-    override fun toDescriptor(): String = "L$jvmName;"
+    override fun toJvmDescriptor(): String = "L${internalName.replace('.', '$')};"
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is TypeName -> false
         position != other.position -> false
-        name != other.name -> false
+        internalName != other.internalName -> false
         else -> true
     }
 
     override fun hashCode(): Int {
         var result = position.hashCode()
-        result = 31 * result + name.hashCode()
+        result = 31 * result + internalName.hashCode()
         return result
     }
 }

@@ -20,16 +20,16 @@ import io.github.classgraph.ClassInfo
 import net.ormr.jukkas.utils.scanForClass
 
 class JvmType(val classInfo: ClassInfo) : ResolvedType {
-    override val jvmName: String
-        get() = classInfo.toString()
+    override val internalName: String = "${packageName.replace('.', '/')}/${simpleName.replace('$', '.')}"
 
+    // empty if located in root package
     override val packageName: String
         get() = classInfo.packageName
 
     override val simpleName: String
         get() = classInfo.simpleName
 
-    override fun toDescriptor(): String = "L$jvmName;"
+    override fun toJvmDescriptor(): String = "L$internalName;"
 
     override fun toString(): String = classInfo.toString()
 
@@ -41,6 +41,7 @@ class JvmType(val classInfo: ClassInfo) : ResolvedType {
     }
 
     override fun hashCode(): Int = classInfo.hashCode()
+
     companion object {
         val OBJECT = native("java.lang.Object")
         val STRING = native("java.lang.String")

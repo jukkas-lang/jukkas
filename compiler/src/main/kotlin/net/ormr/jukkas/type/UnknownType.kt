@@ -17,10 +17,10 @@
 package net.ormr.jukkas.type
 
 object UnknownType : Type {
-    override val jvmName: Nothing
+    override val internalName: Nothing
         get() = error("UnknownType")
 
     override fun resolve(context: TypeResolutionContext): Nothing = error("UnknownType")
 
-    override fun toDescriptor(): Nothing = error("UnknownType")
+    override fun toJvmDescriptor(): Nothing = error("UnknownType")
 }

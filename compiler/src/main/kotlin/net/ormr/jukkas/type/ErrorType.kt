@@ -17,7 +17,7 @@
 package net.ormr.jukkas.type
 
 class ErrorType(val description: String) : ResolvedType {
-    override val jvmName: Nothing
+    override val internalName: Nothing
         get() = error("ErrorType: $description")
 
     override val packageName: Nothing
@@ -26,5 +26,5 @@ class ErrorType(val description: String) : ResolvedType {
     override val simpleName: Nothing
         get() = error("ErrorType: $description")
 
-    override fun toDescriptor(): Nothing = error("ErrorType: $description")
+    override fun toJvmDescriptor(): Nothing = error("ErrorType: $description")
 }

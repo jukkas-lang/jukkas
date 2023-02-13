@@ -21,10 +21,10 @@ class JukkasType private constructor(val name: String) : ResolvedType {
         get() = TODO("Not yet implemented")
     override val simpleName: String
         get() = TODO("Not yet implemented")
-    override val jvmName: String
+    override val internalName: String
         get() = TODO("Not yet implemented")
 
-    override fun toDescriptor(): String {
+    override fun toJvmDescriptor(): String {
         TODO("Not yet implemented")
     }
 
@@ -36,6 +36,7 @@ class JukkasType private constructor(val name: String) : ResolvedType {
     }
 
     override fun hashCode(): Int = name.hashCode()
+
     companion object {
         val UNIT = JukkasType("jukkas.Unit")
     }

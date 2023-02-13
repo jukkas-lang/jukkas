@@ -17,13 +17,16 @@
 package net.ormr.jukkas.type
 
 sealed interface Type {
-    val jvmName: String
+    val internalName: String
 
-    infix fun sameDescriptor(other: Type): Boolean = toDescriptor() == other.toDescriptor()
+    val jvmName: String
+        get() = internalName.replace('.', '$').replace('/', '.')
+
+    infix fun sameDescriptor(other: Type): Boolean = toJvmDescriptor() == other.toJvmDescriptor()
 
     fun resolve(context: TypeResolutionContext): ResolvedType
 
-    fun toAsmType(): AsmType = AsmReferenceType.fromDescriptor(toDescriptor())
+    fun toAsmType(): AsmType = AsmReferenceType.fromDescriptor(toJvmDescriptor())
 
-    fun toDescriptor(): String
+    fun toJvmDescriptor(): String
 }
