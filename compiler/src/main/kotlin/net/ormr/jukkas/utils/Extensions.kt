@@ -1,6 +1,9 @@
 package net.ormr.jukkas.utils
 
-fun String.unescapeUnicode() = replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {
+private val unicodePattern = "\\\\u([0-9A-Fa-f]{4})".toRegex()
+
+// TODO: do we want to make a manual escaper for this instead of using a regex?
+fun String.unescapeUnicode(): String = replace(unicodePattern) {
     String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
 }
 
