@@ -32,29 +32,6 @@ import net.ormr.jukkas.utils.identifierName
 import java.nio.file.Path
 
 class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
-    companion object {
-        internal val IDENTIFIERS = TokenType.setOf<IdentifierLike>()
-        internal val PROPERTIES = hashSetOf(VAL, VAR)
-
-        @PublishedApi
-        internal fun of(source: Source): JukkasParser {
-            val tokens = TokenStream.from(source)
-            return JukkasParser(tokens)
-        }
-
-        inline fun <T> parse(source: Source, crossinline action: JukkasParser.() -> T): JukkasResult<T> {
-            val parser = of(source)
-            return try {
-                parser.reporter.toResult { parser.use(action) }
-            } catch (_: JukkasParseException) {
-                JukkasResult.Failure(parser.reporter.messages)
-            }
-        }
-
-        fun parseFile(file: Path): JukkasResult<CompilationUnit> =
-            parse(Source.File(file), JukkasParser::parseCompilationUnit)
-    }
-
     fun parseCompilationUnit(): CompilationUnit {
         val children = buildList {
             while (hasMore()) {
@@ -113,8 +90,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
 
     private fun parseImports(): List<Import> = TODO()
 
-    private fun parseTopLevel(): Statement? = withSynchronization(
-        { check<TopSynch>() },
+    private fun parseTopLevel(): Statement? = withSynchronization({ check<TopSynch>() },
         { null },
     ) {
         when {
@@ -226,4 +202,26 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     }
 
     inline infix fun <R> with(block: JukkasParser.() -> R): R = run(block)
+    companion object {
+        internal val IDENTIFIERS = TokenType.setOf<IdentifierLike>()
+        internal val PROPERTIES = hashSetOf(VAL, VAR)
+
+        @PublishedApi
+        internal fun of(source: Source): JukkasParser {
+            val tokens = TokenStream.from(source)
+            return JukkasParser(tokens)
+        }
+
+        inline fun <T> parse(source: Source, crossinline action: JukkasParser.() -> T): JukkasResult<T> {
+            val parser = of(source)
+            return try {
+                parser.reporter.toResult { parser.use(action) }
+            } catch (_: JukkasParseException) {
+                JukkasResult.Failure(parser.reporter.messages)
+            }
+        }
+
+        fun parseFile(file: Path): JukkasResult<CompilationUnit> =
+            parse(Source.File(file), JukkasParser::parseCompilationUnit)
+    }
 }

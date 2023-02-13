@@ -47,7 +47,12 @@ class MessageReporter {
         return warning
     }
 
-    fun reportError(source: Source, type: MessageType.Error, position: Positionable, message: String): Message.Error {
+    fun reportError(
+source: Source,
+ type: MessageType.Error,
+ position: Positionable,
+ message: String,
+): Message.Error {
         val error = Message.Error(source, type, position.findPosition(), message)
         _messages += error
         return error

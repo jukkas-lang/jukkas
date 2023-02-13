@@ -46,7 +46,7 @@ import net.ormr.jukkas.type.UnknownType
 object FunctionLiteralParselet : PrefixParselet {
     override fun parse(parser: JukkasParser, token: Token): Function = parser with {
         // TODO: we're using || to separate arguments for now, remove this at a later point,
-        //       will require arbitrary lookahead tho
+        // will require arbitrary lookahead tho
         val arguments = when {
             check(VERTICAL_LINE) -> {
                 consume()

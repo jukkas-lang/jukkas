@@ -35,7 +35,6 @@ class ExpressionParsingTest : FunSpec({
         }
     }
 
-
     test("'12345' should parse to IntLiteral(true)") {
         parseExpression("12345") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo IntLiteral(12345)

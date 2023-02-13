@@ -46,6 +46,6 @@ interface NodeVisitor<T> {
         is ConditionalBranch -> visitConditionalBranch(expression)
         is DefinitionReference -> visitIdentifierReference(expression)
         is StringTemplateExpression -> visitStringTemplateExpression(expression)
-        else -> error("Can not visit <${expression}> as an expression.")
+        else -> error("Can not visit <$expression> as an expression.")
     }
 }

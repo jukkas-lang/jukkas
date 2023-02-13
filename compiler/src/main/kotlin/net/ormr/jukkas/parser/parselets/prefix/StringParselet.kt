@@ -24,6 +24,10 @@ import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.lexer.TokenType
+import net.ormr.jukkas.lexer.TokenType.ESCAPE_SEQUENCE
+import net.ormr.jukkas.lexer.TokenType.STRING_CONTENT
+import net.ormr.jukkas.lexer.TokenType.STRING_TEMPLATE_END
+import net.ormr.jukkas.lexer.TokenType.STRING_TEMPLATE_START
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.utils.unescapeUnicode
 
@@ -47,18 +51,24 @@ object StringParselet : PrefixParselet {
         }
     }
 
-    fun parseLiteralOrTemplate(parser: JukkasParser): StringTemplatePart = parser with {
+    private fun parseLiteralOrTemplate(parser: JukkasParser): StringTemplatePart = parser with {
         when {
-            match(TokenType.STRING_CONTENT) -> {
-                StringTemplatePart.LiteralPart(StringLiteral(previous().text) withPosition previous()) withPosition previous()
+            match(STRING_CONTENT) -> {
+                val content = previous()
+                val text = content.text
+                val literal = StringLiteral(text) withPosition content
+                StringTemplatePart.LiteralPart(literal) withPosition content
             }
-            match(TokenType.ESCAPE_SEQUENCE) -> {
-                StringTemplatePart.LiteralPart(StringLiteral(previous().text.unescapeUnicode()) withPosition previous()) withPosition previous()
+            match(ESCAPE_SEQUENCE) -> {
+                val sequence = previous()
+                val text = previous().text.unescapeUnicode()
+                val literal = StringLiteral(text) withPosition sequence
+                StringTemplatePart.LiteralPart(literal) withPosition sequence
             }
-            match(TokenType.STRING_TEMPLATE_START) -> {
+            match(STRING_TEMPLATE_START) -> {
                 val start = current()
                 val expression = parseExpression()
-                val end = consume(TokenType.STRING_TEMPLATE_END)
+                val end = consume(STRING_TEMPLATE_END)
                 StringTemplatePart.ExpressionPart(expression withPosition createSpan(start, end))
             }
             else -> error("Unexpected token in string: <${consume()}>")

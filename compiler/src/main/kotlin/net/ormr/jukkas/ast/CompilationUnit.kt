@@ -36,9 +36,9 @@ class CompilationUnit(
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitCompilationUnit(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is CompilationUnit
-        && children.size == other.children.size
-        && (children zip other.children).all { (first, second) -> first.isStructurallyEquivalent(second) }
+        other is CompilationUnit &&
+                children.size == other.children.size &&
+                (children zip other.children).all { (first, second) -> first.isStructurallyEquivalent(second) }
 
     private fun onAddChild(index: Int, node: Statement) {
         if (node is Definition) {

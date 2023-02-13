@@ -21,12 +21,6 @@ import net.ormr.jukkas.Source
 import java.io.Closeable
 
 class TokenStream private constructor(private val lexer: Lexer, val source: Source) : Iterator<Token>, Closeable {
-    companion object {
-        fun from(source: Source): TokenStream = TokenStream(Lexer(source.reader()), source)
-    }
-
-    override fun hasNext(): Boolean = !lexer.isAtEnd
-
     private var previous: Token? = null
 
     private val eof: Token by lazy {
@@ -34,9 +28,14 @@ class TokenStream private constructor(private val lexer: Lexer, val source: Sour
         Token(TokenType.END_OF_FILE, "<eof>", point)
     }
 
+    override fun hasNext(): Boolean = !lexer.isAtEnd
+
     override fun next(): Token = lexer.advance()?.also { previous = it } ?: eof
 
     override fun close() {
         lexer.close()
+    }
+    companion object {
+        fun from(source: Source): TokenStream = TokenStream(Lexer(source.reader()), source)
     }
 }

@@ -67,6 +67,12 @@
 - name: BLANK_LINE_BETWEEN_PROPERTIES
   enabled: false
 
+- name: IDENTIFIER_LENGTH
+  enabled: false
+
+- name: EXTENSION_FUNCTION_WITH_CLASS
+  enabled: false
+
 # false positives galore
 - name: WRONG_NAME_OF_VARIABLE_INSIDE_ACCESSOR
   enabled: false

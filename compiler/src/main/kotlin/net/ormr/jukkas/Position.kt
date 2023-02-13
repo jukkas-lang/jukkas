@@ -16,10 +16,6 @@
 
 package net.ormr.jukkas
 
-sealed interface Position : Positionable {
-    override fun findPositionOrNull(): Position = this
-}
-
 val Position.startPoint: Point
     get() = when (this) {
         is Point -> this
@@ -31,3 +27,7 @@ val Position.endPoint: Point
         is Point -> this
         is Span -> end
     }
+
+sealed interface Position : Positionable {
+    override fun findPositionOrNull(): Position = this
+}

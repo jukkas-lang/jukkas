@@ -30,7 +30,11 @@ object FunctionInvocationParselet : InfixParselet {
     override val precedence: Int
         get() = Precedence.POSTFIX
 
-    override fun parse(parser: JukkasParser, left: Expression, token: Token): FunctionInvocation = parser with {
+    override fun parse(
+parser: JukkasParser,
+ left: Expression,
+ token: Token,
+): FunctionInvocation = parser with {
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseInvocationArgument)
         val end = consume(RIGHT_PAREN)
         // TODO: verify amount of arguments passed in at a later stage

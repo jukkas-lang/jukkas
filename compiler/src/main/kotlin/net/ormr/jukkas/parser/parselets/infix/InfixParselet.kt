@@ -23,5 +23,9 @@ import net.ormr.jukkas.parser.JukkasParser
 interface InfixParselet {
     val precedence: Int
 
-    fun parse(parser: JukkasParser, left: Expression, token: Token): Expression
+    fun parse(
+parser: JukkasParser,
+ left: Expression,
+ token: Token,
+): Expression
 }

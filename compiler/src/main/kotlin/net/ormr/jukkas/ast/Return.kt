@@ -28,6 +28,5 @@ class Return(value: Expression?) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitReturn(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Return
-        && bothNullOrEquivalent(value, other.value) { a, b -> a.isStructurallyEquivalent(b) }
+        other is Return && bothNullOrEquivalent(value, other.value) { a, b -> a.isStructurallyEquivalent(b) }
 }

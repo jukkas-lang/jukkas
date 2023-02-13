@@ -22,6 +22,12 @@ import net.ormr.jukkas.reporter.MessageType
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+val Node.closestTable: Table
+    get() = ancestors
+        .filterIsInstance<TableContainer>()
+        .firstOrNull()
+        ?.table ?: error("Could not find a table anywhere in the scope for $this")
+
 abstract class Node : Positionable {
     open var parent: Node? = null
 
@@ -90,7 +96,11 @@ abstract class Node : Positionable {
 
         override fun getValue(thisRef: Node, property: KProperty<*>): T = child
 
-        override fun setValue(thisRef: Node, property: KProperty<*>, value: T) {
+        override fun setValue(
+            thisRef: Node,
+            property: KProperty<*>,
+            value: T,
+        ) {
             setterCallback?.invoke(value)
             child = thisRef.adopt(value)
         }
@@ -109,24 +119,22 @@ abstract class Node : Positionable {
 
         override fun getValue(thisRef: Node, property: KProperty<*>): T? = child
 
-        override fun setValue(thisRef: Node, property: KProperty<*>, value: T?) {
+        override fun setValue(
+            thisRef: Node,
+            property: KProperty<*>,
+            value: T?,
+        ) {
             setterCallback?.invoke(value)
             child = value?.let(thisRef::adopt)
         }
     }
 }
 
-val Node.closestTable: Table
-    get() = ancestors
-        .filterIsInstance<TableContainer>()
-        .firstOrNull()
-        ?.table ?: error("Could not find a table anywhere in the scope for $this")
-
-internal fun <T : Node> T.disownParent(): T = apply {
-    parent?.disown(this)
-}
-
 fun Node.reportSemanticError(position: Positionable, message: String) {
     val unit = compilationUnit
     unit.reporter.reportError(unit.source, MessageType.Error.SEMANTIC, position, message)
+}
+
+internal fun <T : Node> T.disownParent(): T = apply {
+    parent?.disown(this)
 }

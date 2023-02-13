@@ -19,7 +19,11 @@ package net.ormr.jukkas.lexer
 import net.ormr.jukkas.Point
 import net.ormr.jukkas.Positionable
 
-data class Token(val type: TokenType, val text: String, val point: Point) : Positionable {
+data class Token(
+val type: TokenType,
+ val text: String,
+ val point: Point,
+) : Positionable {
     override fun toString(): String = "$point: $text (${type.image})"
 
     override fun findPositionOrNull(): Point = point

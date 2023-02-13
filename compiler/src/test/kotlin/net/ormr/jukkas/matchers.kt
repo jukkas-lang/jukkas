@@ -28,14 +28,6 @@ infix fun Node.shouldBeStructurallyEquivalentTo(other: Node) {
     this should beStructurallyEquivalentTo(other)
 }
 
-fun beStructurallyEquivalentTo(other: Node) = object : Matcher<Node> {
-    override fun test(value: Node): MatcherResult = MatcherResult(
-        value.isStructurallyEquivalent(other),
-        { "<$value> is should equivalent to <$other>" },
-        { "<$value> is not structurally equivalent to <$other>" },
-    )
-}
-
 // JukkasResult.Failure
 inline infix fun JukkasResult<*>.shouldBeFailure(fn: (messages: List<Message>) -> Unit) {
     this.shouldBeFailure()
@@ -48,14 +40,6 @@ fun JukkasResult<*>.shouldBeFailure() {
         returns() implies (this@shouldBeFailure is JukkasResult.Failure)
     }
     this should beFailure()
-}
-
-fun beFailure() = object : Matcher<JukkasResult<*>> {
-    override fun test(value: JukkasResult<*>): MatcherResult = MatcherResult(
-        value is JukkasResult.Failure,
-        { "$value should be Failure" },
-        { "$value should be Success" },
-    )
 }
 
 // JukkasResult.Success
@@ -71,6 +55,22 @@ fun JukkasResult<*>.shouldBeSuccess() {
         returns() implies (this@shouldBeSuccess is JukkasResult.Success<*>)
     }
     this should beSuccess()
+}
+
+fun beStructurallyEquivalentTo(other: Node) = object : Matcher<Node> {
+    override fun test(value: Node): MatcherResult = MatcherResult(
+        value.isStructurallyEquivalent(other),
+        { "<$value> is should equivalent to <$other>" },
+        { "<$value> is not structurally equivalent to <$other>" },
+    )
+}
+
+fun beFailure() = object : Matcher<JukkasResult<*>> {
+    override fun test(value: JukkasResult<*>): MatcherResult = MatcherResult(
+        value is JukkasResult.Failure,
+        { "$value should be Failure" },
+        { "$value should be Success" },
+    )
 }
 
 fun <A> beSuccess() = object : Matcher<JukkasResult<A>> {

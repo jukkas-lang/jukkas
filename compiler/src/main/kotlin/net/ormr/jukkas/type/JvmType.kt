@@ -20,15 +20,6 @@ import io.github.classgraph.ClassInfo
 import net.ormr.jukkas.utils.scanForClass
 
 class JvmType(val classInfo: ClassInfo) : ResolvedType {
-    companion object {
-        val OBJECT = native("java.lang.Object")
-        val STRING = native("java.lang.String")
-        val BOOLEAN = native("java.lang.Boolean")
-
-        private fun native(name: String): JvmType =
-            JvmType(scanForClass(name) ?: error("Could not find native Java class '$name'"))
-    }
-
     override val jvmName: String
         get() = classInfo.toString()
 
@@ -50,4 +41,12 @@ class JvmType(val classInfo: ClassInfo) : ResolvedType {
     }
 
     override fun hashCode(): Int = classInfo.hashCode()
+    companion object {
+        val OBJECT = native("java.lang.Object")
+        val STRING = native("java.lang.String")
+        val BOOLEAN = native("java.lang.Boolean")
+
+        private fun native(name: String): JvmType =
+            JvmType(scanForClass(name) ?: error("Could not find native Java class '$name'"))
+    }
 }
