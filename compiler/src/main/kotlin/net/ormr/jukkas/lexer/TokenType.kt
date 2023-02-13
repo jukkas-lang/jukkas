@@ -21,6 +21,7 @@ package net.ormr.jukkas.lexer
 import net.ormr.jukkas.utils.joinWithOr
 import net.ormr.krautils.collections.asUnmodifiableList
 
+@Suppress("diktat")
 sealed interface TokenType {
     companion object {
         val values: List<TokenType> by lazy {
