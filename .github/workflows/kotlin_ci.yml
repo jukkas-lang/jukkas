@@ -1,0 +1,21 @@
+name: Run CI build and unit tests
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: ./.github/actions/setup_gradle
+      - name: Gradle Build Action
+        uses: gradle/gradle-build-action@v2.2.0
+        with:
+          # --continue so we can aggregate all errors
+          arguments: build --no-daemon --continue
