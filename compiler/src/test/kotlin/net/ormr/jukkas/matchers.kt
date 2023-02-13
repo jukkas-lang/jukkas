@@ -60,8 +60,8 @@ fun JukkasResult<*>.shouldBeSuccess() {
 fun beStructurallyEquivalentTo(other: Node) = object : Matcher<Node> {
     override fun test(value: Node): MatcherResult = MatcherResult(
         value.isStructurallyEquivalent(other),
-        { "<$value> is should equivalent to <$other>" },
-        { "<$value> is not structurally equivalent to <$other>" },
+        { "<$value> should be equivalent to <$other>" },
+        { "<$value> should not be structurally equivalent to <$other>" },
     )
 }
 
