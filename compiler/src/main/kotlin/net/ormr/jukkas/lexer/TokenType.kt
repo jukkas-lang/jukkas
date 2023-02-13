@@ -106,6 +106,7 @@ sealed interface TokenType {
     object AND : AbstractTokenType("and"), Keyword
     object OR : AbstractTokenType("or"), Keyword
     object NOT : AbstractTokenType("not"), Keyword
+    object AS : AbstractTokenType("as"), Keyword // TODO: add parsing support as binary operator
     sealed interface Keyword : TokenType
 
     // soft keywords

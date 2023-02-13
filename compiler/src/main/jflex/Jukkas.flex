@@ -155,6 +155,8 @@ TemplateStart = \\\{
 "and" { return AND.INSTANCE; }
 "or" { return OR.INSTANCE; }
 "not" { return NOT.INSTANCE; }
+// TODO: add lexing for this as binary operator with 'as?'
+"as" { return AS.INSTANCE; }
 
 // soft keywords
 "import" { return IMPORT.INSTANCE; }
