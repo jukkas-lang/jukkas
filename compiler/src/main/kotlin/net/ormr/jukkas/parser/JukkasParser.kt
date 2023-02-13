@@ -116,8 +116,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         // TODO: handle nested classes identifiers
         val name = parseIdentifier()
         val alias = when {
-            // TODO: replace with 'as' keyword?
-            match(EQUAL) -> parseIdentifier()
+            match(AS) -> parseIdentifier()
             else -> null
         }
         val position = alias?.let { createSpan(name, it) } ?: name.findPosition()

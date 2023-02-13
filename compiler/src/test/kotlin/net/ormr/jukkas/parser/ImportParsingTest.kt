@@ -39,7 +39,7 @@ class ImportParsingTest : FunSpec({
     }
 
     test("Alias import") {
-        parseImport("import { Foo, Bar = Bary } from \"foo/bar\";") shouldBeSuccess { import, _ ->
+        parseImport("import { Foo, Bar as Bary } from \"foo/bar\";") shouldBeSuccess { import, _ ->
             import shouldBeStructurallyEquivalentTo Import(
                 listOf(
                     ImportEntry("Foo"),
