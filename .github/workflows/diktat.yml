@@ -9,6 +9,10 @@ on:
 jobs:
   run_diktat:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -18,7 +22,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.2.0
         with:
           # --continue so we can aggregate all errors
-          arguments: diktatCheck --no-daemon --continue
+          arguments: diktatCheck --continue
       - name: Upload SARIF Report
         uses: github/codeql-action/upload-sarif@v2
         if: ${{ always() }}

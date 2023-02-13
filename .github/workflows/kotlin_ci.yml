@@ -18,4 +18,4 @@ jobs:
         uses: gradle/gradle-build-action@v2.2.0
         with:
           # --continue so we can aggregate all errors
-          arguments: build --no-daemon --continue
+          arguments: build --continue
