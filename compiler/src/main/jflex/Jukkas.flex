@@ -144,7 +144,6 @@ TemplateStart = \\\{
 ``` { pushState(QUOTE); return QUOTE_START.INSTANCE; }
 
 // keywords
-"import" { return IMPORT.INSTANCE; }
 "fun" { return FUN.INSTANCE; }
 "val" { return VAL.INSTANCE; }
 "var" { return VAR.INSTANCE; }
@@ -158,6 +157,8 @@ TemplateStart = \\\{
 "not" { return NOT.INSTANCE; }
 
 // soft keywords
+"import" { return IMPORT.INSTANCE; }
+"from" { return FROM.INSTANCE; }
 "set" { return SET.INSTANCE; }
 "get" { return GET.INSTANCE; }
 

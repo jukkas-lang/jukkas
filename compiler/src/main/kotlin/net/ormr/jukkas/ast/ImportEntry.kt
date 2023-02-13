@@ -16,16 +16,11 @@
 
 package net.ormr.jukkas.ast
 
-class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
-    val entries: NodeList<ImportEntry> = entries.toNodeList(this)
-    val path: StringLiteral by child(path)
-
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImport(this)
-
+class ImportEntry(val name: String, val alias: String? = null) : ChildNode() {
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Import &&
-                path.isStructurallyEquivalent(other.path) &&
-                (entries zip other.entries).all { (a, b) -> a.isStructurallyEquivalent(b) }
+        other is ImportEntry && name == other.name && alias == other.alias
 
-    override fun toString(): String = "(import (${entries.joinToString(separator = " ")}) (from $path))"
+    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImportEntry(this)
+
+    override fun toString(): String = alias?.let { "(as $it $name)" } ?: name
 }

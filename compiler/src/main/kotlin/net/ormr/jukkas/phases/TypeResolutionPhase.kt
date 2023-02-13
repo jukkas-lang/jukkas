@@ -118,4 +118,8 @@ internal class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisi
 
     // nothing to resolve
     override fun visitPattern(pattern: Pattern) {}
+
+    override fun visitImportEntry(entry: ImportEntry) {
+        TODO("Not yet implemented")
+    }
 }

@@ -27,12 +27,19 @@ import net.ormr.jukkas.lexer.TokenType
 import net.ormr.jukkas.lexer.TokenType.*
 import net.ormr.jukkas.parser.parselets.prefix.FunctionParselet
 import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
+import net.ormr.jukkas.parser.parselets.prefix.StringParselet
 import net.ormr.jukkas.type.TypeName
 import net.ormr.jukkas.utils.identifierName
 import java.nio.file.Path
 
 class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     fun parseCompilationUnit(): CompilationUnit {
+        val imports = buildList {
+            while (hasMore()) {
+                if (!check(IMPORT)) break
+                add(parseImport() ?: continue)
+            }
+        }
         val children = buildList {
             while (hasMore()) {
                 add(parseTopLevel() ?: continue)
@@ -40,7 +47,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         }
         val end = consume(END_OF_FILE)
         val position = (children.firstOrNull()?.let { createSpan(it, end) } ?: end).findPosition()
-        return CompilationUnit(source, position, children)
+        return CompilationUnit(source, position, imports, children)
     }
 
     fun parseIdentifier(): Token = consume(IDENTIFIERS, "identifier")
@@ -50,11 +57,12 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
      *
      * Does not error if the given identifier is a plain identifier, but rather just returns a list of size `1`.
      *
-     * Note that the separators *(`.`)* are not included in the list, *only* the identifiers are.
+     * Note that the separators *(`/`)* are not included in the list, *only* the identifiers are.
      */
+    // TODO: handle nested classes identifiers
     fun parseQualifiedIdentifier(): List<Token> = buildList {
         add(parseIdentifier())
-        while (match(DOT)) {
+        while (match(SLASH)) {
             add(parseIdentifier())
         }
     }
@@ -88,7 +96,33 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     fun parseExpression(precedence: Int = 0): Expression =
         parseExpressionOrNull(precedence) ?: (current() syntaxError "Expecting expression got ${previous().type}")
 
-    private fun parseImports(): List<Import> = TODO()
+    fun parseImport(): Import? = withSynchronization(
+        { check<TopSynch>() },
+        { null },
+    ) {
+        val import = consume(IMPORT)
+        consume(LEFT_BRACE)
+        val entries = parseArguments(COMMA, RIGHT_BRACE, ::parseImportEntry)
+        consume(RIGHT_BRACE)
+        consume(FROM)
+        val pathStart = consume(STRING_START)
+        val path = StringParselet.parse(this, pathStart)
+        if (path !is StringLiteral) path syntaxError "Only simple strings are allowed as paths"
+        val end = consume(SEMICOLON)
+        Import(entries, path) withPosition createSpan(import, end)
+    }
+
+    private fun parseImportEntry(): ImportEntry {
+        // TODO: handle nested classes identifiers
+        val name = parseIdentifier()
+        val alias = when {
+            // TODO: replace with 'as' keyword?
+            match(EQUAL) -> parseIdentifier()
+            else -> null
+        }
+        val position = alias?.let { createSpan(name, it) } ?: name.findPosition()
+        return ImportEntry(name.identifierName, alias?.identifierName) withPosition position
+    }
 
     private fun parseTopLevel(): Statement? = withSynchronization(
         { check<TopSynch>() },
@@ -97,17 +131,14 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         when {
             check(FUN) -> parseFunction()
             check(PROPERTIES) -> parseProperty()
+            check(IMPORT) -> current() syntaxError "'import' must be declared before anything else"
             else -> current() syntaxError "Expected a top level declaration"
         }
     }
 
     fun parseTypeName(): TypeName {
-        val identifiers = parseQualifiedIdentifier()
-        val position = when (identifiers.size) {
-            1 -> identifiers.first()
-            else -> createSpan(identifiers.first(), identifiers.last())
-        }.findPosition()
-        return TypeName(position, identifiers.joinToString(separator = "."))
+        val identifier = parseIdentifier()
+        return TypeName(identifier.findPosition(), identifier.identifierName)
     }
 
     fun parseTypeDeclaration(): TypeName {

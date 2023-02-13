@@ -24,9 +24,11 @@ import net.ormr.jukkas.type.TypeCache
 class CompilationUnit(
     val source: Source,
     override val position: Position,
+    imports: List<Import>,
     children: List<Statement>,
 ) : Node(), TableContainer {
     override val table: Table = Table()
+    val imports: MutableNodeList<Import> = imports.toMutableNodeList(this)
     val types: TypeCache = TypeCache(this)
     val reporter: MessageReporter = MessageReporter()
     val children: MutableNodeList<Statement> = children.toMutableNodeList(this, ::onAddChild, ::onRemoveChild)

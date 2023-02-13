@@ -95,7 +95,6 @@ sealed interface TokenType {
     sealed interface IdentifierLike : TokenType
 
     // keyword
-    object IMPORT : AbstractTokenType("import"), Keyword, TopSynch
     object FUN : AbstractTokenType("func"), Keyword, TopSynch
     object VAL : AbstractTokenType("val"), Keyword, TopSynch
     object VAR : AbstractTokenType("var"), Keyword, TopSynch
@@ -110,6 +109,8 @@ sealed interface TokenType {
     sealed interface Keyword : TokenType
 
     // soft keywords
+    object IMPORT : AbstractTokenType("import"), SoftKeyword, TopSynch
+    object FROM : AbstractTokenType("from"), SoftKeyword
     object GET : AbstractTokenType("get"), SoftKeyword
     object SET : AbstractTokenType("set"), SoftKeyword
     sealed interface SoftKeyword : TokenType, IdentifierLike

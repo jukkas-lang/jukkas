@@ -48,4 +48,6 @@ interface NodeVisitor<T> {
         is StringTemplateExpression -> visitStringTemplateExpression(expression)
         else -> error("Can not visit <$expression> as an expression.")
     }
+
+    fun visitImportEntry(entry: ImportEntry): T
 }
