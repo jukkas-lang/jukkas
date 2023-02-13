@@ -7,16 +7,12 @@ fun String.unescapeUnicode(): String = replace(unicodePattern) {
     String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
 }
 
-fun <T> bothNullOrEquivalent(
+inline fun <T> bothNullOrEquivalent(
     first: T?,
     second: T?,
     predicate: (first: T, second: T) -> Boolean,
-): Boolean {
-    if (first == null && second == null) {
-        return true
-    }
-    if (first == null || second == null) {
-        return false
-    }
-    return predicate(first, second)
+): Boolean = when {
+    first == null && second == null -> true
+    first == null || second == null -> false
+    else -> predicate(first, second)
 }
