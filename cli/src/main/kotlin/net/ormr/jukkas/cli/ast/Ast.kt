@@ -94,6 +94,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         is Literal -> when (node) {
             is BooleanLiteral -> Tree(node.value.toString())
             is SymbolLiteral -> Tree("'${node.text}")
+            else -> TODO("")
         }
         else -> TODO("${node.javaClass}")
     }
