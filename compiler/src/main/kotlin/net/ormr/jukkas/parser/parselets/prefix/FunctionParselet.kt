@@ -30,6 +30,7 @@ import net.ormr.jukkas.lexer.TokenType.RIGHT_BRACE
 import net.ormr.jukkas.lexer.TokenType.RIGHT_PAREN
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.JukkasParser.Companion.IDENTIFIERS
+import net.ormr.jukkas.type.TypeName
 import net.ormr.jukkas.utils.identifierName
 
 object FunctionParselet : PrefixParselet {
@@ -39,7 +40,8 @@ object FunctionParselet : PrefixParselet {
         consume(LEFT_PAREN)
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
         val argEnd = consume(RIGHT_PAREN)
-        val type = parseTypeDeclaration()
+        val returnType = parseOptionalTypeDeclaration()
+        val returnTypePosition = (returnType as? TypeName)?.position
         // TODO: type parsing
         val body = when {
             match(EQUAL) -> {
@@ -53,6 +55,7 @@ object FunctionParselet : PrefixParselet {
             // TODO: verify that the function is actually abstract if no body exists in the verifier
             else -> null
         }
-        Function(name, arguments, body, type) withPosition createSpan(token, body ?: argEnd)
+        val position = createSpan(token, body ?: returnTypePosition ?: argEnd)
+        Function(name, arguments, body, returnType) withPosition position
     }
 }

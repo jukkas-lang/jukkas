@@ -17,6 +17,8 @@
 package net.ormr.jukkas.parser
 
 import net.ormr.jukkas.JukkasResult
+import net.ormr.jukkas.Position
+import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
@@ -28,7 +30,9 @@ import net.ormr.jukkas.lexer.TokenType.*
 import net.ormr.jukkas.parser.parselets.prefix.FunctionParselet
 import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
 import net.ormr.jukkas.parser.parselets.prefix.StringParselet
+import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.TypeName
+import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.identifierName
 import java.nio.file.Path
 
@@ -142,6 +146,16 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     fun parseTypeDeclaration(): TypeName {
         consume(COLON)
         return parseTypeName()
+    }
+
+    fun parseOptionalTypeDeclaration(): Type = when {
+        check(COLON) -> parseTypeDeclaration()
+        else -> UnknownType
+    }
+
+    fun createTypePosition(start: Positionable, type: Type): Position = when (type) {
+        is TypeName -> createSpan(start, type)
+        else -> start.findPosition()
     }
 
     private fun parseFunction(): Function = FunctionParselet.parse(this, consume(FUN))
