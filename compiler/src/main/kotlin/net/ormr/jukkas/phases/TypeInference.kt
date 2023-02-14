@@ -23,11 +23,11 @@ import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
 object TypeInference {
-    fun findType(expr: Expression): Type = when (expr) {
-        is AssignmentOperation -> findType(expr.value)
+    fun inferType(expr: Expression): Type = when (expr) {
+        is AssignmentOperation -> inferType(expr.value)
         is BinaryOperation -> {
-            val left = findType(expr.left)
-            val right = findType(expr.right)
+            val left = inferType(expr.left)
+            val right = inferType(expr.right)
             if (left != right) {
                 // TODO: we need to check if function exists on types for this...
                 errorType(expr, "Incompatible types $left vs $right")
@@ -63,7 +63,7 @@ object TypeInference {
         fold(first) { findNullableType(fallback, parent) }
 
     private fun findNullableType(expr: Expression?, parent: Node): Type =
-        expr?.let(::findType) ?: errorType(parent, "Could not resolve type")
+        expr?.let(::inferType) ?: errorType(parent, "Could not resolve type")
 
     private inline fun fold(type: Type, ifUnknown: () -> Type): Type = when (type) {
         UnknownType -> ifUnknown()

@@ -68,7 +68,7 @@ internal class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisi
         TODO("Not yet implemented")
     }
 
-    override fun visitCall(operation: MemberAccessOperation) {
+    override fun visitMemberAccessOperation(operation: MemberAccessOperation) {
         TODO("Not yet implemented")
     }
 

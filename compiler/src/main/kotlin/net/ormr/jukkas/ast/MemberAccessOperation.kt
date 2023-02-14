@@ -28,8 +28,9 @@ class MemberAccessOperation(
     var value: Expression by child(value)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitCall(this)
+    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitMemberAccessOperation(this)
 
+    // TODO: do we want to check for type here?
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is MemberAccessOperation &&
                 isSafe == other.isSafe &&
