@@ -61,6 +61,7 @@ subprojects {
         compileKotlin {
             compilerOptions {
                 jvmTarget.set(JVM_17)
+                freeCompilerArgs.add("-opt-in=kotlin.contracts.ExperimentalContracts")
             }
         }
 
