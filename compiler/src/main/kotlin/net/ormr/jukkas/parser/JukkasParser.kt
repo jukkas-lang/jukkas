@@ -46,7 +46,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
             }
         }
         val end = consume(END_OF_FILE)
-        val position = (children.firstOrNull()?.let { createSpan(it, end) } ?: end).findPosition()
+        val position = children.firstOrNull()?.let { createSpan(it, end) } ?: end.findPosition()
         return CompilationUnit(source, position, imports, children)
     }
 
