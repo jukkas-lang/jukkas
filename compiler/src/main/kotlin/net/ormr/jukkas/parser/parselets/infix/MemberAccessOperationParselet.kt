@@ -16,7 +16,7 @@
 
 package net.ormr.jukkas.parser.parselets.infix
 
-import net.ormr.jukkas.ast.Call
+import net.ormr.jukkas.ast.MemberAccessOperation
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
@@ -25,7 +25,7 @@ import net.ormr.jukkas.lexer.TokenType
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.Precedence
 
-object CallParselet : InfixParselet {
+object MemberAccessOperationParselet : InfixParselet {
     override val precedence: Int
         get() = Precedence.POSTFIX
 
@@ -33,7 +33,7 @@ object CallParselet : InfixParselet {
         parser: JukkasParser,
         left: Expression,
         token: Token,
-    ): Call = parser with {
+    ): MemberAccessOperation = parser with {
         val isSafe = when (token.type) {
             TokenType.DOT -> false
             TokenType.HOOK_DOT -> true
@@ -41,6 +41,6 @@ object CallParselet : InfixParselet {
         }
         val value = parseExpression(precedence)
         // TODO: createSpan(token, value.findPosition().startPoint.end) or something?
-        Call(left, value, isSafe) withPosition createSpan(token, value)
+        MemberAccessOperation(left, value, isSafe) withPosition createSpan(token, value)
     }
 }

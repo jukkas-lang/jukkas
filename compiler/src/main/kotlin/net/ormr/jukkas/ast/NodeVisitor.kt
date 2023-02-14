@@ -23,7 +23,7 @@ interface NodeVisitor<T> {
     fun visitAssignmentOperation(operation: AssignmentOperation): T
     fun visitBinaryOperation(operation: BinaryOperation): T
     fun visitBlock(block: Block): T
-    fun visitCall(call: Call): T
+    fun visitCall(operation: MemberAccessOperation): T
     fun visitConditionalBranch(conditional: ConditionalBranch): T
     fun visitExpressionStatement(statement: ExpressionStatement): T
     fun visitFunction(function: Function): T
@@ -41,7 +41,7 @@ interface NodeVisitor<T> {
         is Literal -> visitLiteral(expression)
         is BinaryOperation -> visitBinaryOperation(expression)
         is Invocation -> visitInvocation(expression)
-        is Call -> visitCall(expression)
+        is MemberAccessOperation -> visitCall(expression)
         is Return -> visitReturn(expression)
         is ConditionalBranch -> visitConditionalBranch(expression)
         is DefinitionReference -> visitIdentifierReference(expression)

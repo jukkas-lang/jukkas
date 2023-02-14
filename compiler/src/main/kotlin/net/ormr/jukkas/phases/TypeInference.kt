@@ -34,7 +34,7 @@ object TypeInference {
             } else left
         }
         is Block -> TODO()
-        is Call -> TODO()
+        is MemberAccessOperation -> TODO()
         is ConditionalBranch -> TODO()
         is Function -> findDefinitionType(expr)
         is DefinitionReference -> expr

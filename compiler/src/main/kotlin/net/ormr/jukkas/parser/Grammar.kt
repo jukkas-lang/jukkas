@@ -27,7 +27,7 @@ import net.ormr.jukkas.parser.Precedence.EQUALITY
 import net.ormr.jukkas.parser.Precedence.MULTIPLICATIVE
 import net.ormr.jukkas.parser.parselets.infix.AssignmentParselet
 import net.ormr.jukkas.parser.parselets.infix.BinaryOperationParselet
-import net.ormr.jukkas.parser.parselets.infix.CallParselet
+import net.ormr.jukkas.parser.parselets.infix.MemberAccessOperationParselet
 import net.ormr.jukkas.parser.parselets.infix.FunctionInvocationParselet
 import net.ormr.jukkas.parser.parselets.infix.InfixInvocationParselet
 import net.ormr.jukkas.parser.parselets.infix.InfixParselet
@@ -60,7 +60,7 @@ internal object Grammar {
         prefix(LEFT_BRACE, FunctionLiteralParselet)
         prefix(LEFT_PAREN, ParenthesizedExpressionParselet)
 
-        infix<Call>(CallParselet) // 14
+        infix<Call>(MemberAccessOperationParselet) // 14
         infix(LEFT_PAREN, FunctionInvocationParselet) // 14
         infix<Multiplicative>(BinaryOperationParselet(MULTIPLICATIVE)) // 11
         infix<Additive>(BinaryOperationParselet(ADDITIVE)) // 10

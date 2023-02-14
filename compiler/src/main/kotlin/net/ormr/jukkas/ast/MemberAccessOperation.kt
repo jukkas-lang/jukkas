@@ -19,7 +19,7 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
-class Call(
+class MemberAccessOperation(
     left: Expression,
     value: Expression,
     val isSafe: Boolean,
@@ -31,7 +31,7 @@ class Call(
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitCall(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Call &&
+        other is MemberAccessOperation &&
                 isSafe == other.isSafe &&
                 left.isStructurallyEquivalent(other.left) &&
                 value.isStructurallyEquivalent(other.value)
