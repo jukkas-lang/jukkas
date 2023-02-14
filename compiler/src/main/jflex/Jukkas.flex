@@ -160,7 +160,6 @@ TemplateStart = \\\{
 
 // soft keywords
 "import" { return IMPORT.INSTANCE; }
-"from" { return FROM.INSTANCE; }
 "set" { return SET.INSTANCE; }
 "get" { return GET.INSTANCE; }
 

@@ -26,27 +26,49 @@ import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
 
 class ImportParsingTest : FunSpec({
-    test("Simple import") {
-        parseImport("import { Foo, Bar } from \"foo/bar\";") shouldBeSuccess { import, _ ->
-            import shouldBeStructurallyEquivalentTo Import(
-                listOf(
-                    ImportEntry("Foo"),
-                    ImportEntry("Bar"),
-                ),
-                StringLiteral("foo/bar"),
-            )
+    context("Parse basic import") {
+        test("import Foo") {
+            parseImport("import \"foo/bar\" { Foo }") shouldBeSuccess { import, _ ->
+                import shouldBeStructurallyEquivalentTo Import(
+                    listOf(ImportEntry("Foo")),
+                    StringLiteral("foo/bar"),
+                )
+            }
+        }
+
+        test("import Foo, Bar") {
+            parseImport("import \"foo/bar\" { Foo, Bar }") shouldBeSuccess { import, _ ->
+                import shouldBeStructurallyEquivalentTo Import(
+                    listOf(
+                        ImportEntry("Foo"),
+                        ImportEntry("Bar"),
+                    ),
+                    StringLiteral("foo/bar"),
+                )
+            }
         }
     }
 
-    test("Alias import") {
-        parseImport("import { Foo, Bar as Bary } from \"foo/bar\";") shouldBeSuccess { import, _ ->
-            import shouldBeStructurallyEquivalentTo Import(
-                listOf(
-                    ImportEntry("Foo"),
-                    ImportEntry("Bar", "Bary"),
-                ),
-                StringLiteral("foo/bar"),
-            )
+    context("Parse alias import") {
+        test("import Foo as Fooy") {
+            parseImport("import \"foo/bar\" { Foo as Fooy }") shouldBeSuccess { import, _ ->
+                import shouldBeStructurallyEquivalentTo Import(
+                    listOf(ImportEntry("Foo", "Fooy")),
+                    StringLiteral("foo/bar"),
+                )
+            }
+        }
+
+        test("import Foo as Fooy, Bar") {
+            parseImport("import \"foo/bar\" { Foo as Fooy }") shouldBeSuccess { import, _ ->
+                import shouldBeStructurallyEquivalentTo Import(
+                    listOf(
+                        ImportEntry("Foo", "Fooy"),
+                        ImportEntry("Bar"),
+                    ),
+                    StringLiteral("foo/bar"),
+                )
+            }
         }
     }
 })

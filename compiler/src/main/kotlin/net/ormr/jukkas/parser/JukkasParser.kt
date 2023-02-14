@@ -101,14 +101,13 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         { null },
     ) {
         val import = consume(IMPORT)
-        consume(LEFT_BRACE)
-        val entries = parseArguments(COMMA, RIGHT_BRACE, ::parseImportEntry)
-        consume(RIGHT_BRACE)
-        consume(FROM)
         val pathStart = consume(STRING_START)
         val path = StringParselet.parse(this, pathStart)
+        consume(LEFT_BRACE)
+        val entries = parseArguments(COMMA, RIGHT_BRACE, ::parseImportEntry)
+        val end = consume(RIGHT_BRACE)
+        // report error here so we can attempt to properly parse the symbol block first
         if (path !is StringLiteral) path syntaxError "Only simple strings are allowed as paths"
-        val end = consume(SEMICOLON)
         Import(entries, path) withPosition createSpan(import, end)
     }
 

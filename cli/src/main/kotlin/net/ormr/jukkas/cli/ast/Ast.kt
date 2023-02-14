@@ -94,7 +94,6 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             }
             is PatternArgument -> TODO("pattern argument")
         }
-        is Import -> TODO()
         is Property -> TODO()
         is Variable -> TODO()
         is Literal -> when (node) {
