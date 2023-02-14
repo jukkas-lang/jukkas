@@ -26,16 +26,16 @@ sealed class Invocation : Expression() {
 }
 
 class InfixInvocation(
-left: Expression,
- val name: String,
- right: Expression,
+    left: Expression,
+    val name: String,
+    right: Expression,
 ) : Invocation() {
     var left: Expression by child(left)
     var right: Expression by child(right)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is InfixInvocation && name == other.name && left.isStructurallyEquivalent(other.left) &&
- right.isStructurallyEquivalent(other.right)
+                right.isStructurallyEquivalent(other.right)
 }
 
 class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) : Invocation() {
@@ -44,6 +44,6 @@ class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) 
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is FunctionInvocation && left.isStructurallyEquivalent(other.left) &&
- arguments.size == other.arguments.size &&
- (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) }
+                arguments.size == other.arguments.size &&
+                (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) }
 }
