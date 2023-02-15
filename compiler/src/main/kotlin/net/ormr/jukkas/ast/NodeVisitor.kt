@@ -18,6 +18,8 @@ package net.ormr.jukkas.ast
 
 interface NodeVisitor<T> {
     fun visitCompilationUnit(unit: CompilationUnit): T
+    fun visitImport(import: Import): T
+    fun visitImportEntry(entry: ImportEntry): T
     fun visitArgument(argument: Argument): T
     fun visitAssignmentOperation(operation: AssignmentOperation): T
     fun visitBinaryOperation(operation: BinaryOperation): T
@@ -28,8 +30,6 @@ interface NodeVisitor<T> {
     fun visitLambda(lambda: Lambda): T
     fun visitFunction(function: Function): T
     fun visitIdentifierReference(reference: DefinitionReference): T
-    fun visitImport(import: Import): T
-    fun visitImportEntry(entry: ImportEntry): T
     fun visitInvocation(invocation: Invocation): T
     fun visitInvocationArgument(argument: InvocationArgument): T
     fun visitLiteral(literal: Literal): T
