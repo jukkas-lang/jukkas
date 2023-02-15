@@ -16,7 +16,7 @@
 
 package net.ormr.jukkas.parser.parselets.prefix
 
-import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.Lambda
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -44,9 +44,9 @@ import net.ormr.jukkas.type.UnknownType
  * ```
  */
 object FunctionLiteralParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): Function = parser with {
+    override fun parse(parser: JukkasParser, token: Token): Lambda = parser with {
         // TODO: we're using || to separate arguments for now, remove this at a later point,
-        // will require arbitrary lookahead tho
+        //       will require arbitrary lookahead tho
         val arguments = when {
             check(VERTICAL_LINE) -> {
                 consume()
@@ -63,6 +63,6 @@ object FunctionLiteralParselet : PrefixParselet {
         // TODO: set the end of the position of this block to its last child
         val body = parseBlock(RIGHT_BRACE)
         val end = previous()
-        Function(null, arguments, body, UnknownType) withPosition createSpan(token, end)
+        Lambda(arguments, body, UnknownType) withPosition createSpan(token, end)
     }
 }

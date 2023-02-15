@@ -16,8 +16,6 @@
 
 package net.ormr.jukkas.cli.ast
 
-import ajs.printutils.Color
-import ajs.printutils.PrettyPrintTree
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
@@ -25,12 +23,11 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.Lambda
 import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.getOrElse
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.phases.TypeResolutionPhase
-import net.ormr.jukkas.type.TypeResolutionContext
 import kotlin.io.path.name
 
 class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
@@ -71,7 +68,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
                 addChild(createTree(child))
             }
         }
-        is Function -> Tree("fun ${node.name ?: ""}") {
+        is Lambda -> Tree("fun ${node.name ?: ""}") {
             if (node.arguments.isNotEmpty()) {
                 addChild("parameters") {
                     for (arg in node.arguments) {

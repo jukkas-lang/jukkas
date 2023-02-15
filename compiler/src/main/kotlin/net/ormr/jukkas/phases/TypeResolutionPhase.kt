@@ -93,6 +93,10 @@ class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisitor<Unit>
         visit(statement.expression)
     }
 
+    override fun visitLambda(lambda: Lambda) {
+        TODO("visitLambda")
+    }
+
     override fun visitFunction(function: Function) {
         function.arguments.forEach(::visit)
         visit(function.body)

@@ -19,6 +19,7 @@ package net.ormr.jukkas.phases
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.Lambda
 import net.ormr.jukkas.type.ErrorType
 import net.ormr.jukkas.type.ResolvedTypeOrError
 import net.ormr.jukkas.type.Type
@@ -107,6 +108,10 @@ internal class TypeCheckingPhase(private val unit: CompilationUnit) : NodeVisito
 
     override fun visitExpressionStatement(statement: ExpressionStatement) {
         visit(statement.expression)
+    }
+
+    override fun visitLambda(lambda: Lambda) {
+        TODO("Not yet implemented")
     }
 
     override fun visitFunction(function: Function) {

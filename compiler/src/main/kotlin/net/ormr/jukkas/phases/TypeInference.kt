@@ -18,6 +18,7 @@ package net.ormr.jukkas.phases
 
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.Lambda
 import net.ormr.jukkas.type.ErrorType
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
@@ -36,7 +37,7 @@ object TypeInference {
         is Block -> TODO()
         is MemberAccessOperation -> TODO()
         is ConditionalBranch -> TODO()
-        is Function -> inferDefinitionType(expr)
+        is Lambda -> inferDefinitionType(expr)
         is DefinitionReference -> expr
             .find(expr.closestTable)
             ?.let(::inferDefinitionType) ?: errorType(expr, "Unknown name '${expr.name}'")
@@ -49,7 +50,8 @@ object TypeInference {
     }
 
     fun inferDefinitionType(def: Definition): Type = when (def) {
-        is Function -> resolve(def, def.type, def.body)
+        is Lambda -> resolve(def, def.type, def.body)
+        is Function -> TODO()
         is NamedArgument -> def.type
         is Property -> TODO("check initializer or getter if no type given exactly")
         is Variable -> resolve(def, def.type, def.initializer)

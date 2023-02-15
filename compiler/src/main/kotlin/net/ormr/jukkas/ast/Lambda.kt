@@ -19,20 +19,18 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Function(
-    val name: String,
+class Lambda(
     arguments: List<Argument>,
-    body: Block?,
+    body: Block,
     override var type: Type,
-) : Statement(), Invokable {
+) : Expression(), Invokable {
     override val arguments: MutableNodeList<Argument> = arguments.toMutableNodeList(this)
-    override var body: Block? by child(body)
+    override var body: Block by child(body)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitFunction(this)
+    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLambda(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Function &&
-                name == other.name &&
+        other is Lambda &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
-                checkStructuralEquivalence(body, other.body)
+                body.isStructurallyEquivalent(other.body)
 }

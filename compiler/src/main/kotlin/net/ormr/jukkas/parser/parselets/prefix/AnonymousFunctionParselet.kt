@@ -17,7 +17,7 @@
 package net.ormr.jukkas.parser.parselets.prefix
 
 import net.ormr.jukkas.ast.Block
-import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.Lambda
 import net.ormr.jukkas.ast.Table
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
@@ -26,12 +26,11 @@ import net.ormr.jukkas.lexer.TokenType.*
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.JukkasParser.Companion.IDENTIFIERS
 import net.ormr.jukkas.type.TypeName
-import net.ormr.jukkas.utils.identifierName
 
-object FunctionParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): Function = parser with {
-        // TODO: give error/warning for usage like 'val thing = fun namedFun()'
-        val name = consumeIfMatch(IDENTIFIERS, "identifier")?.identifierName
+object AnonymousFunctionParselet : PrefixParselet {
+    override fun parse(parser: JukkasParser, token: Token): Lambda = parser with {
+        val name = consumeIfMatch(IDENTIFIERS, "identifier")
+        name?.syntaxError("Anonymous functions with names are prohibited")
         consume(LEFT_PAREN)
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
         val argEnd = consume(RIGHT_PAREN)
@@ -46,10 +45,8 @@ object FunctionParselet : PrefixParselet {
                 Block(Table(), listOf(expr)) withPosition createSpan(equal, expr)
             }
             match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
-            // TODO: verify that the function is actually abstract if no body exists in the verifier
-            else -> null
+            else -> createSpan(token, returnTypePosition ?: argEnd) syntaxError "Function must have a body"
         }
-        val position = createSpan(token, body ?: returnTypePosition ?: argEnd)
-        Function(name, arguments, body, returnType) withPosition position
+        Lambda(arguments, body, returnType) withPosition createSpan(token, body)
     }
 }

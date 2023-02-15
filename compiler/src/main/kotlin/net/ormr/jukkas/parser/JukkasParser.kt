@@ -27,7 +27,6 @@ import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.lexer.TokenStream
 import net.ormr.jukkas.lexer.TokenType
 import net.ormr.jukkas.lexer.TokenType.*
-import net.ormr.jukkas.parser.parselets.prefix.FunctionParselet
 import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
 import net.ormr.jukkas.parser.parselets.prefix.StringParselet
 import net.ormr.jukkas.type.Type
@@ -54,7 +53,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         return CompilationUnit(source, position, imports, children)
     }
 
-    fun parseIdentifier(): Token = consume(IDENTIFIERS, "identifier")
+    fun consumeIdentifier(): Token = consume(IDENTIFIERS, "identifier")
 
     /**
      * Returns a list of identifiers in a potentially qualified name.
@@ -65,9 +64,9 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
      */
     // TODO: handle nested classes identifiers
     fun parseQualifiedIdentifier(): List<Token> = buildList {
-        add(parseIdentifier())
+        add(consumeIdentifier())
         while (match(SLASH)) {
-            add(parseIdentifier())
+            add(consumeIdentifier())
         }
     }
 
@@ -117,9 +116,9 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
 
     private fun parseImportEntry(): ImportEntry {
         // TODO: handle nested classes identifiers
-        val name = parseIdentifier()
+        val name = consumeIdentifier()
         val alias = when {
-            match(AS) -> parseIdentifier()
+            match(AS) -> consumeIdentifier()
             else -> null
         }
         val position = alias?.let { createSpan(name, it) } ?: name.findPosition()
@@ -139,7 +138,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     }
 
     fun parseTypeName(): TypeName {
-        val identifier = parseIdentifier()
+        val identifier = consumeIdentifier()
         return TypeName(identifier.findPosition(), identifier.identifierName)
     }
 
@@ -158,7 +157,30 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         else -> start.findPosition()
     }
 
-    private fun parseFunction(): Function = FunctionParselet.parse(this, consume(FUN))
+    private fun parseFunction(): Function {
+        val keyword = consume(FUN)
+        val name = consumeIdentifier().identifierName
+        consume(LEFT_PAREN)
+        val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
+        val argEnd = consume(RIGHT_PAREN)
+        val returnType = parseOptionalTypeDeclaration(ARROW)
+        val returnTypePosition = (returnType as? TypeName)?.position
+        val body = when {
+            match(EQUAL) -> {
+                // TODO: give warning for structures like 'fun() = return;' ?
+                val equal = previous()
+                val expr = parseExpressionStatement()
+                // TODO: proper table stacks
+                Block(Table(), listOf(expr)) withPosition createSpan(equal, expr)
+            }
+            match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
+            // TODO: verify that the function is actually abstract if no body exists in the verifier
+            //       and also verify that only class level functions are marked abstract and that stuff
+            else -> null
+        }
+        val position = createSpan(keyword, body ?: returnTypePosition ?: argEnd)
+        return Function(name, arguments, body, returnType) withPosition position
+    }
 
     private fun parseProperty(): Property = TODO()
 
@@ -188,13 +210,13 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     }
 
     fun parseBasicArgument(): BasicArgument {
-        val name = parseIdentifier()
+        val name = consumeIdentifier()
         val type = parseTypeDeclaration()
         return BasicArgument(name.identifierName, type) withPosition createSpan(name, type)
     }
 
     fun parseDefaultArgument(): Argument {
-        val name = parseIdentifier()
+        val name = consumeIdentifier()
         val identifierName = name.identifierName
         val type = parseTypeDeclaration()
         return when (val default = if (match(EQUAL)) parseExpression() else null) {

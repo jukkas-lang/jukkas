@@ -25,6 +25,7 @@ interface NodeVisitor<T> {
     fun visitMemberAccessOperation(operation: MemberAccessOperation): T
     fun visitConditionalBranch(conditional: ConditionalBranch): T
     fun visitExpressionStatement(statement: ExpressionStatement): T
+    fun visitLambda(lambda: Lambda): T
     fun visitFunction(function: Function): T
     fun visitIdentifierReference(reference: DefinitionReference): T
     fun visitImport(import: Import): T
