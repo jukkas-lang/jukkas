@@ -71,7 +71,7 @@ class CliErrorReporter {
         println(content)
         print(INDENT)
         print(" ".repeat(start.column))
-        println(bold(cyan("^".repeat((end.column - start.column) + 1))))
+        println(bold(cyan("^".repeat(start.indices.last - start.indices.first))))
     }
 
     private companion object {
