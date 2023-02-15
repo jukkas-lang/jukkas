@@ -16,41 +16,41 @@
 
 package net.ormr.jukkas.type.member
 
-import io.github.classgraph.FieldInfo
-import io.github.classgraph.MethodInfo
 import net.ormr.jukkas.type.AsmMethodType
-import net.ormr.jukkas.type.JvmReferenceType
 import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.ResolvedType
+import net.ormr.krautils.collections.asUnmodifiableList
+import java.lang.reflect.Constructor as JavaConstructor
+import java.lang.reflect.Executable as JavaExecutable
+import java.lang.reflect.Field as JavaField
+import java.lang.reflect.Method as JavaMethod
 
 sealed interface JvmMember : TypeMember {
-    data class Method(val info: MethodInfo) : TypeMember.Method, JvmMember {
+    data class Method(val method: JavaMethod) : TypeMember.Method, JvmMember {
         override val name: String
-            get() = info.name
+            get() = method.name
 
-        override val parameterTypes: List<ResolvedType> by lazy { createTypeList(info) }
+        override val parameterTypes: List<ResolvedType> by lazy { createTypeList(method) }
 
-        // TODO: is this valid?
-        override fun toAsmType(): AsmMethodType = AsmMethodType.fromDescriptor(info.typeDescriptorStr)
+        override fun toAsmType(): AsmMethodType = AsmMethodType.of(method)
     }
 
-    data class Constructor(val info: MethodInfo) : TypeMember.Constructor, JvmMember {
+    data class Constructor(val constructor: JavaConstructor<*>) : TypeMember.Constructor, JvmMember {
         override val name: String
-            get() = info.name
+            get() = constructor.name
 
-        override val parameterTypes: List<ResolvedType> by lazy { createTypeList(info) }
+        override val parameterTypes: List<ResolvedType> by lazy { createTypeList(constructor) }
 
-        // TODO: is this valid?
-        override fun toAsmType(): AsmMethodType = AsmMethodType.fromDescriptor(info.typeDescriptorStr)
+        override fun toAsmType(): AsmMethodType = AsmMethodType.of(constructor)
     }
 
-    data class Field(val info: FieldInfo) : TypeMember.Field, JvmMember {
+    data class Field(val field: JavaField) : TypeMember.Field, JvmMember {
         override val name: String
-            get() = this.info.name
+            get() = this.field.name
 
-        override val type: ResolvedType by lazy { JvmReferenceType.from(info.classInfo) }
+        override val type: ResolvedType by lazy { JvmType.of(field.type) }
     }
 }
 
-private fun createTypeList(method: MethodInfo): List<ResolvedType> =
-    method.parameterInfo.map { JvmType.fromSignature(it.typeDescriptor) }
+private fun createTypeList(executable: JavaExecutable): List<ResolvedType> =
+    executable.parameterTypes.map { JvmType.of(it) }.asUnmodifiableList()

@@ -16,10 +16,6 @@
 
 package net.ormr.jukkas.type
 
-import io.github.classgraph.ArrayTypeSignature
-import io.github.classgraph.BaseTypeSignature
-import io.github.classgraph.ClassRefTypeSignature
-import io.github.classgraph.TypeSignature
 import net.ormr.jukkas.type.member.JvmMember
 
 sealed interface JvmType : ResolvedType {
@@ -30,18 +26,14 @@ sealed interface JvmType : ResolvedType {
     override fun isSameType(other: ResolvedTypeOrError): Boolean = when (other) {
         is ErrorType -> false
         // TODO: handle cases with jukkas types, like 'Jukkas.Int = int', and like 'jukkas.Array[Int] = Integer[]'
-        else -> this sameJvmDescriptor other
+        else -> this jvmDescriptorMatches other
     }
 
     companion object {
-        internal fun fromSignature(signature: TypeSignature): JvmType = when (signature) {
-            is ArrayTypeSignature -> JvmReferenceType.from(signature.arrayClassInfo)
-            is BaseTypeSignature -> JvmPrimitiveType.fromSymbol(signature.typeSignatureChar.toString())
-            is ClassRefTypeSignature -> {
-                val info = signature.classInfo ?: error("Could not find ClassInfo for <$signature>")
-                JvmReferenceType.from(info)
-            }
-            else -> throw IllegalArgumentException("Can't create JvmType for <$signature>")
+        fun of(clz: Class<*>): JvmType = when {
+            clz.isArray -> JvmArrayType.of(clz)
+            clz.isPrimitive -> JvmPrimitiveType.of(clz)
+            else -> JvmReferenceType.of(clz)
         }
     }
 }

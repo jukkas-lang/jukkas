@@ -22,7 +22,7 @@ sealed interface Type {
     val jvmName: String
         get() = internalName.replace('.', '$').replace('/', '.')
 
-    infix fun sameJvmDescriptor(other: Type): Boolean = toJvmDescriptor() == other.toJvmDescriptor()
+    infix fun jvmDescriptorMatches(other: Type): Boolean = toJvmDescriptor() == other.toJvmDescriptor()
 
     fun resolve(context: TypeResolutionContext): ResolvedTypeOrError
 

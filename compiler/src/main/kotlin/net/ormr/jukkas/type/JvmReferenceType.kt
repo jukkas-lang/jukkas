@@ -16,37 +16,37 @@
 
 package net.ormr.jukkas.type
 
-import io.github.classgraph.ArrayClassInfo
-import io.github.classgraph.ClassInfo
-import io.github.classgraph.FieldInfoList
-import io.github.classgraph.MethodInfoList
 import net.ormr.jukkas.type.member.JvmMember
 import net.ormr.jukkas.type.member.TypeMember
-import net.ormr.jukkas.utils.scanForClass
+import net.ormr.jukkas.utils.getDescriptor
 import net.ormr.krautils.collections.asUnmodifiableList
+import java.lang.reflect.Constructor
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 
-class JvmReferenceType private constructor(val classInfo: ClassInfo) : JvmType {
-    override val superType: ResolvedType? by lazy { classInfo.superclass?.let { from(it) } }
+class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
+    override val superType: ResolvedType? by lazy { clz.superclass?.let { of(it) } }
 
     override val interfaces: List<ResolvedType> by lazy {
-        classInfo.interfaces.map { from(it) }.asUnmodifiableList()
+        clz.interfaces.map { of(it) }.asUnmodifiableList()
     }
 
     override val internalName: String = "${packageName.replace('.', '/')}/${simpleName.replace('$', '.')}"
 
     // empty if located in root package
     override val packageName: String
-        get() = classInfo.packageName
+        get() = clz.packageName
 
+    // TODO: empty if class is anonymous
     override val simpleName: String
-        get() = classInfo.simpleName
+        get() = clz.simpleName
 
     override val members: List<TypeMember> by lazy {
-        createMemberList(classInfo.methodInfo, classInfo.constructorInfo, classInfo.fieldInfo)
+        createMemberList(clz.methods, clz.constructors, clz.fields)
     }
 
     override val declaredMembers: List<JvmMember> by lazy {
-        createMemberList(classInfo.declaredMethodInfo, classInfo.declaredConstructorInfo, classInfo.declaredFieldInfo)
+        createMemberList(clz.declaredMethods, clz.declaredConstructors, clz.declaredFields)
     }
 
     override fun findMethod(name: String, types: List<ResolvedType>): JvmMember.Method? =
@@ -74,69 +74,78 @@ class JvmReferenceType private constructor(val classInfo: ClassInfo) : JvmType {
         is JukkasType -> TODO("isCompatible -> JukkasType")
         // TODO: is this sound?
         is JvmType -> when (other) {
+            is JvmArrayType -> false
             is JvmPrimitiveType -> false // a wrapper type is never allowed in place of a primitive
-            is JvmReferenceType -> this sameJvmDescriptor other || this extendsOrImplements other
+            is JvmReferenceType -> other.clz.isAssignableFrom(clz) // TODO: is this the right order?
         }
     }
 
-    infix fun extendsOrImplements(other: JvmReferenceType): Boolean =
-        classInfo.extendsSuperclass(other.classInfo.name) || classInfo.implementsInterface(other.classInfo.name)
+    override fun toJvmDescriptor(): String = getDescriptor(clz)
 
-    override fun toJvmDescriptor(): String = when (classInfo) {
-        is ArrayClassInfo -> classInfo.typeSignatureStr
-        else -> "L$jvmName;"
-    }
+    override fun toAsmType(): AsmReferenceType = AsmReferenceType.of(clz)
 
-    override fun toAsmType(): AsmType = when (classInfo) {
-        is ArrayClassInfo -> AsmArrayType.fromDescriptor(classInfo.typeSignatureStr)
-        else -> AsmReferenceType.fromDescriptor(toJvmDescriptor())
-    }
-
-    override fun toString(): String = classInfo.toString()
+    override fun toString(): String = internalName
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is JvmReferenceType -> false
-        classInfo != other.classInfo -> false
+        clz != other.clz -> false
         else -> true
     }
 
-    override fun hashCode(): Int = classInfo.hashCode()
-
-    private fun createMemberList(
-        methods: MethodInfoList,
-        constructors: MethodInfoList,
-        fields: FieldInfoList,
-    ): List<JvmMember> = buildList(methods.size + constructors.size + fields.size) {
-        for (method in methods) {
-            add(JvmMember.Method(method))
-        }
-
-        for (constructor in constructors) {
-            add(JvmMember.Constructor(constructor))
-        }
-
-        for (field in fields) {
-            add(JvmMember.Field(field))
-        }
-    }
+    override fun hashCode(): Int = clz.hashCode()
 
     companion object {
         private val cache = hashMapOf<String, JvmReferenceType>()
 
-        // TODO: switch away from ClassGraph, it explicitly removes java.lang.Object which makes stuff a fucking pita
-        val OBJECT: JvmReferenceType = of("java.lang.Object")
-        val STRING: JvmReferenceType = of("java.lang.String")
-        val INT: JvmReferenceType = of("java.lang.Integer")
-        val BOOLEAN: JvmReferenceType = of("java.lang.Boolean")
+        val OBJECT: JvmReferenceType = of<Any>()
+        val STRING: JvmReferenceType = of<String>()
+        val INT: JvmReferenceType = of<Int>()
+        val BOOLEAN: JvmReferenceType = of<Boolean>()
+
+        private inline fun <reified T : Any> of(): JvmReferenceType = of(T::class.javaObjectType)
 
         // TODO: 'info.name' is probably not correct as we want to use the full name?
-        fun from(info: ClassInfo): JvmReferenceType = cache.getOrPut(info.name) { JvmReferenceType(info) }
-
-        fun of(name: String): JvmReferenceType = cache.getOrPut(name) {
-            val info = scanForClass(name)
-            require(info != null) { "Could not find class: $name" }
-            JvmReferenceType(info)
+        fun of(clz: Class<*>): JvmReferenceType {
+            require(!clz.isPrimitive) { "Class <$clz> is a primitive, use JvmPrimitiveType instead" }
+            require(!clz.isArray) { "Class <$clz> is an array, use JvmArrayType instead" }
+            return cache.getOrPut(getDescriptor(clz)) { JvmReferenceType(clz) }
         }
+
+        /**
+         * Returns a [JvmReferenceType] for a [Class] instance loaded from the given [name], or `null` if no class
+         * with `name` could be loaded.
+         *
+         * This uses the [Class.forName] function for loading classes.
+         *
+         * @see [Class.forName]
+         */
+        fun find(name: String): JvmReferenceType? {
+            val clz = try {
+                // TODO: this will initialize the class, do we want that?
+                Class.forName(name)
+            } catch (_: Exception) {
+                return null
+            }
+            return of(clz)
+        }
+    }
+}
+
+private fun createMemberList(
+    methods: Array<Method>,
+    constructors: Array<Constructor<*>>,
+    fields: Array<Field>,
+): List<JvmMember> = buildList(methods.size + constructors.size + fields.size) {
+    for (method in methods) {
+        add(JvmMember.Method(method))
+    }
+
+    for (constructor in constructors) {
+        add(JvmMember.Constructor(constructor))
+    }
+
+    for (field in fields) {
+        add(JvmMember.Field(field))
     }
 }

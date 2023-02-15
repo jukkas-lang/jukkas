@@ -18,12 +18,36 @@ package net.ormr.jukkas.type
 
 import net.ormr.jukkas.type.member.JvmMember
 import net.ormr.jukkas.type.member.TypeMember
+import net.ormr.jukkas.utils.getDescriptor
 import net.ormr.krautils.collections.getOrThrow
+import kotlin.reflect.typeOf
 
-class JvmPrimitiveType private constructor(
-    override val internalName: String,
-    override val simpleName: String,
-) : JvmType {
+enum class JvmPrimitiveType(val clz: Class<*>) : JvmType {
+    VOID(primitive<Void>()),
+    BOOLEAN(primitive<Boolean>()),
+    CHAR(primitive<Char>()),
+    BYTE(primitive<Byte>()),
+    SHORT(primitive<Short>()),
+    INT(primitive<Int>()),
+    LONG(primitive<Long>()),
+    FLOAT(primitive<Float>()),
+    DOUBLE(primitive<Double>());
+
+    // TODO: internal name for primitive should probably be the actual name we use in Jukkas
+    //       so like: int -> Int32, long -> Int64, etc..
+    //       this will cause a problem for the VOID type tho, because Jukkas doesn't have the void type
+    override val internalName: String
+        get() = getDescriptor(clz)
+
+    override val simpleName: String
+        get() = clz.name
+
+    override val packageName: String
+        get() = clz.packageName
+
+    override val jvmName: String
+        get() = getDescriptor(clz)
+
     override val superType: ResolvedType?
         get() = null
 
@@ -36,9 +60,6 @@ class JvmPrimitiveType private constructor(
     override val declaredMembers: List<JvmMember>
         get() = emptyList()
 
-    override val packageName: String
-        get() = ""
-
     override fun findMethod(name: String, types: List<ResolvedType>): TypeMember.Method? = null
 
     override fun findConstructor(types: List<ResolvedType>): TypeMember.Constructor? = null
@@ -49,52 +70,26 @@ class JvmPrimitiveType private constructor(
         is ErrorType -> false
         is JukkasType -> TODO("isCompatible -> JukkasType")
         is JvmType -> when (other) {
-            is JvmPrimitiveType -> internalName == other.internalName
+            is JvmArrayType -> false
+            is JvmPrimitiveType -> this == other
             is JvmReferenceType -> TODO("allow primitives in place of wrapper types")
         }
     }
 
     override fun toJvmDescriptor(): String = internalName
 
-    override fun toAsmType(): AsmPrimitiveType = AsmPrimitiveType.fromDescriptor(internalName)
+    override fun toAsmType(): AsmPrimitiveType = AsmPrimitiveType.of(clz)
+
+    override fun toString(): String = internalName
 
     companion object {
-        private val symbolCache = hashMapOf<String, JvmPrimitiveType>()
-        private val nameCache = hashMapOf<String, JvmPrimitiveType>()
+        private val cache: Map<Class<*>, JvmPrimitiveType> = values().associateByTo(hashMapOf()) { it.clz }
 
-        val VOID: JvmPrimitiveType = of("V", "void")
-        val BOOLEAN: JvmPrimitiveType = of("Z", "boolean")
-        val CHAR: JvmPrimitiveType = of("C", "char")
-        val BYTE: JvmPrimitiveType = of("B", "byte")
-        val SHORT: JvmPrimitiveType = of("S", "short")
-        val INT: JvmPrimitiveType = of("I", "int")
-        val LONG: JvmPrimitiveType = of("J", "long")
-        val FLOAT: JvmPrimitiveType = of("F", "float")
-        val DOUBLE: JvmPrimitiveType = of("D", "double")
-
-        private fun of(symbol: String, name: String): JvmPrimitiveType {
-            val type = JvmPrimitiveType(symbol, name)
-            symbolCache[symbol] = type
-            nameCache[name] = type
-            return type
-        }
-
-        /**
-         * Returns the [JvmPrimitiveType] corresponding to the given [symbol], or throws a [NoSuchElementException] if
-         * none is found.
-         *
-         * For example, [INT] has the symbol `I`, and [BOOLEAN] has the symbol `Z`.
-         */
-        fun fromSymbol(symbol: String): JvmPrimitiveType =
-            symbolCache.getOrThrow(symbol) { "Unknown primitive type symbol: $symbol" }
-
-        /**
-         * Returns the [JvmPrimitiveType] corresponding to the given [name], or throws a [NoSuchElementException] if
-         * none is found.
-         *
-         * For example, [INT] has the name `int`, and [BOOLEAN] has the name `boolean`.
-         */
-        fun fromName(name: String): JvmPrimitiveType =
-            nameCache.getOrThrow(name) { "Unknown primitive type name: $name" }
+        // TODO: we currently don't support implicit conversions of wrapper classes to their primitive counterparts
+        //       should we do this?
+        fun of(clz: Class<*>): JvmPrimitiveType = cache.getOrThrow(clz) { "Class <$clz> is not a primitive" }
     }
 }
+
+private inline fun <reified T : Any> primitive(): Class<T> =
+    T::class.javaPrimitiveType ?: error("Could not retrieve Java primitive type for ${typeOf<T>()}")

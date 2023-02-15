@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.type
+package net.ormr.jukkas.utils
 
-import net.ormr.jukkas.Positionable
+import org.objectweb.asm.Type as ObjectWebAsmType
 
-interface TypeResolutionContext {
-    val cache: TypeCache
+internal fun getDescriptor(clz: Class<*>): String = ObjectWebAsmType.getDescriptor(clz)
 
-    fun reportSemanticError(position: Positionable, message: String)
-
-    fun reportTypeError(position: Positionable, message: String)
-}
-
-fun TypeResolutionContext.errorType(position: Positionable, message: String): ErrorType {
-    reportSemanticError(position, message)
-    return ErrorType(message)
-}
+internal fun getInternalName(clz: Class<*>): String = ObjectWebAsmType.getInternalName(clz)

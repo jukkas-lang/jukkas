@@ -18,20 +18,15 @@ package net.ormr.jukkas.type
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
-import net.ormr.jukkas.utils.scanForClass
 
 class TypeName(val position: Position, override val internalName: String) : Type, Positionable {
     override fun findPositionOrNull(): Position = position
 
     // TODO: handle jukkas classes
     override fun resolve(context: TypeResolutionContext): ResolvedTypeOrError =
-        context.cache.find(internalName) ?: run {
-            val info = scanForClass(jvmName) ?: return@run run {
-                context.reportSemanticError(position, "Can't find type '$internalName'")
-                ErrorType("Can't find type '$internalName'")
-            }
-            JvmReferenceType.from(info)
-        }
+        context.cache.find(internalName)
+            ?: JvmReferenceType.find(jvmName)
+            ?: context.errorType(position, "Can't find type '$internalName'")
 
     override fun toJvmDescriptor(): String = "L${internalName.replace('.', '$')};"
 

@@ -19,8 +19,6 @@ package net.ormr.jukkas.phases
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
-import net.ormr.jukkas.getOrElse
-import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.type.ErrorType
 import net.ormr.jukkas.type.JvmPrimitiveType
 import net.ormr.jukkas.type.ResolvedType
@@ -29,24 +27,6 @@ import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.TypeCache
 import net.ormr.jukkas.type.TypeResolutionContext
 import net.ormr.jukkas.type.UnknownType
-
-fun main() {
-    val source = """
-        import "java/lang" { System }
-        
-        fun main() {
-            System.out.println("Hello, World!");
-        }
-    """.trimIndent()
-    val thing = JukkasParser.parseText(source)
-    val unit = thing.getOrElse { error(it) }
-    val typeResolver = TypeResolutionPhase(unit)
-    typeResolver.visit(unit)
-    if (unit.reporter.hasErrors()) {
-        error(unit.reporter.messages)
-    }
-    println(unit.children)
-}
 
 /**
  * Performs type resolution and type inference.
