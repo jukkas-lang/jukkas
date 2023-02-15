@@ -21,12 +21,3 @@ import net.ormr.jukkas.type.Type
 sealed interface Definition : Node {
     val type: Type
 }
-
-val Definition.name: String?
-    get() = when (this) {
-        is Lambda -> null
-        is Function -> name
-        is Property -> name
-        is Variable -> name
-        is NamedArgument -> name
-    }

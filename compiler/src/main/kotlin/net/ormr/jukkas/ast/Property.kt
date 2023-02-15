@@ -22,10 +22,10 @@ import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Property(
     val kind: PropertyKind,
-    val name: String,
+    override val name: String,
     override var type: Type,
     initializer: Expression?,
-) : Statement(), Definition {
+) : Statement(), NamedDefinition {
     var initializer: Expression? by child(initializer)
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)

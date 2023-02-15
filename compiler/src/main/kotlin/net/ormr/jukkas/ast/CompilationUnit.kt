@@ -45,15 +45,15 @@ class CompilationUnit(
                 checkStructuralEquivalence(children, other.children)
 
     private fun onAddChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
+        if (node is NamedDefinition) {
+            val name = node.name
             table.define(name, node)
         }
     }
 
     private fun onRemoveChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
+        if (node is NamedDefinition) {
+            val name = node.name
             table.undefine(name)
         }
     }

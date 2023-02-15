@@ -16,25 +16,6 @@
 
 package net.ormr.jukkas.ast
 
-class Table(val parent: Table? = null) {
-    private val entries = hashMapOf<String, NamedDefinition>()
-
-    // TODO: use iteration instead of recursion
-
-    fun find(name: String): NamedDefinition? = entries[name] ?: parent?.find(name)
-
-    fun findLocal(name: String): NamedDefinition? = entries[name]
-
-    fun define(name: String, value: NamedDefinition) {
-        if (name in entries) {
-            value.reportSemanticError(value, "Redefined name: '$name'")
-        } else {
-            entries[name] = value
-        }
-    }
-
-    fun undefine(name: String) {
-        // TODO: verify?
-        entries -= name
-    }
+sealed interface NamedDefinition : Definition {
+    val name: String
 }

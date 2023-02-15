@@ -33,15 +33,15 @@ class Block(override val table: Table, statements: List<Statement>) : Expression
                 type.isStructurallyEquivalent(other.type)
 
     private fun onAddChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
+        if (node is NamedDefinition) {
+            val name = node.name
             table.define(name, node)
         }
     }
 
     private fun onRemoveChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
+        if (node is NamedDefinition) {
+            val name = node.name
             table.undefine(name)
         }
     }

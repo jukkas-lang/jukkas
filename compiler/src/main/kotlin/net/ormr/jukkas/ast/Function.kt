@@ -21,11 +21,11 @@ import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Function(
-    val name: String,
+    override val name: String,
     arguments: List<Argument>,
     body: Block?,
     override var type: Type,
-) : Statement(), Invokable {
+) : Statement(), Invokable, NamedDefinition {
     override val arguments: MutableNodeList<Argument> = arguments.toMutableNodeList(this)
     override var body: Block? by child(body)
 

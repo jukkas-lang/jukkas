@@ -23,8 +23,8 @@ sealed class Argument : Statement() {
     final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitArgument(this)
 }
 
-sealed class NamedArgument : Argument(), Definition {
-    abstract val name: String
+sealed class NamedArgument : Argument(), NamedDefinition {
+    abstract override val name: String
     abstract override var type: Type
 
     operator fun component1(): String = name
