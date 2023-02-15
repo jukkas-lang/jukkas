@@ -22,12 +22,7 @@ import net.ormr.jukkas.ast.Table
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
-import net.ormr.jukkas.lexer.TokenType.COMMA
-import net.ormr.jukkas.lexer.TokenType.EQUAL
-import net.ormr.jukkas.lexer.TokenType.LEFT_BRACE
-import net.ormr.jukkas.lexer.TokenType.LEFT_PAREN
-import net.ormr.jukkas.lexer.TokenType.RIGHT_BRACE
-import net.ormr.jukkas.lexer.TokenType.RIGHT_PAREN
+import net.ormr.jukkas.lexer.TokenType.*
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.JukkasParser.Companion.IDENTIFIERS
 import net.ormr.jukkas.type.TypeName
@@ -40,9 +35,8 @@ object FunctionParselet : PrefixParselet {
         consume(LEFT_PAREN)
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
         val argEnd = consume(RIGHT_PAREN)
-        val returnType = parseOptionalTypeDeclaration()
+        val returnType = parseOptionalTypeDeclaration(ARROW)
         val returnTypePosition = (returnType as? TypeName)?.position
-        // TODO: type parsing
         val body = when {
             match(EQUAL) -> {
                 // TODO: give warning for structures like 'fun() = return;' ?
