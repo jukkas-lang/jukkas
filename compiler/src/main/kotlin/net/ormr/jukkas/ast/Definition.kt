@@ -18,7 +18,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
-sealed interface Definition {
+sealed interface Definition : Node {
     val type: Type
 }
 
@@ -29,8 +29,3 @@ val Definition.name: String?
         is Variable -> name
         is NamedArgument -> name
     }
-
-fun Definition.asNode(): Node {
-    check(this is Node) { "Definition wasn't Node, this should never happen. <$this>" }
-    return this
-}
