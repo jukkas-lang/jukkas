@@ -18,6 +18,10 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
+sealed interface Definition {
+    val type: Type
+}
+
 val Definition.name: String?
     get() = when (this) {
         is Function -> name
@@ -25,10 +29,6 @@ val Definition.name: String?
         is Variable -> name
         is NamedArgument -> name
     }
-
-sealed interface Definition {
-    val type: Type
-}
 
 fun Definition.asNode(): Node {
     check(this is Node) { "Definition wasn't Node, this should never happen. <$this>" }
