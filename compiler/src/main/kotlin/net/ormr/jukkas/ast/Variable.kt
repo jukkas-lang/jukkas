@@ -17,7 +17,7 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.utils.bothNullOrEquivalent
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Variable(
     val kind: PropertyKind,
@@ -33,7 +33,7 @@ class Variable(
         other is Variable &&
                 kind == other.kind &&
                 name == other.name &&
-                bothNullOrEquivalent(initializer, other.initializer) { a, b -> a.isStructurallyEquivalent(b) }
+                checkStructuralEquivalence(initializer, other.initializer)
 
     operator fun component1(): PropertyKind = kind
 

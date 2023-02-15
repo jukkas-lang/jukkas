@@ -18,7 +18,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
-import net.ormr.jukkas.utils.bothNullOrEquivalent
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class ConditionalBranch(
     condition: Expression,
@@ -36,7 +36,7 @@ class ConditionalBranch(
         other is ConditionalBranch &&
                 condition.isStructurallyEquivalent(other.condition) &&
                 thenBranch.isStructurallyEquivalent(other.thenBranch) &&
-                bothNullOrEquivalent(elseBranch, other.elseBranch) { a, b -> a.isStructurallyEquivalent(b) }
+                checkStructuralEquivalence(elseBranch, other.elseBranch)
 
     operator fun component1(): Expression = condition
 

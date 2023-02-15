@@ -17,7 +17,7 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.utils.bothNullOrEquivalent
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Function(
     val name: String?,
@@ -33,7 +33,6 @@ class Function(
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is Function &&
                 name == other.name &&
-                arguments.size == other.arguments.size &&
-                (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) } &&
-                bothNullOrEquivalent(body, other.body) { a, b -> a.isStructurallyEquivalent(b) }
+                checkStructuralEquivalence(arguments, other.arguments) &&
+                checkStructuralEquivalence(body, other.body)
 }

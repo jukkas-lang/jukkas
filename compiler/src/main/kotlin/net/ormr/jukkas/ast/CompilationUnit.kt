@@ -20,6 +20,7 @@ import net.ormr.jukkas.Position
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.type.TypeCache
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class CompilationUnit(
     val source: Source,
@@ -39,8 +40,8 @@ class CompilationUnit(
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is CompilationUnit &&
-                children.size == other.children.size &&
-                (children zip other.children).all { (first, second) -> first.isStructurallyEquivalent(second) }
+                checkStructuralEquivalence(imports, other.imports) &&
+                checkStructuralEquivalence(children, other.children)
 
     private fun onAddChild(index: Int, node: Statement) {
         if (node is Definition) {

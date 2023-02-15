@@ -2,6 +2,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.JvmReferenceType
 import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 sealed class StringTemplatePart : ChildNode() {
     class LiteralPart(val literal: StringLiteral) : StringTemplatePart() {
@@ -28,7 +29,5 @@ class StringTemplateExpression(parts: List<StringTemplatePart>) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitStringTemplateExpression(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is StringTemplateExpression &&
-                parts.size == other.parts.size &&
-                (parts zip other.parts).all { (first, second) -> first.isStructurallyEquivalent(second) }
+        other is StringTemplateExpression && checkStructuralEquivalence(parts, other.parts)
 }

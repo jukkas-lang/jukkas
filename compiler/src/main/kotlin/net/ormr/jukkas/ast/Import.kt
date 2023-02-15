@@ -16,6 +16,8 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.utils.checkStructuralEquivalence
+
 class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
     val entries: NodeList<ImportEntry> = entries.toNodeList(this)
     val path: StringLiteral by child(path)
@@ -25,7 +27,7 @@ class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is Import &&
                 path.isStructurallyEquivalent(other.path) &&
-                (entries zip other.entries).all { (a, b) -> a.isStructurallyEquivalent(b) }
+                checkStructuralEquivalence(entries, other.entries)
 
     override fun toString(): String = "(import (${entries.joinToString(separator = " ")}) (from $path))"
 }

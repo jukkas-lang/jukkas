@@ -18,7 +18,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
-import net.ormr.jukkas.utils.bothNullOrEquivalent
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Return(value: Expression?) : Expression() {
     var value: Expression? by child(value)
@@ -27,7 +27,7 @@ class Return(value: Expression?) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitReturn(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Return && bothNullOrEquivalent(value, other.value) { a, b -> a.isStructurallyEquivalent(b) }
+        other is Return && checkStructuralEquivalence(value, other.value)
 
     override fun toString(): String = when (value) {
         null -> "return"
