@@ -18,14 +18,10 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
-sealed class Node : Positionable {
-    open var parent: Node? = null
-
-    abstract val position: Position?
-
+sealed interface Node : Positionable {
+    var parent: Node?
+    val position: Position?
     val closestPosition: Position?
         get() = position ?: parent?.closestPosition
 
@@ -39,7 +35,7 @@ sealed class Node : Positionable {
     val ancestors: Sequence<Node>
         get() = generateSequence(parent) { it.parent }
 
-    abstract val compilationUnit: CompilationUnit
+    val compilationUnit: CompilationUnit
 
     /**
      * Returns `true` if [other] is structurally equivalent to `this` node.
@@ -51,91 +47,16 @@ sealed class Node : Positionable {
      * Structural equivalence checks are intended for use via unit tests, and should probably not be used outside of
      * unit tests.
      */
-    abstract fun isStructurallyEquivalent(other: Node): Boolean
+    fun isStructurallyEquivalent(other: Node): Boolean
 
     override fun findPosition(): Position = closestPosition ?: error("Could not find any position for $this")
 
     override fun findPositionOrNull(): Position? = position
 
-    abstract fun <T> accept(visitor: NodeVisitor<T>): T
+    fun <T> accept(visitor: NodeVisitor<T>): T
 
-    fun <T : Node> adopt(child: T): T {
-        if (child.parent !== this) {
-            child.disownParent()
-            child.parent = this
-            childAdopted(child)
-        }
+    fun <T : Node> adopt(child: T): T
 
-        return child
-    }
-
-    protected open fun childAdopted(child: Node) {}
-
-    fun <T : Node> disown(child: T): T {
-        if (child.parent === this) {
-            child.parent = null
-            childDisowned(child)
-        }
-
-        return child
-    }
-
-    protected open fun childDisowned(child: Node) {}
-
-    protected fun <T : Node> child(
-        initial: T,
-        setterCallback: ((T) -> Unit)? = null,
-    ): ReadWriteProperty<Node, T> = ChildProperty(this, initial, setterCallback)
-
-    @JvmName("nullableChild")
-    protected fun <T : Node> child(
-        initial: T?,
-        setterCallback: ((T?) -> Unit)? = null,
-    ): ReadWriteProperty<Node, T?> = NullableChildProperty(this, initial, setterCallback)
-
-    private class ChildProperty<T : Node>(
-        parent: Node,
-        private var child: T,
-        private val setterCallback: ((T) -> Unit)?,
-    ) : ReadWriteProperty<Node, T> {
-        init {
-            val child = child
-            setterCallback?.invoke(child)
-            parent.adopt(child)
-        }
-
-        override fun getValue(thisRef: Node, property: KProperty<*>): T = child
-
-        override fun setValue(
-            thisRef: Node,
-            property: KProperty<*>,
-            value: T,
-        ) {
-            setterCallback?.invoke(value)
-            child = thisRef.adopt(value)
-        }
-    }
-
-    private class NullableChildProperty<T : Node>(
-        parent: Node,
-        private var child: T?,
-        private val setterCallback: ((T?) -> Unit)?,
-    ) : ReadWriteProperty<Node, T?> {
-        init {
-            val child = child
-            setterCallback?.invoke(child)
-            if (child != null) parent.adopt(child)
-        }
-
-        override fun getValue(thisRef: Node, property: KProperty<*>): T? = child
-
-        override fun setValue(
-            thisRef: Node,
-            property: KProperty<*>,
-            value: T?,
-        ) {
-            setterCallback?.invoke(value)
-            child = value?.let(thisRef::adopt)
-        }
-    }
+    fun <T : Node> disown(child: T): T
 }
+
