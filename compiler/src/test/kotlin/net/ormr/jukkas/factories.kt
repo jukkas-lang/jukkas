@@ -36,4 +36,4 @@ fun reference(name: String): DefinitionReference = DefinitionReference(name)
 fun binary(left: Expression, operator: BinaryOperator, right: Expression): BinaryOperation =
     BinaryOperation(left, operator, right)
 
-fun argument(value: Expression, name: String? = null): InvocationArgument = InvocationArgument(name, value)
+fun argument(value: Expression, name: String? = null): InvocationArgument = InvocationArgument(value, name)

@@ -184,7 +184,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         if (name != null) consume(EQUAL)
         val value = parseExpression()
         val position = name?.let { createSpan(it, value) } ?: value
-        return InvocationArgument(name?.identifierName, value) withPosition position
+        return InvocationArgument(value, name?.identifierName) withPosition position
     }
 
     fun parseBasicArgument(): BasicArgument {

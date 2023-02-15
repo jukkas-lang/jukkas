@@ -19,7 +19,7 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
-class InvocationArgument(val name: String?, value: Expression) : Expression() {
+class InvocationArgument(value: Expression, val name: String?) : Expression() {
     var value: Expression by child(value)
     override var type: Type = UnknownType
 
