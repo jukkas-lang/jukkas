@@ -120,7 +120,7 @@ internal class TypeCheckingPhase(private val unit: CompilationUnit) : NodeVisito
             reportSemanticError(reference, "Unresolved reference: ${reference.name}")
             return
         }
-        visit(definition.asNode())
+        visit(definition)
     }
 
     override fun visitImport(import: Import) {

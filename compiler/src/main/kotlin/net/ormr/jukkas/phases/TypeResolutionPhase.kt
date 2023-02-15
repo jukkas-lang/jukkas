@@ -102,7 +102,7 @@ class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisitor<Unit>
 
     override fun visitIdentifierReference(reference: DefinitionReference) {
         val definition = findDefinition(reference) ?: return
-        visit(definition.asNode())
+        visit(definition)
     }
 
     override fun visitInvocation(invocation: Invocation) {
