@@ -16,6 +16,6 @@
 
 package net.ormr.jukkas.ast
 
-sealed interface TableContainer {
+sealed interface TableContainer : Node {
     val table: Table
 }
