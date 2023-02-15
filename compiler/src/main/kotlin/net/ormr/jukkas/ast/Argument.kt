@@ -33,7 +33,7 @@ sealed class NamedArgument : Argument(), Definition {
 
 class BasicArgument(override val name: String, override var type: Type) : NamedArgument() {
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is BasicArgument && name == other.name && type == other.type
+        other is BasicArgument && name == other.name
 }
 
 class DefaultArgument(
@@ -46,8 +46,7 @@ class DefaultArgument(
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is DefaultArgument &&
                 name == other.name &&
-                default.isStructurallyEquivalent(other.default) &&
-                type == other.type
+                default.isStructurallyEquivalent(other.default)
 
     operator fun component3(): Expression = default
 }
