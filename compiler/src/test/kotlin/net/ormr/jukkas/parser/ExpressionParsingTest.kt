@@ -17,7 +17,7 @@
 package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
-import net.ormr.jukkas.argument
+import net.ormr.jukkas.invArg
 import net.ormr.jukkas.ast.BinaryOperator.DIVISION
 import net.ormr.jukkas.ast.BinaryOperator.MINUS
 import net.ormr.jukkas.ast.BinaryOperator.MULTIPLICATION
@@ -89,9 +89,9 @@ class ExpressionParsingTest : FunSpec({
             expr shouldBeStructurallyEquivalentTo FunctionInvocation(
                 reference("foo"),
                 listOf(
-                    argument(int(1)),
-                    argument(int(2), "bar"),
-                    argument(int(3)),
+                    invArg(int(1)),
+                    invArg(int(2), "bar"),
+                    invArg(int(3)),
                 ),
             )
         }
@@ -106,7 +106,7 @@ class ExpressionParsingTest : FunSpec({
                     isSafe = false,
                 ),
                 listOf(
-                    argument(int(1)),
+                    invArg(int(1)),
                 ),
             )
         }

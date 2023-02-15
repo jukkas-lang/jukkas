@@ -34,6 +34,7 @@ class TypeName(val position: Position, override val internalName: String) : Type
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is TypeName && internalName == other.internalName
 
+
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is TypeName -> false
@@ -47,4 +48,6 @@ class TypeName(val position: Position, override val internalName: String) : Type
         result = 31 * result + internalName.hashCode()
         return result
     }
+
+    override fun toString(): String = "TypeName(internalName='$internalName')"
 }

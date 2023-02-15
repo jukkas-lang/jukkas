@@ -18,12 +18,16 @@ package net.ormr.jukkas
 
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.Node
+import net.ormr.jukkas.ast.Statement
 import net.ormr.jukkas.parser.JukkasParser
 
 inline fun <T : Node> parseNode(
     source: String,
     crossinline fn: (JukkasParser) -> T,
 ): JukkasResult<T> = JukkasParser.parse(Source.Text(source), fn)
+
+fun parseStatement(source: String): JukkasResult<Statement> =
+    JukkasParser.parse(Source.Text(source), JukkasParser::parseStatement)
 
 fun parseExpression(source: String): JukkasResult<Expression> =
     JukkasParser.parse(Source.Text(source), JukkasParser::parseExpression)

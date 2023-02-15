@@ -37,4 +37,6 @@ class Function(
                 checkStructuralEquivalence(arguments, other.arguments) &&
                 checkStructuralEquivalence(body, other.body) &&
                 type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String = "Function(name='$name', type=$type, arguments=$arguments, body=$body)"
 }

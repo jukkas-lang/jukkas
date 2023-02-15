@@ -35,6 +35,8 @@ sealed class NamedArgument : Argument(), Definition {
 class BasicArgument(override val name: String, override var type: Type) : NamedArgument() {
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is BasicArgument && name == other.name && type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String = "BasicArgument(name='$name', type=$type)"
 }
 
 class DefaultArgument(
@@ -51,6 +53,8 @@ class DefaultArgument(
                 type.isStructurallyEquivalent(other.type)
 
     operator fun component3(): Expression = default
+
+    override fun toString(): String = "DefaultArgument(name='$name', type=$type, default=$default)"
 }
 
 // TODO: we probably don't want to support arbitrary pattern matching for arguments,
