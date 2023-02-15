@@ -45,24 +45,26 @@ import net.ormr.jukkas.type.UnknownType
  */
 object FunctionLiteralParselet : PrefixParselet {
     override fun parse(parser: JukkasParser, token: Token): Lambda = parser with {
-        // TODO: we're using || to separate arguments for now, remove this at a later point,
-        //       will require arbitrary lookahead tho
-        val arguments = when {
-            check(VERTICAL_LINE) -> {
-                consume()
-                val arguments = parseArguments(COMMA, VERTICAL_LINE, ::parsePatternArgument)
-                consume(VERTICAL_LINE)
-                consume(ARROW)
-                arguments
+        newBlock {
+            // TODO: we're using || to separate arguments for now, remove this at a later point,
+            //       will require arbitrary lookahead tho
+            val arguments = when {
+                check(VERTICAL_LINE) -> {
+                    consume()
+                    val arguments = parseArguments(COMMA, VERTICAL_LINE, ::parsePatternArgument)
+                    consume(VERTICAL_LINE)
+                    consume(ARROW)
+                    arguments
+                }
+                else -> {
+                    if (check(ARROW)) consume()
+                    emptyList()
+                }
             }
-            else -> {
-                if (check(ARROW)) consume()
-                emptyList()
-            }
+            // TODO: set the end of the position of this block to its last child
+            val body = parseBlock(RIGHT_BRACE)
+            val end = previous()
+            Lambda(arguments, body, UnknownType, table) withPosition createSpan(token, end)
         }
-        // TODO: set the end of the position of this block to its last child
-        val body = parseBlock(RIGHT_BRACE)
-        val end = previous()
-        Lambda(arguments, body, UnknownType) withPosition createSpan(token, end)
     }
 }

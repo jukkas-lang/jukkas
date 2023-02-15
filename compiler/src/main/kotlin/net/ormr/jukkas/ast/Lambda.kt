@@ -24,8 +24,10 @@ class Lambda(
     arguments: List<Argument>,
     body: Block,
     override var type: Type,
-) : Expression(), Invokable {
-    override val arguments: MutableNodeList<Argument> = arguments.toMutableNodeList(this)
+    override val table: Table,
+) : Expression(), Invokable, TableContainer {
+    override val arguments: MutableNodeList<Argument> =
+        arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override var body: Block by child(body)
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLambda(this)

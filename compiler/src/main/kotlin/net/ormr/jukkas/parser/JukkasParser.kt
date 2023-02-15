@@ -36,7 +36,30 @@ import net.ormr.jukkas.utils.identifierName
 import java.nio.file.Path
 
 class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
-    fun parseCompilationUnit(): CompilationUnit {
+    private val tables = ArrayDeque<Table>()
+    val table: Table
+        get() = tables.firstOrNull() ?: error("No tables found")
+
+    fun newTable(): Table = Table(tables.firstOrNull())
+
+    fun pushTable(table: Table = newTable()) {
+        tables.addFirst(table)
+    }
+
+    fun popTable() {
+        tables.removeFirst()
+    }
+
+    inline fun <T> newBlock(table: Table = newTable(), block: () -> T): T {
+        pushTable(table)
+        return try {
+            block()
+        } finally {
+            popTable()
+        }
+    }
+
+    fun parseCompilationUnit(): CompilationUnit = newBlock(Table()) {
         val imports = buildList {
             while (hasMore()) {
                 if (!check(IMPORT)) break
@@ -50,7 +73,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         }
         val end = consume(END_OF_FILE)
         val position = children.firstOrNull()?.let { createSpan(it, end) } ?: end.findPosition()
-        return CompilationUnit(source, position, imports, children)
+        return CompilationUnit(source, position, imports, children, table)
     }
 
     fun consumeIdentifier(): Token = consume(IDENTIFIERS, "identifier")
@@ -157,7 +180,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         else -> start.findPosition()
     }
 
-    private fun parseFunction(): Function {
+    private fun parseFunction(): Function = newBlock {
         val keyword = consume(FUN)
         val name = consumeIdentifier().identifierName
         consume(LEFT_PAREN)
@@ -170,8 +193,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
                 // TODO: give warning for structures like 'fun() = return;' ?
                 val equal = previous()
                 val expr = parseExpressionStatement()
-                // TODO: proper table stacks
-                Block(Table(), listOf(expr)) withPosition createSpan(equal, expr)
+                Block(newTable(), listOf(expr)) withPosition createSpan(equal, expr)
             }
             match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
             // TODO: verify that the function is actually abstract if no body exists in the verifier
@@ -179,7 +201,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
             else -> null
         }
         val position = createSpan(keyword, body ?: returnTypePosition ?: argEnd)
-        return Function(name, arguments, body, returnType) withPosition position
+        return Function(name, arguments, body, returnType, table) withPosition position
     }
 
     private fun parseProperty(): Property = TODO()
@@ -254,7 +276,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         else -> parseExpression()
     }
 
-    fun parseBlock(blockEnd: TokenType): Block {
+    fun parseBlock(blockEnd: TokenType): Block = newBlock {
         val start = previous()
         val statements = buildList {
             while (!check(blockEnd) && hasMore()) {
@@ -263,8 +285,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
             }
         }
         val end = consume(blockEnd)
-        // TODO: proper table stacks
-        return Block(Table(), statements) withPosition createSpan(start, end)
+        return Block(table, statements) withPosition createSpan(start, end)
     }
 
     inline infix fun <R> with(block: JukkasParser.() -> R): R = run(block)

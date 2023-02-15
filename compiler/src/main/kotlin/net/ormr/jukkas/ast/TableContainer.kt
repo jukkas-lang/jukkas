@@ -19,3 +19,17 @@ package net.ormr.jukkas.ast
 sealed interface TableContainer : Node {
     val table: Table
 }
+
+internal fun TableContainer.handleAddChild(index: Int, node: Statement) {
+    if (node is NamedDefinition) {
+        val name = node.name
+        table.define(name, node)
+    }
+}
+
+internal fun TableContainer.handleRemoveChild(index: Int, node: Statement) {
+    if (node is NamedDefinition) {
+        val name = node.name
+        table.undefine(name)
+    }
+}

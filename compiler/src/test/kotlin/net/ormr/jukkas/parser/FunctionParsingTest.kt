@@ -19,6 +19,7 @@ package net.ormr.jukkas.parser
 import io.kotest.core.spec.style.FunSpec
 import net.ormr.jukkas.arg
 import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.Table
 import net.ormr.jukkas.parseStatement
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
@@ -35,6 +36,7 @@ class FunctionParsingTest : FunSpec({
                         arguments = emptyList(),
                         body = null,
                         type = typeName("Unit"),
+                        table = Table(),
                     )
                 }
             }
@@ -48,6 +50,7 @@ class FunctionParsingTest : FunSpec({
                         ),
                         body = null,
                         type = typeName("Unit"),
+                        table = Table(),
                     )
                 }
             }
@@ -61,6 +64,7 @@ class FunctionParsingTest : FunSpec({
                         arguments = emptyList(),
                         body = null,
                         type = UnknownType,
+                        table = Table(),
                     )
                 }
             }
@@ -74,6 +78,7 @@ class FunctionParsingTest : FunSpec({
                         ),
                         body = null,
                         type = UnknownType,
+                        table = Table(),
                     )
                 }
             }

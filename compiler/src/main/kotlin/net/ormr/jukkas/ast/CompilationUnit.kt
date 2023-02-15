@@ -28,8 +28,8 @@ class CompilationUnit(
     override val position: Position,
     imports: List<Import>,
     children: List<Statement>,
+    override val table: Table,
 ) : AbstractNode(), TableContainer {
-    override val table: Table = Table()
     val imports: MutableNodeList<Import> = imports.toMutableNodeList(this)
     val types: TypeCache = TypeCache(this)
     val reporter: MessageReporter = MessageReporter()

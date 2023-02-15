@@ -18,7 +18,6 @@ package net.ormr.jukkas.parser.parselets.prefix
 
 import net.ormr.jukkas.ast.Block
 import net.ormr.jukkas.ast.Lambda
-import net.ormr.jukkas.ast.Table
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -29,24 +28,25 @@ import net.ormr.jukkas.type.TypeName
 
 object AnonymousFunctionParselet : PrefixParselet {
     override fun parse(parser: JukkasParser, token: Token): Lambda = parser with {
-        val name = consumeIfMatch(IDENTIFIERS, "identifier")
-        name?.syntaxError("Anonymous functions with names are prohibited")
-        consume(LEFT_PAREN)
-        val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
-        val argEnd = consume(RIGHT_PAREN)
-        val returnType = parseOptionalTypeDeclaration(ARROW)
-        val returnTypePosition = (returnType as? TypeName)?.position
-        val body = when {
-            match(EQUAL) -> {
-                // TODO: give warning for structures like 'fun() = return;' ?
-                val equal = previous()
-                val expr = parseExpressionStatement()
-                // TODO: proper table stacks
-                Block(Table(), listOf(expr)) withPosition createSpan(equal, expr)
+        newBlock {
+            val name = consumeIfMatch(IDENTIFIERS, "identifier")
+            name?.syntaxError("Anonymous functions with names are prohibited")
+            consume(LEFT_PAREN)
+            val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
+            val argEnd = consume(RIGHT_PAREN)
+            val returnType = parseOptionalTypeDeclaration(ARROW)
+            val returnTypePosition = (returnType as? TypeName)?.position
+            val body = when {
+                match(EQUAL) -> {
+                    // TODO: give warning for structures like 'fun() = return;' ?
+                    val equal = previous()
+                    val expr = parseExpressionStatement()
+                    Block(newTable(), listOf(expr)) withPosition createSpan(equal, expr)
+                }
+                match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
+                else -> createSpan(token, returnTypePosition ?: argEnd) syntaxError "Function must have a body"
             }
-            match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
-            else -> createSpan(token, returnTypePosition ?: argEnd) syntaxError "Function must have a body"
+            Lambda(arguments, body, returnType, table) withPosition createSpan(token, body)
         }
-        Lambda(arguments, body, returnType) withPosition createSpan(token, body)
     }
 }
