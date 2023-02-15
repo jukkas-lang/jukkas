@@ -35,7 +35,8 @@ class MemberAccessOperation(
         other is MemberAccessOperation &&
                 isSafe == other.isSafe &&
                 left.isStructurallyEquivalent(other.left) &&
-                right.isStructurallyEquivalent(other.right)
+                right.isStructurallyEquivalent(other.right) &&
+                type == other.type
 
     override fun toString(): String = "$left.${if (isSafe) "?" else ""}$right"
 

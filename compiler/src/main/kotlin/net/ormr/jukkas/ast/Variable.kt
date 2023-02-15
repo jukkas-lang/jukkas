@@ -33,7 +33,8 @@ class Variable(
         other is Variable &&
                 kind == other.kind &&
                 name == other.name &&
-                checkStructuralEquivalence(initializer, other.initializer)
+                checkStructuralEquivalence(initializer, other.initializer) &&
+                type == other.type
 
     operator fun component1(): PropertyKind = kind
 

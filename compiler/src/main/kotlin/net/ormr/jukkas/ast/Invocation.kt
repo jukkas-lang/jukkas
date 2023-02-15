@@ -39,7 +39,8 @@ class InfixInvocation(
         other is InfixInvocation &&
                 name == other.name &&
                 left.isStructurallyEquivalent(other.left) &&
-                right.isStructurallyEquivalent(other.right)
+                right.isStructurallyEquivalent(other.right) &&
+                type == other.type
 
     operator fun component1(): Expression = left
 
@@ -56,7 +57,8 @@ class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is FunctionInvocation &&
                 left.isStructurallyEquivalent(other.left) &&
-                checkStructuralEquivalence(arguments, other.arguments)
+                checkStructuralEquivalence(arguments, other.arguments) &&
+                type == other.type
 
     override fun toString(): String = "($left (${arguments.joinToString(separator = " ")}))"
 

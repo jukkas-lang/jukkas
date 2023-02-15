@@ -40,11 +40,9 @@ sealed interface Node : Positionable {
     /**
      * Returns `true` if [other] is structurally equivalent to `this` node.
      *
-     * Two nodes being structurally equivalent is *not* the same as the two nodes being [equal][Node.equals]. This is
-     * because structural equivalence checks leaves out certain properties when comparing two instances, one of which
-     * is the `type` of a node.
+     * Two nodes being structurally equivalent does *not* guarantee that they will also be [equal][Node.equals].
      *
-     * Structural equivalence checks are intended for use via unit tests, and should probably not be used outside of
+     * Structural equivalence checks are intended for use via unit tests, and should probably not be used outside
      * unit tests.
      */
     fun isStructurallyEquivalent(other: Node): Boolean

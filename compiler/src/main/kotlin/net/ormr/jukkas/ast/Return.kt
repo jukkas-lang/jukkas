@@ -27,7 +27,7 @@ class Return(value: Expression?) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitReturn(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Return && checkStructuralEquivalence(value, other.value)
+        other is Return && checkStructuralEquivalence(value, other.value) && type == other.type
 
     override fun toString(): String = when (value) {
         null -> "return"

@@ -32,5 +32,6 @@ class Lambda(
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is Lambda &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
-                body.isStructurallyEquivalent(other.body)
+                body.isStructurallyEquivalent(other.body) &&
+                type == other.type
 }

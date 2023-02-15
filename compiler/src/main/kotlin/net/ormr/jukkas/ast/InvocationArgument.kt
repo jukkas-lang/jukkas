@@ -26,7 +26,10 @@ class InvocationArgument(value: Expression, val name: String?) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitInvocationArgument(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is InvocationArgument && name == other.name && value.isStructurallyEquivalent(other.value)
+        other is InvocationArgument &&
+                name == other.name &&
+                value.isStructurallyEquivalent(other.value) &&
+                type == other.type
 
     override fun toString(): String = when (name) {
         null -> value.toString()

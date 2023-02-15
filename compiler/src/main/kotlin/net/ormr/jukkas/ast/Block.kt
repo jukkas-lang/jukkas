@@ -27,7 +27,7 @@ class Block(override val table: Table, statements: List<Statement>) : Expression
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBlock(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Block && checkStructuralEquivalence(statements, other.statements)
+        other is Block && checkStructuralEquivalence(statements, other.statements) && type == other.type
 
     private fun onAddChild(index: Int, node: Statement) {
         if (node is Definition) {

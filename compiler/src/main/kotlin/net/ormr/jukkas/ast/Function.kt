@@ -34,5 +34,6 @@ class Function(
         other is Function &&
                 name == other.name &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
-                checkStructuralEquivalence(body, other.body)
+                checkStructuralEquivalence(body, other.body) &&
+                type == other.type
 }

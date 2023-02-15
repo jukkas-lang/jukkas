@@ -27,7 +27,7 @@ class DefinitionReference(val name: String) : Expression() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitIdentifierReference(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is DefinitionReference && name == other.name
+        other is DefinitionReference && name == other.name && type == other.type
 
     override fun toString(): String = name
 
