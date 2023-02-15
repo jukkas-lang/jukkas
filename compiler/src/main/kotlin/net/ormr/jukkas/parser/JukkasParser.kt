@@ -143,13 +143,13 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         return TypeName(identifier.findPosition(), identifier.identifierName)
     }
 
-    fun parseTypeDeclaration(): TypeName {
-        consume(COLON)
+    fun parseTypeDeclaration(separator: TokenType = COLON): TypeName {
+        consume(separator)
         return parseTypeName()
     }
 
-    fun parseOptionalTypeDeclaration(): Type = when {
-        check(COLON) -> parseTypeDeclaration()
+    fun parseOptionalTypeDeclaration(separator: TokenType = COLON): Type = when {
+        check(separator) -> parseTypeDeclaration()
         else -> UnknownType
     }
 
