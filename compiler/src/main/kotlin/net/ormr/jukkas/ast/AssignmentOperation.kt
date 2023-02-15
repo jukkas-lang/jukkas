@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
@@ -31,11 +32,12 @@ class AssignmentOperation(
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitAssignmentOperation(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is AssignmentOperation &&
                 operator == other.operator &&
                 left.isStructurallyEquivalent(other.left) &&
-                value.isStructurallyEquivalent(other.value)
+                value.isStructurallyEquivalent(other.value) &&
+                type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "(= $left $value)"
 

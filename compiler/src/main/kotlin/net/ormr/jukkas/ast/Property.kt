@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
@@ -29,12 +30,12 @@ class Property(
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Property &&
                 kind == other.kind &&
                 name == other.name &&
                 checkStructuralEquivalence(initializer, other.initializer) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 
     operator fun component1(): PropertyKind = kind
 

@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.checkStructuralEquivalence
@@ -26,8 +27,10 @@ class Return(value: Expression?) : Expression() {
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitReturn(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Return && checkStructuralEquivalence(value, other.value) && type == other.type
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is Return &&
+                checkStructuralEquivalence(value, other.value) &&
+                type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = when (value) {
         null -> "return"

@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 
 sealed class Argument : Statement() {
@@ -32,8 +33,8 @@ sealed class NamedArgument : Argument(), Definition {
 }
 
 class BasicArgument(override val name: String, override var type: Type) : NamedArgument() {
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is BasicArgument && name == other.name && type == other.type
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is BasicArgument && name == other.name && type.isStructurallyEquivalent(other.type)
 }
 
 class DefaultArgument(
@@ -43,11 +44,11 @@ class DefaultArgument(
 ) : NamedArgument() {
     var default: Expression by child(default)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is DefaultArgument &&
                 name == other.name &&
                 default.isStructurallyEquivalent(other.default) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 
     operator fun component3(): Expression = default
 }
@@ -58,6 +59,6 @@ class DefaultArgument(
 class PatternArgument(pattern: Pattern) : Argument() {
     var pattern: Pattern by child(pattern)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is PatternArgument && pattern.isStructurallyEquivalent(other.pattern)
 }

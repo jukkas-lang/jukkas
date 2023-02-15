@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.ast
+package net.ormr.jukkas
 
-import net.ormr.jukkas.StructurallyComparable
-
-class Pattern : ChildNode() {
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitPattern(this)
-
-    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean = other is Pattern
+interface StructurallyComparable {
+    /**
+     * Returns `true` if [other] is structurally equivalent to `this` instance.
+     *
+     * Two instances being structurally equivalent does *not* guarantee that they will also be [equal][Any.equals].
+     *
+     * Structural equivalence checks are intended for use via unit tests, and should probably not be used outside
+     * unit tests.
+     */
+    fun isStructurallyEquivalent(other: StructurallyComparable): Boolean
 }

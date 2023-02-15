@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.type.member.TypeMember
@@ -35,12 +36,12 @@ class InfixInvocation(
     var left: Expression by child(left)
     var right: Expression by child(right)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is InfixInvocation &&
                 name == other.name &&
                 left.isStructurallyEquivalent(other.left) &&
                 right.isStructurallyEquivalent(other.right) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 
     operator fun component1(): Expression = left
 
@@ -54,11 +55,11 @@ class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) 
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
     var member: TypeMember? = null
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionInvocation &&
                 left.isStructurallyEquivalent(other.left) &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "($left (${arguments.joinToString(separator = " ")}))"
 

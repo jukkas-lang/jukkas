@@ -18,8 +18,9 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
+import net.ormr.jukkas.StructurallyComparable
 
-sealed interface Node : Positionable {
+sealed interface Node : Positionable, StructurallyComparable {
     var parent: Node?
     val position: Position?
     val closestPosition: Position?
@@ -36,16 +37,6 @@ sealed interface Node : Positionable {
         get() = generateSequence(parent) { it.parent }
 
     val compilationUnit: CompilationUnit
-
-    /**
-     * Returns `true` if [other] is structurally equivalent to `this` node.
-     *
-     * Two nodes being structurally equivalent does *not* guarantee that they will also be [equal][Node.equals].
-     *
-     * Structural equivalence checks are intended for use via unit tests, and should probably not be used outside
-     * unit tests.
-     */
-    fun isStructurallyEquivalent(other: Node): Boolean
 
     override fun findPosition(): Position = closestPosition ?: error("Could not find any position for $this")
 

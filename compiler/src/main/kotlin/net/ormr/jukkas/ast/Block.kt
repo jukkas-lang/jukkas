@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.checkStructuralEquivalence
@@ -26,8 +27,10 @@ class Block(override val table: Table, statements: List<Statement>) : Expression
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBlock(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Block && checkStructuralEquivalence(statements, other.statements) && type == other.type
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is Block &&
+                checkStructuralEquivalence(statements, other.statements) &&
+                type.isStructurallyEquivalent(other.type)
 
     private fun onAddChild(index: Int, node: Statement) {
         if (node is Definition) {

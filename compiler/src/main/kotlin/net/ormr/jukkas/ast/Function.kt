@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
@@ -30,10 +31,10 @@ class Function(
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitFunction(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Function &&
                 name == other.name &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
                 checkStructuralEquivalence(body, other.body) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 }

@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
@@ -31,12 +32,12 @@ class MemberAccessOperation(
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitMemberAccessOperation(this)
 
     // TODO: do we want to check for type here?
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is MemberAccessOperation &&
                 isSafe == other.isSafe &&
                 left.isStructurallyEquivalent(other.left) &&
                 right.isStructurallyEquivalent(other.right) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "$left.${if (isSafe) "?" else ""}$right"
 

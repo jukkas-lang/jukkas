@@ -18,6 +18,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Source
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.type.TypeCache
 import net.ormr.jukkas.utils.checkStructuralEquivalence
@@ -38,7 +39,7 @@ class CompilationUnit(
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitCompilationUnit(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is CompilationUnit &&
                 checkStructuralEquivalence(imports, other.imports) &&
                 checkStructuralEquivalence(children, other.children)

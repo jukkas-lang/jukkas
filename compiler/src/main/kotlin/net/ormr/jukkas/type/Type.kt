@@ -16,7 +16,9 @@
 
 package net.ormr.jukkas.type
 
-sealed interface Type {
+import net.ormr.jukkas.StructurallyComparable
+
+sealed interface Type : StructurallyComparable {
     val internalName: String
 
     val jvmName: String
@@ -29,4 +31,6 @@ sealed interface Type {
     fun toAsmType(): AsmType = AsmReferenceType.fromDescriptor(toJvmDescriptor())
 
     fun toJvmDescriptor(): String
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean = equals(other)
 }

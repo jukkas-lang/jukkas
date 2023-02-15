@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.checkStructuralEquivalence
@@ -32,12 +33,12 @@ class ConditionalBranch(
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitConditionalBranch(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ConditionalBranch &&
                 condition.isStructurallyEquivalent(other.condition) &&
                 thenBranch.isStructurallyEquivalent(other.thenBranch) &&
                 checkStructuralEquivalence(elseBranch, other.elseBranch) &&
-                type == other.type
+                type.isStructurallyEquivalent(other.type)
 
     operator fun component1(): Expression = condition
 

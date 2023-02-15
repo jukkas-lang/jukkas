@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.JvmPrimitiveType
 import net.ormr.jukkas.type.JvmReferenceType
 import net.ormr.jukkas.type.ResolvedTypeOrError
@@ -29,7 +30,7 @@ sealed class Literal : Expression() {
 class SymbolLiteral(val text: String) : Literal() {
     override lateinit var type: ResolvedTypeOrError
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is SymbolLiteral && text == other.text
 }
 
@@ -39,8 +40,8 @@ class IntLiteral(val value: Int) : Literal() {
 
     override fun toString(): String = value.toString()
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is IntLiteral && value == other.value && type == other.type
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is IntLiteral && value == other.value && type.isStructurallyEquivalent(other.type)
 }
 
 class BooleanLiteral(val value: Boolean) : Literal() {
@@ -49,8 +50,8 @@ class BooleanLiteral(val value: Boolean) : Literal() {
 
     override fun toString(): String = value.toString()
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is BooleanLiteral && value == other.value && type == other.type
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is BooleanLiteral && value == other.value && type.isStructurallyEquivalent(other.type)
 }
 
 class StringLiteral(val value: String) : Literal() {
@@ -59,6 +60,6 @@ class StringLiteral(val value: String) : Literal() {
 
     override fun toString(): String = "\"$value\""
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is StringLiteral && value == other.value && type == other.type
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is StringLiteral && value == other.value && type.isStructurallyEquivalent(other.type)
 }

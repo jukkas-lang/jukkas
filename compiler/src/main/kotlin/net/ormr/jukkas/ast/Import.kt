@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
@@ -24,7 +25,7 @@ class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImport(this)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Import &&
                 path.isStructurallyEquivalent(other.path) &&
                 checkStructuralEquivalence(entries, other.entries)

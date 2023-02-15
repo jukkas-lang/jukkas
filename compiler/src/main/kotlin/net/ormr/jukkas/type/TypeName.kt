@@ -18,6 +18,7 @@ package net.ormr.jukkas.type
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
+import net.ormr.jukkas.StructurallyComparable
 
 class TypeName(val position: Position, override val internalName: String) : Type, Positionable {
     override fun findPositionOrNull(): Position = position
@@ -29,6 +30,9 @@ class TypeName(val position: Position, override val internalName: String) : Type
             ?: context.errorType(position, "Can't find type '$internalName'")
 
     override fun toJvmDescriptor(): String = "L${internalName.replace('.', '$')};"
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is TypeName && internalName == other.internalName
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
