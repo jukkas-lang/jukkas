@@ -33,14 +33,14 @@ data class Point(
         column < other.column -> -1
         else -> 0
     }
+
     companion object {
         @JvmStatic
         fun of(
-line: Int,
- column: Int,
- startIndex: Int,
- endIndex: Int,
-): Point =
-            Point(line, column, startIndex..endIndex)
+            line: Int,
+            column: Int,
+            startIndex: Int,
+            endIndex: Int,
+        ): Point = Point(line, column, startIndex..endIndex)
     }
 }
