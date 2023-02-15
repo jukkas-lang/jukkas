@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.phases
 
+import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
@@ -31,7 +32,7 @@ import net.ormr.jukkas.type.UnknownType
 /**
  * Performs type resolution and type inference.
  */
-class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisitor<Unit> {
+class TypeResolutionPhase private constructor(private val unit: CompilationUnit) : NodeVisitor<Unit> {
     private val context = object : TypeResolutionContext {
         override val cache: TypeCache
             get() = unit.types
@@ -230,6 +231,14 @@ class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisitor<Unit>
         return when (val type = expr.type) {
             is UnknownType -> errorType(expr, "Failed to resolve type.")
             else -> type
+        }
+    }
+
+    companion object {
+        fun <T : Node> run(node: T): JukkasResult<T> {
+            val unit = node.compilationUnit
+            node.accept(TypeResolutionPhase(unit))
+            return unit.reporter.toResult { node }
         }
     }
 }

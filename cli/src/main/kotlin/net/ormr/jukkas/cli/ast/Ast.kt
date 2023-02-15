@@ -25,6 +25,7 @@ import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
 import net.ormr.jukkas.cli.CliErrorReporter
+import net.ormr.jukkas.flatMap
 import net.ormr.jukkas.getOrElse
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.phases.TypeResolutionPhase
@@ -39,10 +40,10 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
 
     override fun run() {
         val terminal = currentContext.terminal
-        val unit = JukkasParser.parseFile(file).getOrElse { reporter.printErrors(terminal, it) }
-        val resolution = TypeResolutionPhase(unit)
-        resolution.visit(unit)
-        unit.reporter.toResult { unit }.getOrElse { reporter.printErrors(terminal, it) }
+        val unit = JukkasParser
+            .parseFile(file)
+            .flatMap { TypeResolutionPhase.run(it.value) }
+            .getOrElse { reporter.printErrors(terminal, it) }
         /*val tree = createRootTree(unit)
         val printTree = PrettyPrintTree(Tree::children, Tree::value).apply {
             setColor(Color.NONE)

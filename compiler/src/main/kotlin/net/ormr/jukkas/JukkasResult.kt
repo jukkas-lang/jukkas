@@ -38,4 +38,14 @@ inline fun <T, R> JukkasResult<T>.fold(failure: (Failure) -> R, success: (Succes
     is Success -> success(this)
 }
 
+inline fun <T, R> JukkasResult<T>.map(transform: (Success<T>) -> R): JukkasResult<R> = when (this) {
+    is Failure -> this
+    is Success -> Success(transform(this), messages)
+}
+
+inline fun <T, R> JukkasResult<T>.flatMap(transform: (Success<T>) -> JukkasResult<R>): JukkasResult<R> = when (this) {
+    is Failure -> this
+    is Success -> transform(this)
+}
+
 inline fun <T> JukkasResult<T>.getOrElse(defaultValue: (Failure) -> T): T = fold(defaultValue) { it.value }
