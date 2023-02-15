@@ -28,6 +28,7 @@ interface NodeVisitor<T> {
     fun visitFunction(function: Function): T
     fun visitIdentifierReference(reference: DefinitionReference): T
     fun visitImport(import: Import): T
+    fun visitImportEntry(entry: ImportEntry): T
     fun visitInvocation(invocation: Invocation): T
     fun visitInvocationArgument(argument: InvocationArgument): T
     fun visitLiteral(literal: Literal): T
@@ -47,8 +48,6 @@ interface NodeVisitor<T> {
         is StringTemplateExpression -> visitStringTemplateExpression(expression)
         else -> error("Can not visit <$expression> as an expression.")
     }
-
-    fun visitImportEntry(entry: ImportEntry): T
 }
 
 fun <T> NodeVisitor<T>.visit(node: Node): T = node.accept(this)
