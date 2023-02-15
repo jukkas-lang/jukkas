@@ -16,9 +16,15 @@
 
 package net.ormr.jukkas.ast
 
-class ExpressionStatement(val expression: Expression) : Statement() {
+class ExpressionStatement(expression: Expression) : Statement() {
+    val expression: Expression by child(expression)
+
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitExpressionStatement(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is ExpressionStatement && expression.isStructurallyEquivalent(other.expression)
+
+    override fun toString(): String = expression.toString()
+
+    operator fun component1(): Expression = expression
 }

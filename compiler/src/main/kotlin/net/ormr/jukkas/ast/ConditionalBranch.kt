@@ -37,4 +37,12 @@ class ConditionalBranch(
                 condition.isStructurallyEquivalent(other.condition) &&
                 thenBranch.isStructurallyEquivalent(other.thenBranch) &&
                 bothNullOrEquivalent(elseBranch, other.elseBranch) { a, b -> a.isStructurallyEquivalent(b) }
+
+    operator fun component1(): Expression = condition
+
+    operator fun component2(): Expression = thenBranch
+
+    operator fun component3(): Expression? = elseBranch
+
+    operator fun component4(): Type = type
 }

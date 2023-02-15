@@ -29,6 +29,8 @@ import net.ormr.jukkas.ast.Function
 import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.getOrElse
 import net.ormr.jukkas.parser.JukkasParser
+import net.ormr.jukkas.phases.TypeResolutionPhase
+import net.ormr.jukkas.type.TypeResolutionContext
 import kotlin.io.path.name
 
 class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
@@ -41,12 +43,15 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
     override fun run() {
         val terminal = currentContext.terminal
         val unit = JukkasParser.parseFile(file).getOrElse { reporter.printErrors(terminal, it) }
-        val tree = createRootTree(unit)
+        val resolution = TypeResolutionPhase(unit)
+        resolution.visit(unit)
+        unit.reporter.toResult { unit }.getOrElse { reporter.printErrors(terminal, it) }
+        /*val tree = createRootTree(unit)
         val printTree = PrettyPrintTree(Tree::children, Tree::value).apply {
             setColor(Color.NONE)
             setBorder(false)
         }
-        printTree.display(tree)
+        printTree.display(tree)*/
     }
 
     private fun fileName(source: Source): String = when (source) {

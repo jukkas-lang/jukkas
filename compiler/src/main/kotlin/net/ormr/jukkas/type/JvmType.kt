@@ -16,38 +16,32 @@
 
 package net.ormr.jukkas.type
 
-import io.github.classgraph.ClassInfo
-import net.ormr.jukkas.utils.scanForClass
+import io.github.classgraph.ArrayTypeSignature
+import io.github.classgraph.BaseTypeSignature
+import io.github.classgraph.ClassRefTypeSignature
+import io.github.classgraph.TypeSignature
+import net.ormr.jukkas.type.member.JvmMember
 
-class JvmType(val classInfo: ClassInfo) : ResolvedType {
-    override val internalName: String = "${packageName.replace('.', '/')}/${simpleName.replace('$', '.')}"
+sealed interface JvmType : ResolvedType {
+    override val superType: ResolvedType?
+    override val interfaces: List<ResolvedType>
+    override val declaredMembers: List<JvmMember>
 
-    // empty if located in root package
-    override val packageName: String
-        get() = classInfo.packageName
-
-    override val simpleName: String
-        get() = classInfo.simpleName
-
-    override fun toJvmDescriptor(): String = "L$internalName;"
-
-    override fun toString(): String = classInfo.toString()
-
-    override fun equals(other: Any?): Boolean = when {
-        this === other -> true
-        other !is JvmType -> false
-        classInfo != other.classInfo -> false
-        else -> true
+    override fun isSameType(other: ResolvedTypeOrError): Boolean = when (other) {
+        is ErrorType -> false
+        // TODO: handle cases with jukkas types, like 'Jukkas.Int = int', and like 'jukkas.Array[Int] = Integer[]'
+        else -> this sameJvmDescriptor other
     }
 
-    override fun hashCode(): Int = classInfo.hashCode()
-
     companion object {
-        val OBJECT = native("java.lang.Object")
-        val STRING = native("java.lang.String")
-        val BOOLEAN = native("java.lang.Boolean")
-
-        private fun native(name: String): JvmType =
-            JvmType(scanForClass(name) ?: error("Could not find native Java class '$name'"))
+        internal fun fromSignature(signature: TypeSignature): JvmType = when (signature) {
+            is ArrayTypeSignature -> JvmReferenceType.from(signature.arrayClassInfo)
+            is BaseTypeSignature -> JvmPrimitiveType.fromSymbol(signature.typeSignatureChar.toString())
+            is ClassRefTypeSignature -> {
+                val info = signature.classInfo ?: error("Could not find ClassInfo for <$signature>")
+                JvmReferenceType.from(info)
+            }
+            else -> throw IllegalArgumentException("Can't create JvmType for <$signature>")
+        }
     }
 }

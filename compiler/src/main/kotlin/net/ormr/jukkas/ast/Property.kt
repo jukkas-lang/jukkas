@@ -22,9 +22,20 @@ class Property(
     val kind: PropertyKind,
     val name: String,
     override var type: Type,
+    initializer: Expression?,
 ) : Statement(), Definition {
+    var initializer: Expression? by child(initializer)
+
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is Property && kind == other.kind && name == other.name
+
+    operator fun component1(): PropertyKind = kind
+
+    operator fun component2(): String = name
+
+    operator fun component3(): Type = type
+
+    operator fun component4(): Expression? = initializer
 }

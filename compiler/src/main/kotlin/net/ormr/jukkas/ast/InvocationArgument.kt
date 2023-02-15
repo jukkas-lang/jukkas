@@ -27,4 +27,15 @@ class InvocationArgument(val name: String?, value: Expression) : Expression() {
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is InvocationArgument && name == other.name && value.isStructurallyEquivalent(other.value)
+
+    override fun toString(): String = when (name) {
+        null -> value.toString()
+        else -> "($name $value)"
+    }
+
+    operator fun component1(): String? = name
+
+    operator fun component2(): Expression = value
+
+    operator fun component3(): Type = type
 }

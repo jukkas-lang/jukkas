@@ -14,23 +14,6 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.ast
+package net.ormr.jukkas.type.member
 
-import net.ormr.jukkas.type.Type
-
-val Definition.name: String?
-    get() = when (this) {
-        is Function -> name
-        is Property -> name
-        is Variable -> name
-        is NamedArgument -> name
-    }
-
-sealed interface Definition {
-    val type: Type
-}
-
-fun Definition.asNode(): Node {
-    check(this is Node) { "Definition wasn't Node, this should never happen. <$this>" }
-    return this
-}
+sealed interface JukkasMember : TypeMember

@@ -22,9 +22,9 @@ sealed interface Type {
     val jvmName: String
         get() = internalName.replace('.', '$').replace('/', '.')
 
-    infix fun sameDescriptor(other: Type): Boolean = toJvmDescriptor() == other.toJvmDescriptor()
+    infix fun sameJvmDescriptor(other: Type): Boolean = toJvmDescriptor() == other.toJvmDescriptor()
 
-    fun resolve(context: TypeResolutionContext): ResolvedType
+    fun resolve(context: TypeResolutionContext): ResolvedTypeOrError
 
     fun toAsmType(): AsmType = AsmReferenceType.fromDescriptor(toJvmDescriptor())
 

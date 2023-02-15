@@ -19,13 +19,22 @@ package net.ormr.jukkas.utils
 import io.github.classgraph.ClassGraph
 import io.github.classgraph.ClassInfo
 import io.github.classgraph.ScanResult
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 internal fun scanForClass(name: String): ClassInfo? = scanClassGraph { it.getClassInfo(name) }
 
 internal inline fun <R> scanClassGraph(
-    builder: ClassGraph.() -> Unit = { enableAllInfo() },
+    builder: ClassGraph.() -> Unit = { enableAllInfo().enableSystemJarsAndModules() },
     block: (ScanResult) -> R,
 ): R {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     val graph = ClassGraph().apply(builder)
-    return graph.scan().use(block)
+    // TODO: we can't use the returned ClassInfo after closing the ClassGraph, so this might be leaking
+    //       we should probably look into another library for this, or just use JVM reflection, which is slow
+    return graph.scan().let(block)
 }

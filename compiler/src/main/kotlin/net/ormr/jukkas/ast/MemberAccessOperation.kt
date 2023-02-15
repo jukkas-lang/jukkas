@@ -21,11 +21,11 @@ import net.ormr.jukkas.type.UnknownType
 
 class MemberAccessOperation(
     left: Expression,
-    value: Expression,
+    right: Expression,
     val isSafe: Boolean,
 ) : Expression() {
     var left: Expression by child(left)
-    var value: Expression by child(value)
+    var right: Expression by child(right)
     override var type: Type = UnknownType
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitMemberAccessOperation(this)
@@ -35,5 +35,13 @@ class MemberAccessOperation(
         other is MemberAccessOperation &&
                 isSafe == other.isSafe &&
                 left.isStructurallyEquivalent(other.left) &&
-                value.isStructurallyEquivalent(other.value)
+                right.isStructurallyEquivalent(other.right)
+
+    override fun toString(): String = "$left.${if (isSafe) "?" else ""}$right"
+
+    operator fun component1(): Expression = left
+
+    operator fun component2(): Expression = right
+
+    operator fun component3(): Type = type
 }

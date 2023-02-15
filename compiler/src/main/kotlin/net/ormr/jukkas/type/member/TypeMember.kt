@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.ast
+package net.ormr.jukkas.type.member
 
-import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.type.AsmMethodType
+import net.ormr.jukkas.type.ResolvedType
 
-val Definition.name: String?
-    get() = when (this) {
-        is Function -> name
-        is Property -> name
-        is Variable -> name
-        is NamedArgument -> name
+sealed interface TypeMember {
+    val name: String
+
+    sealed interface Method : TypeMember {
+        val parameterTypes: List<ResolvedType>
+
+        fun toAsmType(): AsmMethodType
     }
 
-sealed interface Definition {
-    val type: Type
-}
+    sealed interface Constructor : TypeMember {
+        val parameterTypes: List<ResolvedType>
 
-fun Definition.asNode(): Node {
-    check(this is Node) { "Definition wasn't Node, this should never happen. <$this>" }
-    return this
+        fun toAsmType(): AsmMethodType
+    }
+
+    sealed interface Field : TypeMember {
+        val type: ResolvedType
+    }
 }

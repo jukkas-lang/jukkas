@@ -16,13 +16,50 @@
 
 package net.ormr.jukkas.type
 
-class JukkasType private constructor(val name: String) : ResolvedType {
+import net.ormr.jukkas.type.member.JukkasMember
+import net.ormr.jukkas.type.member.TypeMember
+
+class JukkasType private constructor(override val internalName: String) : ResolvedType {
+    override val superType: ResolvedType?
+        get() = TODO("Not yet implemented")
+
+    override val interfaces: List<ResolvedType>
+        get() = TODO("Not yet implemented")
+
     override val packageName: String
         get() = TODO("Not yet implemented")
     override val simpleName: String
         get() = TODO("Not yet implemented")
-    override val internalName: String
+
+    override val members: List<JukkasMember>
         get() = TODO("Not yet implemented")
+
+    override val declaredMembers: List<JukkasMember>
+        get() = TODO("Not yet implemented")
+
+    override fun findMethod(name: String, types: List<ResolvedType>): TypeMember.Method? {
+        TODO("Not yet implemented")
+    }
+
+    override fun findConstructor(types: List<ResolvedType>): TypeMember.Constructor? {
+        TODO("Not yet implemented")
+    }
+
+    override fun findField(name: String): TypeMember.Field? {
+        TODO("Not yet implemented")
+    }
+
+    override fun isCompatible(other: ResolvedTypeOrError): Boolean = when (other) {
+        is ErrorType -> false
+        is JukkasType -> TODO("isCompatible -> JukkasType")
+        is JvmType -> TODO("isCompatible -> JukkasType")
+    }
+
+    override fun isSameType(other: ResolvedTypeOrError): Boolean = when (other) {
+        is ErrorType -> false
+        is JukkasType -> TODO("isSameType -> JukkasType")
+        is JvmType -> TODO("isSameType -> JukkasType")
+    }
 
     override fun toJvmDescriptor(): String {
         TODO("Not yet implemented")
@@ -31,11 +68,11 @@ class JukkasType private constructor(val name: String) : ResolvedType {
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is JukkasType -> false
-        name != other.name -> false
+        internalName != other.internalName -> false
         else -> true
     }
 
-    override fun hashCode(): Int = name.hashCode()
+    override fun hashCode(): Int = internalName.hashCode()
 
     companion object {
         val UNIT = JukkasType("jukkas.Unit")

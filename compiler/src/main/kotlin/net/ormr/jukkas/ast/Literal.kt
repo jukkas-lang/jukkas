@@ -16,25 +16,26 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.type.JvmType
-import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.type.JvmPrimitiveType
+import net.ormr.jukkas.type.JvmReferenceType
+import net.ormr.jukkas.type.ResolvedTypeOrError
 
 sealed class Literal : Expression() {
-    abstract override val type: Type
+    abstract override val type: ResolvedTypeOrError
 
     final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLiteral(this)
 }
 
 class SymbolLiteral(val text: String) : Literal() {
-    override lateinit var type: Type
+    override lateinit var type: ResolvedTypeOrError
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is SymbolLiteral && text == other.text
 }
 
 class IntLiteral(val value: Int) : Literal() {
-    override val type: Type
-        get() = JvmType.BOOLEAN // TODO: INT
+    override val type: ResolvedTypeOrError
+        get() = JvmPrimitiveType.INT
 
     override fun toString(): String = value.toString()
 
@@ -43,8 +44,8 @@ class IntLiteral(val value: Int) : Literal() {
 }
 
 class BooleanLiteral(val value: Boolean) : Literal() {
-    override val type: Type
-        get() = JvmType.BOOLEAN
+    override val type: ResolvedTypeOrError
+        get() = JvmPrimitiveType.BOOLEAN
 
     override fun toString(): String = value.toString()
 
@@ -53,8 +54,8 @@ class BooleanLiteral(val value: Boolean) : Literal() {
 }
 
 class StringLiteral(val value: String) : Literal() {
-    override val type: Type
-        get() = JvmType.STRING
+    override val type: ResolvedTypeOrError
+        get() = JvmReferenceType.STRING
 
     override fun toString(): String = "\"$value\""
 

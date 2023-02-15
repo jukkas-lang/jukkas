@@ -266,6 +266,9 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
             }
         }
 
+        fun parseText(text: String): JukkasResult<CompilationUnit> =
+            parse(Source.Text(text), JukkasParser::parseCompilationUnit)
+
         fun parseFile(file: Path): JukkasResult<CompilationUnit> =
             parse(Source.File(file), JukkasParser::parseCompilationUnit)
     }

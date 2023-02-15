@@ -36,6 +36,16 @@ class AssignmentOperation(
                 operator == other.operator &&
                 left.isStructurallyEquivalent(other.left) &&
                 value.isStructurallyEquivalent(other.value)
+
+    override fun toString(): String = "(= $left $value)"
+
+    operator fun component1(): Expression = left
+
+    operator fun component2(): AssignmentOperator = operator
+
+    operator fun component3(): Expression = value
+
+    operator fun component4(): Type = type
 }
 
 enum class AssignmentOperator(override val symbol: String) : Operator {

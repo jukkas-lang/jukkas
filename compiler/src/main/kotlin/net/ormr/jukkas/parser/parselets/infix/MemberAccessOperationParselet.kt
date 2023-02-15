@@ -16,8 +16,8 @@
 
 package net.ormr.jukkas.parser.parselets.infix
 
-import net.ormr.jukkas.ast.MemberAccessOperation
 import net.ormr.jukkas.ast.Expression
+import net.ormr.jukkas.ast.MemberAccessOperation
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -39,8 +39,8 @@ object MemberAccessOperationParselet : InfixParselet {
             TokenType.HOOK_DOT -> true
             else -> token syntaxError "Unknown call operator"
         }
-        val value = parseExpression(precedence)
+        val right = parseExpression(precedence)
         // TODO: createSpan(token, value.findPosition().startPoint.end) or something?
-        MemberAccessOperation(left, value, isSafe) withPosition createSpan(token, value)
+        MemberAccessOperation(left, right, isSafe) withPosition createSpan(token, right)
     }
 }

@@ -24,13 +24,14 @@ class TypeName(val position: Position, override val internalName: String) : Type
     override fun findPositionOrNull(): Position = position
 
     // TODO: handle jukkas classes
-    override fun resolve(context: TypeResolutionContext): ResolvedType = context.cache.find(internalName) ?: run {
-        val info = scanForClass(jvmName) ?: return@run run {
-            context.reportSemanticError(position, "Can't find type '$internalName'")
-            ErrorType("Can't find type '$internalName'")
+    override fun resolve(context: TypeResolutionContext): ResolvedTypeOrError =
+        context.cache.find(internalName) ?: run {
+            val info = scanForClass(jvmName) ?: return@run run {
+                context.reportSemanticError(position, "Can't find type '$internalName'")
+                ErrorType("Can't find type '$internalName'")
+            }
+            JvmReferenceType.from(info)
         }
-        JvmType(info)
-    }
 
     override fun toJvmDescriptor(): String = "L${internalName.replace('.', '$')};"
 

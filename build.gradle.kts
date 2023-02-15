@@ -39,7 +39,7 @@ subprojects {
     diktat {
         githubActions = System.getenv("CI").toBoolean()
         diktatConfigFile = rootProject.file("diktat-analysis.yml")
-        inputs { include("src/**/*.kt") }
+        //inputs { include("src/**/*.kt") }
     }
 
     testlogger {

@@ -37,6 +37,14 @@ class BinaryOperation(
                 right.isStructurallyEquivalent(other.right)
 
     override fun toString(): String = "(${operator.symbol} $left $right)"
+
+    operator fun component1(): Expression = left
+
+    operator fun component2(): BinaryOperator = operator
+
+    operator fun component3(): Expression = right
+
+    operator fun component4(): Type = type
 }
 
 enum class BinaryOperator(override val symbol: String) : Operator {

@@ -36,10 +36,10 @@ object TypeInference {
         is Block -> TODO()
         is MemberAccessOperation -> TODO()
         is ConditionalBranch -> TODO()
-        is Function -> findDefinitionType(expr)
+        is Function -> inferDefinitionType(expr)
         is DefinitionReference -> expr
             .find(expr.closestTable)
-            ?.let(::findDefinitionType) ?: errorType(expr, "Unknown name '${expr.name}'")
+            ?.let(::inferDefinitionType) ?: errorType(expr, "Unknown name '${expr.name}'")
         is FunctionInvocation -> TODO()
         is InfixInvocation -> TODO()
         is InvocationArgument -> TODO()
@@ -48,7 +48,7 @@ object TypeInference {
         is StringTemplateExpression -> expr.type
     }
 
-    fun findDefinitionType(def: Definition): Type = when (def) {
+    fun inferDefinitionType(def: Definition): Type = when (def) {
         is Function -> resolve(def, def.type, def.body)
         is NamedArgument -> def.type
         is Property -> TODO("check initializer or getter if no type given exactly")
@@ -59,8 +59,7 @@ object TypeInference {
         parent: Node,
         first: Type,
         fallback: Expression?,
-    ): Type =
-        fold(first) { findNullableType(fallback, parent) }
+    ): Type = fold(first) { findNullableType(fallback, parent) }
 
     private fun findNullableType(expr: Expression?, parent: Node): Type =
         expr?.let(::inferType) ?: errorType(parent, "Could not resolve type")

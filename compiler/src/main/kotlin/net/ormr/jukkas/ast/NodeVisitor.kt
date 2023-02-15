@@ -17,7 +17,6 @@
 package net.ormr.jukkas.ast
 
 interface NodeVisitor<T> {
-    fun visit(node: Node): T = node.accept(this)
     fun visitCompilationUnit(unit: CompilationUnit): T
     fun visitArgument(argument: Argument): T
     fun visitAssignmentOperation(operation: AssignmentOperation): T
@@ -51,3 +50,8 @@ interface NodeVisitor<T> {
 
     fun visitImportEntry(entry: ImportEntry): T
 }
+
+fun <T> NodeVisitor<T>.visit(node: Node): T = node.accept(this)
+
+@JvmName("visitNullable")
+fun <T> NodeVisitor<T>.visit(node: Node?): T? = node?.accept(this)

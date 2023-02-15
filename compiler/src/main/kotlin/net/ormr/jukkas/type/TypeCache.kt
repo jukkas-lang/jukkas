@@ -21,11 +21,11 @@ import net.ormr.jukkas.ast.CompilationUnit
 import net.ormr.jukkas.ast.reportSemanticError
 
 class TypeCache internal constructor(private val unit: CompilationUnit) {
-    private val entries = hashMapOf<String, ResolvedType>()
+    private val entries = hashMapOf<String, ResolvedTypeOrError>()
 
-    fun find(name: String): ResolvedType? = entries[name]
+    fun find(name: String): ResolvedTypeOrError? = entries[name]
 
-    fun define(position: Positionable, type: ResolvedType) {
+    fun define(position: Positionable, type: ResolvedTypeOrError) {
         addType(position, type.simpleName, type)
         if (type.toString() != type.simpleName) {
             addType(position, type.toString(), type)
@@ -35,7 +35,7 @@ class TypeCache internal constructor(private val unit: CompilationUnit) {
     private fun addType(
         position: Positionable,
         name: String,
-        type: ResolvedType,
+        type: ResolvedTypeOrError,
     ) {
         if (name in entries) {
             unit.reportSemanticError(position, "Redefining name: $name")

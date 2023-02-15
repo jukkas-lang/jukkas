@@ -34,4 +34,12 @@ class Variable(
                 kind == other.kind &&
                 name == other.name &&
                 bothNullOrEquivalent(initializer, other.initializer) { a, b -> a.isStructurallyEquivalent(b) }
+
+    operator fun component1(): PropertyKind = kind
+
+    operator fun component2(): String = name
+
+    operator fun component3(): Type = type
+
+    operator fun component4(): Expression? = initializer
 }

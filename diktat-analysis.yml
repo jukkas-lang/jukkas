@@ -81,10 +81,9 @@
 - name: WRONG_NAME_OF_VARIABLE_INSIDE_ACCESSOR
   enabled: false
 
+# it doesn't play nicely with how you're supposed to format multiline TODO comments
 - name: COMMENT_WHITE_SPACE
-  enabled: true
-  configuration:
-    maxSpaces: 7 # to allow for aligning TO-DO comments properly
+  enabled: false
 
 # way too harsh about things
 - name: NO_BRACES_IN_CONDITIONALS_AND_LOOPS

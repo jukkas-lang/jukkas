@@ -19,14 +19,39 @@ package net.ormr.jukkas.phases
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.getOrElse
+import net.ormr.jukkas.parser.JukkasParser
+import net.ormr.jukkas.type.ErrorType
+import net.ormr.jukkas.type.JvmPrimitiveType
 import net.ormr.jukkas.type.ResolvedType
+import net.ormr.jukkas.type.ResolvedTypeOrError
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.TypeCache
 import net.ormr.jukkas.type.TypeResolutionContext
 import net.ormr.jukkas.type.UnknownType
 
-internal class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisitor<Unit> {
-    private val types get() = unit.types
+fun main() {
+    val source = """
+        import "java/lang" { System }
+        
+        fun main() {
+            System.out.println("Hello, World!");
+        }
+    """.trimIndent()
+    val thing = JukkasParser.parseText(source)
+    val unit = thing.getOrElse { error(it) }
+    val typeResolver = TypeResolutionPhase(unit)
+    typeResolver.visit(unit)
+    if (unit.reporter.hasErrors()) {
+        error(unit.reporter.messages)
+    }
+    println(unit.children)
+}
+
+/**
+ * Performs type resolution and type inference.
+ */
+class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisitor<Unit> {
     private val context = object : TypeResolutionContext {
         override val cache: TypeCache
             get() = unit.types
@@ -34,46 +59,54 @@ internal class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisi
         override fun reportSemanticError(position: Positionable, message: String) {
             unit.reportSemanticError(position, message)
         }
-    }
 
-    private fun resolve(type: Type): ResolvedType {
-        require(type !is UnknownType) { "Can't resolve UnknownType. Was type inference skipped?" }
-        return type.resolve(context)
+        override fun reportTypeError(position: Positionable, message: String) {
+            unit.reportTypeError(position, message)
+        }
     }
 
     override fun visitCompilationUnit(unit: CompilationUnit) {
         unit.children.forEach(::visit)
     }
 
-    override fun visitImport(import: Import) {
-        TODO("import types from import")
-    }
-
     override fun visitArgument(argument: Argument) {
         if (argument is NamedArgument) {
             val type = argument.type
-            argument.type = resolve(type)
+            argument.type = resolveType(type)
         }
     }
 
     override fun visitAssignmentOperation(operation: AssignmentOperation) {
-        TODO("Not yet implemented")
+        visit(operation.left)
+        operation.type = visitAndGetType(operation.value)
     }
 
+    // TODO: resolve these types as if a function once we operator overloading put in
     override fun visitBinaryOperation(operation: BinaryOperation) {
-        TODO("Not yet implemented")
+        visit(operation.left)
+        visit(operation.right)
+        // TODO: set 'operation.type' once we figure out a better way of handling this
     }
 
     override fun visitBlock(block: Block) {
-        TODO("Not yet implemented")
+        block.statements.forEach(::visit)
     }
 
     override fun visitMemberAccessOperation(operation: MemberAccessOperation) {
-        TODO("Not yet implemented")
+        visit(operation.left)
+        operation.type = visitAndGetType(operation.right)
     }
 
     override fun visitConditionalBranch(conditional: ConditionalBranch) {
-        TODO("Not yet implemented")
+        // TODO: do we want to only resolve and infer types for a conditional branch if it's actually used as
+        //       an expression? could potentially improve performance, as type inference and resolution can be
+        //       relatively costly.
+        val (condition, thenBranch, elseBranch) = conditional
+        visit(condition)
+        visit(thenBranch)
+        visit(elseBranch)
+        // TODO: resolve type ourselves
+        conditional.type = TypeInference.inferType(conditional)
     }
 
     override fun visitExpressionStatement(statement: ExpressionStatement) {
@@ -81,45 +114,138 @@ internal class TypeResolutionPhase(private val unit: CompilationUnit) : NodeVisi
     }
 
     override fun visitFunction(function: Function) {
-        TODO("Not yet implemented")
+        function.arguments.forEach(::visit)
+        visit(function.body)
+        // TODO: actually infer the type
+        function.type = resolveTypeIfNeeded(function.type) { JvmPrimitiveType.VOID }
     }
 
     override fun visitIdentifierReference(reference: DefinitionReference) {
-        TODO("Not yet implemented")
+        val definition = findDefinition(reference) ?: return
+        visit(definition.asNode())
     }
 
     override fun visitInvocation(invocation: Invocation) {
-        TODO("Not yet implemented")
+        // TODO: set the type of this at some point
+        when (invocation) {
+            is FunctionInvocation -> {
+                val (left, arguments) = invocation
+                visit(left)
+                arguments.forEach(::visit)
+                when (left) {
+                    is DefinitionReference -> {
+                        val definition = findDefinition(left) ?: return
+                        TODO("standalone definition")
+                    }
+                    is MemberAccessOperation -> {
+                        // TODO: better variable names
+                        // TODO: this code is very hacky and needs to be severely improved
+                        val priorType = visitAndGetType(left.left)
+                        val right = left.right
+                        if (priorType !is ResolvedType) return
+                        require(right is DefinitionReference) { "FIXME" }
+                        val name = right.name
+                        val types = arguments.map { it.type as ResolvedType }
+                        val method = priorType.findMethod(name, types)
+                        if (method != null) {
+                            invocation.member = method
+                        } else {
+                            val signature = "$name(${types.joinToString { it.internalName }})"
+                            reportSemanticError(
+                                invocation,
+                                "Could not find a function with signature: $signature",
+                            )
+                        }
+                    }
+                    else -> reportSemanticError(left, "Not invokable")
+                }
+            }
+            is InfixInvocation -> TODO("infix invocation")
+        }
     }
 
     override fun visitInvocationArgument(argument: InvocationArgument) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitLiteral(literal: Literal) {
-        TODO("Not yet implemented")
+        argument.type = visitAndGetType(argument.value)
     }
 
     override fun visitProperty(property: Property) {
-        TODO("Not yet implemented")
+        property.type = when (val type = property.type) {
+            is UnknownType -> when (val initializer = property.initializer) {
+                null -> errorType(property, "Could not infer variable type, please specify it explicitly.")
+                else -> visitAndGetType(initializer)
+            }
+            else -> resolveType(type)
+        }
     }
 
     override fun visitReturn(expr: Return) {
-        TODO("Not yet implemented")
+        val value = expr.value
+        expr.type = when (value) {
+            // TODO: return JukkasType.UNIT
+            null -> JvmPrimitiveType.VOID
+            else -> visitAndGetType(value)
+        }
     }
 
     override fun visitVariable(variable: Variable) {
-        TODO("Not yet implemented")
+        variable.type = resolveTypeIfNeeded(variable.type) {
+            when (val initializer = variable.initializer) {
+                null -> errorType(variable, "Could not infer variable type, please specify it explicitly.")
+                else -> visitAndGetType(initializer)
+            }
+        }
     }
 
     override fun visitStringTemplateExpression(variable: StringTemplateExpression) {
         TODO("Not yet implemented")
     }
 
-    // nothing to resolve
+    // nodes with nothing to resolve / infer
+    override fun visitImport(import: Import) {}
+
+    override fun visitImportEntry(entry: ImportEntry) {}
+
+    override fun visitLiteral(literal: Literal) {}
+
     override fun visitPattern(pattern: Pattern) {}
 
-    override fun visitImportEntry(entry: ImportEntry) {
-        TODO("Not yet implemented")
+    // misc
+    private fun findDefinition(reference: DefinitionReference): Definition? {
+        // TODO: should we handle this potential error in a better manner?
+        val parent = reference.parent ?: error("No parent found for $reference")
+        return reference.find(parent.closestTable) ?: run {
+            reportSemanticError(reference, "Unresolved reference: ${reference.name}")
+            null
+        }
+    }
+
+    private fun resolveType(type: Type): ResolvedTypeOrError {
+        require(type !is UnknownType) { "Can't resolve an UnknownType. Was type inference skipped?" }
+        return type.resolve(context)
+    }
+
+    private fun errorType(position: Positionable, message: String): ErrorType {
+        unit.reportTypeError(position, message)
+        return ErrorType(message)
+    }
+
+    private fun reportSemanticError(position: Positionable, message: String) {
+        unit.reportSemanticError(position, message)
+    }
+
+    // TODO: better name
+    private inline fun resolveTypeIfNeeded(type: Type, ifUnknown: () -> Type): Type = when (type) {
+        is UnknownType -> ifUnknown()
+        is ResolvedType -> type
+        else -> resolveType(type)
+    }
+
+    // TODO: better name
+    private fun visitAndGetType(expr: Expression): Type {
+        visit(expr)
+        return when (val type = expr.type) {
+            is UnknownType -> errorType(expr, "Failed to resolve type.")
+            else -> type
+        }
     }
 }

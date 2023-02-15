@@ -28,4 +28,10 @@ class DefinitionReference(val name: String) : Expression() {
 
     override fun isStructurallyEquivalent(other: Node): Boolean =
         other is DefinitionReference && name == other.name
+
+    override fun toString(): String = name
+
+    operator fun component1(): String = name
+
+    operator fun component2(): Type = type
 }
