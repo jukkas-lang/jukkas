@@ -148,7 +148,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     }
 
     fun parseOptionalTypeDeclaration(separator: TokenType = COLON): Type = when {
-        check(separator) -> parseTypeDeclaration()
+        check(separator) -> parseTypeDeclaration(separator)
         else -> UnknownType
     }
 
