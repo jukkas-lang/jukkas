@@ -16,32 +16,11 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Variable(
-    val kind: PropertyKind,
-    override val name: String,
-    override var type: Type,
-    initializer: Expression?,
-) : Statement(), NamedDefinition {
-    var initializer: Expression? by child(initializer)
-
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitVariable(this)
-
-    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is Variable &&
-                kind == other.kind &&
-                name == other.name &&
-                checkStructuralEquivalence(initializer, other.initializer) &&
-                type.isStructurallyEquivalent(other.type)
-
-    operator fun component1(): PropertyKind = kind
-
-    operator fun component2(): String = name
-
-    operator fun component3(): Type = type
-
-    operator fun component4(): Expression? = initializer
+sealed class Variable : Statement(), NamedDefinition {
+    abstract val kind: PropertyKind
+    abstract override val name: String
+    abstract override var type: Type
+    abstract var initializer: Expression?
 }

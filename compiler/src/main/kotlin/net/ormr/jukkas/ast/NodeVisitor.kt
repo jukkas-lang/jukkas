@@ -16,8 +16,6 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.type.TypeName
-
 interface NodeVisitor<T> {
     fun visitCompilationUnit(unit: CompilationUnit): T
     fun visitImport(import: Import): T
@@ -38,7 +36,7 @@ interface NodeVisitor<T> {
     fun visitPattern(pattern: Pattern): T
     fun visitProperty(property: Property): T
     fun visitReturn(expr: Return): T
-    fun visitVariable(variable: Variable): T
+    fun visitLocalVariable(variable: LocalVariable): T
     fun visitStringTemplateExpression(variable: StringTemplateExpression): T
     fun visitExpression(expression: Expression): T = when (expression) {
         is Literal -> visitLiteral(expression)

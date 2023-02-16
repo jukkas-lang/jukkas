@@ -20,18 +20,19 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Property(
+class LocalVariable(
     override val kind: PropertyKind,
     override val name: String,
     override var type: Type,
     initializer: Expression?,
 ) : Variable() {
     override var initializer: Expression? by child(initializer)
+    var index: Int = -1
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
+    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLocalVariable(this)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is Property &&
+        other is LocalVariable &&
                 kind == other.kind &&
                 name == other.name &&
                 checkStructuralEquivalence(initializer, other.initializer) &&

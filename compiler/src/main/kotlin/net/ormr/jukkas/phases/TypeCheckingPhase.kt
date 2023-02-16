@@ -156,7 +156,7 @@ internal class TypeCheckingPhase(private val unit: CompilationUnit) : NodeVisito
         TODO("Not yet implemented")
     }
 
-    override fun visitVariable(variable: Variable) {
+    override fun visitLocalVariable(variable: LocalVariable) {
         TODO("Not yet implemented")
     }
 

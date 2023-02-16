@@ -227,7 +227,7 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
         }
     }
 
-    override fun visitVariable(variable: Variable) {
+    override fun visitLocalVariable(variable: LocalVariable) {
         variable.type = resolveTypeIfNeeded(variable.type) {
             when (val initializer = variable.initializer) {
                 null -> errorType(variable, "Could not infer variable type, please specify it explicitly.")

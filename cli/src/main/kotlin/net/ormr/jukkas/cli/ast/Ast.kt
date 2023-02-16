@@ -46,7 +46,7 @@ import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.flatMap
 import net.ormr.jukkas.getOrElse
 import net.ormr.jukkas.parser.JukkasParser
-import net.ormr.jukkas.phases.TypeResolutionPhase
+import net.ormr.jukkas.phases.TypeResolutionPhaseNew
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.member.JukkasMember
 import net.ormr.jukkas.type.member.JvmMember
@@ -84,7 +84,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         val terminal = currentContext.terminal
         val unit = JukkasParser
             .parseFile(file)
-            .flatMap { TypeResolutionPhase.run(it.value) }
+            .flatMap { TypeResolutionPhaseNew.run(it.value) }
             .getOrElse { reporter.printErrors(terminal, it) }
         terminal.println(json.encodeToString(toJson(unit)))
     }
@@ -247,7 +247,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             put("body", toJson(node.body))
         }
         is Property -> TODO()
-        is Variable -> TODO()
+        is LocalVariable -> TODO()
         is StringTemplatePart.ExpressionPart -> TODO()
         is StringTemplatePart.LiteralPart -> TODO()
     }
