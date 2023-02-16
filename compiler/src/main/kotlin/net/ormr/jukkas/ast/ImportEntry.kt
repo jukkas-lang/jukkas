@@ -25,4 +25,8 @@ class ImportEntry(val name: String, val alias: String? = null) : ChildNode() {
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImportEntry(this)
 
     override fun toString(): String = alias?.let { "(as $it $name)" } ?: name
+
+    operator fun component1(): String = name
+
+    operator fun component2(): String? = alias
 }

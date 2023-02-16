@@ -31,15 +31,13 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         clz.interfaces.map { of(it) }.asUnmodifiableList()
     }
 
-    override val internalName: String = "${packageName.replace('.', '/')}/${simpleName.replace('$', '.')}"
+    override val internalName: String = Type.buildJukkasName(clz.packageName, clz.simpleName)
 
     // empty if located in root package
-    override val packageName: String
-        get() = clz.packageName
+    override val packageName: String = clz.packageName.replace('.', '/')
 
     // TODO: empty if class is anonymous
-    override val simpleName: String
-        get() = clz.simpleName
+    override val simpleName: String = clz.simpleName.replace('$', '.')
 
     override val members: List<TypeMember> by lazy {
         createMemberList(clz.methods, clz.constructors, clz.fields)
@@ -49,10 +47,12 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         createMemberList(clz.declaredMethods, clz.declaredConstructors, clz.declaredFields)
     }
 
-    override fun findMethod(name: String, types: List<ResolvedType>): JvmMember.Method? =
+    // TODO: is it safe to just do a direct check like this? or do we want to do some sort of priority sorted list
+    //       of potential candidates?
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): JvmMember.Method? =
         findMember { it.name == name && typesMatch(types, it.parameterTypes) }
 
-    override fun findConstructor(types: List<ResolvedType>): JvmMember.Constructor? =
+    override fun findConstructor(types: List<ResolvedTypeOrError>): JvmMember.Constructor? =
         findDeclaredMember { typesMatch(types, it.parameterTypes) }
 
     private fun typesMatch(a: List<ResolvedTypeOrError>, b: List<ResolvedTypeOrError>): Boolean {

@@ -20,7 +20,15 @@ import net.ormr.jukkas.type.member.TypeMember
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-sealed interface ResolvedType : ResolvedTypeOrError
+sealed interface ResolvedType : ResolvedTypeOrError {
+    companion object {
+        // TODO: make it handle any potential jukkas sources too
+        fun of(clz: Class<*>): ResolvedType = JvmType.of(clz)
+
+        // TODO: make it look for any potential jukkas sources too
+        fun find(name: String): ResolvedType? = JvmReferenceType.find(name)
+    }
+}
 
 /**
  * Returns the first member that matches [predicate], or `null` if none is found.

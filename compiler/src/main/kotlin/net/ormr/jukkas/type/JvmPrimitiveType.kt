@@ -22,28 +22,22 @@ import net.ormr.jukkas.utils.getDescriptor
 import net.ormr.krautils.collections.getOrThrow
 import kotlin.reflect.typeOf
 
-enum class JvmPrimitiveType(val clz: Class<*>) : JvmType {
-    VOID(primitive<Void>()),
-    BOOLEAN(primitive<Boolean>()),
-    CHAR(primitive<Char>()),
-    BYTE(primitive<Byte>()),
-    SHORT(primitive<Short>()),
-    INT(primitive<Int>()),
-    LONG(primitive<Long>()),
-    FLOAT(primitive<Float>()),
-    DOUBLE(primitive<Double>());
-
-    // TODO: internal name for primitive should probably be the actual name we use in Jukkas
-    //       so like: int -> Int32, long -> Int64, etc..
-    //       this will cause a problem for the VOID type tho, because Jukkas doesn't have the void type
-    override val internalName: String
-        get() = getDescriptor(clz)
+enum class JvmPrimitiveType(val clz: Class<*>, override val internalName: String) : JvmType {
+    VOID(primitive<Void>(), "jukkas/Unit"), // TODO: this isn't entirely correct
+    BOOLEAN(primitive<Boolean>(), "jukkas/Boolean"),
+    CHAR(primitive<Char>(), "jukkas/Char"),
+    BYTE(primitive<Byte>(), "jukkas/Int8"),
+    SHORT(primitive<Short>(), "jukkas/Int16"),
+    INT(primitive<Int>(), "jukkas/Int32"),
+    LONG(primitive<Long>(), "jukkas/Int64"),
+    FLOAT(primitive<Float>(), "jukkas/Float32"),
+    DOUBLE(primitive<Double>(), "jukkas/Float64");
 
     override val simpleName: String
         get() = clz.name
 
     override val packageName: String
-        get() = clz.packageName
+        get() = "java/lang"
 
     override val jvmName: String
         get() = getDescriptor(clz)
@@ -60,9 +54,9 @@ enum class JvmPrimitiveType(val clz: Class<*>) : JvmType {
     override val declaredMembers: List<JvmMember>
         get() = emptyList()
 
-    override fun findMethod(name: String, types: List<ResolvedType>): TypeMember.Method? = null
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method? = null
 
-    override fun findConstructor(types: List<ResolvedType>): TypeMember.Constructor? = null
+    override fun findConstructor(types: List<ResolvedTypeOrError>): TypeMember.Constructor? = null
 
     override fun findField(name: String): TypeMember.Field? = null
 
@@ -72,7 +66,7 @@ enum class JvmPrimitiveType(val clz: Class<*>) : JvmType {
         is JvmType -> when (other) {
             is JvmArrayType -> false
             is JvmPrimitiveType -> this == other
-            is JvmReferenceType -> TODO("allow primitives in place of wrapper types")
+            is JvmReferenceType -> false // TODO: allow primitives in place of wrapper types
         }
     }
 

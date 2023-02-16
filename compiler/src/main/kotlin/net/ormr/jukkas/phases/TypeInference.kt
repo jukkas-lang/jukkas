@@ -49,13 +49,15 @@ object TypeInference {
         is StringTemplateExpression -> expr.type
     }
 
-    fun inferDefinitionType(def: Definition): Type = when (def) {
+    fun inferDefinitionType(def: Definition): Type = error("lol")
+
+    /*fun inferDefinitionType(def: Definition): Type = when (def) {
         is Lambda -> resolve(def, def.type, def.body)
         is Function -> TODO()
         is NamedArgument -> def.type
         is Property -> TODO("check initializer or getter if no type given exactly")
         is Variable -> resolve(def, def.type, def.initializer)
-    }
+    }*/
 
     private fun resolve(
         parent: Node,

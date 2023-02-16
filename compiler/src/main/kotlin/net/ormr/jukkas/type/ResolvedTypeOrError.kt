@@ -34,9 +34,9 @@ sealed interface ResolvedTypeOrError : Type {
 
     val declaredMembers: List<TypeMember>
 
-    fun findMethod(name: String, types: List<ResolvedType>): TypeMember.Method?
+    fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method?
 
-    fun findConstructor(types: List<ResolvedType>): TypeMember.Constructor?
+    fun findConstructor(types: List<ResolvedTypeOrError>): TypeMember.Constructor?
 
     fun findField(name: String): TypeMember.Field?
 

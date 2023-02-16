@@ -21,21 +21,26 @@ import net.ormr.jukkas.ast.CompilationUnit
 import net.ormr.jukkas.ast.reportSemanticError
 
 class TypeCache internal constructor(private val unit: CompilationUnit) {
-    private val entries = hashMapOf<String, ResolvedTypeOrError>()
+    private val entries = hashMapOf<String, ResolvedType>()
 
-    fun find(name: String): ResolvedTypeOrError? = entries[name]
+    fun find(name: String): ResolvedType? = entries[name]
 
-    fun define(position: Positionable, type: ResolvedTypeOrError) {
-        addType(position, type.simpleName, type)
-        if (type.toString() != type.simpleName) {
-            addType(position, type.toString(), type)
+    fun define(position: Positionable, type: ResolvedType, alias: String? = null) {
+        if (alias == null) {
+            addType(position, type.simpleName, type)
+            if (type.internalName != type.simpleName) {
+                addType(position, type.internalName, type)
+            }
+        } else {
+            // TODO: is this the proper way of handling aliases?
+            addType(position, alias, type)
         }
     }
 
     private fun addType(
         position: Positionable,
         name: String,
-        type: ResolvedTypeOrError,
+        type: ResolvedType,
     ) {
         if (name in entries) {
             unit.reportSemanticError(position, "Redefining name: $name")

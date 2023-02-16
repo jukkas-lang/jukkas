@@ -33,7 +33,7 @@ class CompilationUnit(
     val imports: MutableNodeList<Import> = imports.toMutableNodeList(this)
     val types: TypeCache = TypeCache(this)
     val reporter: MessageReporter = MessageReporter()
-    val children: MutableNodeList<Statement> = children.toMutableNodeList(this, ::onAddChild, ::onRemoveChild)
+    val children: MutableNodeList<Statement> = children.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override val compilationUnit: CompilationUnit
         get() = this
 
@@ -43,18 +43,4 @@ class CompilationUnit(
         other is CompilationUnit &&
                 checkStructuralEquivalence(imports, other.imports) &&
                 checkStructuralEquivalence(children, other.children)
-
-    private fun onAddChild(index: Int, node: Statement) {
-        if (node is NamedDefinition) {
-            val name = node.name
-            table.define(name, node)
-        }
-    }
-
-    private fun onRemoveChild(index: Int, node: Statement) {
-        if (node is NamedDefinition) {
-            val name = node.name
-            table.undefine(name)
-        }
-    }
 }

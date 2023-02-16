@@ -25,6 +25,8 @@ sealed interface TypeMember {
     sealed interface Method : TypeMember {
         val parameterTypes: List<ResolvedType>
 
+        val returnType: ResolvedType
+
         fun toAsmType(): AsmMethodType
     }
 

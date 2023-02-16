@@ -19,15 +19,17 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.member.TypeMember
 
 class MemberAccessOperation(
     left: Expression,
-    right: Expression,
+    target: Expression,
     val isSafe: Boolean,
 ) : Expression() {
     var left: Expression by child(left)
-    var right: Expression by child(right)
+    var right: Expression by child(target)
     override var type: Type = UnknownType
+    var member: TypeMember? = null
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitMemberAccessOperation(this)
 
@@ -37,9 +39,11 @@ class MemberAccessOperation(
                 isSafe == other.isSafe &&
                 left.isStructurallyEquivalent(other.left) &&
                 right.isStructurallyEquivalent(other.right) &&
-                type.isStructurallyEquivalent(other.type)
+                type.isStructurallyEquivalent(other.type) &&
+                member == other.member
 
-    override fun toString(): String = "$left.${if (isSafe) "?" else ""}$right"
+    override fun toString(): String =
+        "MemberAccessOperation(isSafe=$isSafe, left=$left, right=$right, type=$type, member=$member)"
 
     operator fun component1(): Expression = left
 

@@ -45,10 +45,28 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
             unit.reportTypeError(position, message)
         }
     }
+    private val types: TypeCache
+        get() = unit.types
 
     override fun visitCompilationUnit(unit: CompilationUnit) {
+        unit.imports.forEach(::visit)
         unit.children.forEach(::visit)
     }
+
+    override fun visitImport(import: Import) {
+        val path = import.path.value
+        for (entry in import.entries) {
+            val (name, alias) = entry
+            val type = ResolvedType.find(Type.buildJavaName(path, name))
+            if (type != null) {
+                types.define(entry, type, alias)
+            } else {
+                reportSemanticError(entry, "Unable to find ${path}/${name}")
+            }
+        }
+    }
+
+    override fun visitImportEntry(entry: ImportEntry) = error("'visitImportEntry' should never be called")
 
     override fun visitArgument(argument: Argument) {
         if (argument is NamedArgument) {
@@ -74,8 +92,24 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
     }
 
     override fun visitMemberAccessOperation(operation: MemberAccessOperation) {
-        visit(operation.left)
-        operation.type = visitAndGetType(operation.right)
+        operation.type = when (val type = visitAndGetType(operation.left)) {
+            is ResolvedType -> when (val reference = operation.right) {
+                !is DefinitionReference -> semanticErrorType(reference, "Unknown member part")
+                else -> {
+                    val name = reference.name
+                    when (val member = type.findField(name)) {
+                        null -> unresolvedReference(reference, name)
+                        else -> {
+                            operation.member = member
+                            reference.type = member.type
+                            member.type
+                        }
+                    }
+                }
+            }
+            // TODO: can we handle this better?
+            else -> errorType(operation.left, "Unresolved type")
+        }
     }
 
     override fun visitConditionalBranch(conditional: ConditionalBranch) {
@@ -106,43 +140,63 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
     }
 
     override fun visitIdentifierReference(reference: DefinitionReference) {
-        val definition = findDefinition(reference) ?: return
-        visit(definition)
+        reference.type = when (val definition = findDefinition(reference)) {
+            // TODO: semantic type error?
+            null -> types.find(reference.name) ?: unresolvedReference(reference, reference.name)
+            else -> visitAndGetType(definition)
+        }
+    }
+
+    private fun getLastMember(operation: MemberAccessOperation): Expression {
+        var current: Expression = operation
+        while (current is MemberAccessOperation) {
+            visit(current.left)
+            current = current.right
+        }
+        return current
     }
 
     override fun visitInvocation(invocation: Invocation) {
-        // TODO: set the type of this at some point
-        when (invocation) {
+        invocation.type = when (invocation) {
             is FunctionInvocation -> {
                 val (left, arguments) = invocation
-                visit(left)
                 arguments.forEach(::visit)
                 when (left) {
-                    is DefinitionReference -> {
-                        val definition = findDefinition(left) ?: return
-                        TODO("standalone definition")
-                    }
-                    is MemberAccessOperation -> {
-                        // TODO: better variable names
-                        // TODO: this code is very hacky and needs to be severely improved
-                        val priorType = visitAndGetType(left.left)
-                        val right = left.right
-                        if (priorType !is ResolvedType) return
-                        require(right is DefinitionReference) { "FIXME" }
-                        val name = right.name
-                        val types = arguments.map { it.type as ResolvedType }
-                        val method = priorType.findMethod(name, types)
-                        if (method != null) {
-                            invocation.member = method
-                        } else {
-                            val signature = "$name(${types.joinToString { it.internalName }})"
-                            reportSemanticError(
-                                invocation,
-                                "Could not find a function with signature: $signature",
-                            )
+                    is DefinitionReference -> TODO("standalone definition")
+                    is MemberAccessOperation -> when (val reference = getLastMember(left)) {
+                        !is DefinitionReference -> semanticErrorType(reference, "Unknown member part")
+                        else -> {
+                            val name = reference.name
+                            // TODO: is this thinking correct?
+                            val target = left.left
+                            when (val type = target.type) {
+                                // TODO: can we handle this better?
+                                !is ResolvedType -> errorType(target, "Unresolved type")
+                                else -> when {
+                                    arguments.any { it.type !is ResolvedTypeOrError } -> {
+                                        for (arg in arguments) {
+                                            if (arg.type !is ResolvedTypeOrError) {
+                                                arg.type = errorType(arg, "Failed to resolve type")
+                                            }
+                                        }
+                                        errorType(reference, "Failed to resolve argument types")
+                                    }
+                                    else -> {
+                                        val params = arguments.map { it.type as ResolvedTypeOrError }
+                                        when (val member = type.findMethod(name, params)) {
+                                            null -> unresolvedReference(reference, name)
+                                            else -> {
+                                                invocation.member = member
+                                                member.returnType
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                         }
                     }
-                    else -> reportSemanticError(left, "Not invokable")
+                    else -> semanticErrorType(left, "Not invokable")
                 }
             }
             is InfixInvocation -> TODO("infix invocation")
@@ -186,22 +240,15 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
     }
 
     // nodes with nothing to resolve / infer
-    override fun visitImport(import: Import) {}
-
-    override fun visitImportEntry(entry: ImportEntry) {}
-
     override fun visitLiteral(literal: Literal) {}
 
     override fun visitPattern(pattern: Pattern) {}
 
     // misc
-    private fun findDefinition(reference: DefinitionReference): Definition? {
+    private fun findDefinition(reference: DefinitionReference): NamedDefinition? {
         // TODO: should we handle this potential error in a better manner?
         val parent = reference.parent ?: error("No parent found for $reference")
-        return reference.find(parent.closestTable) ?: run {
-            reportSemanticError(reference, "Unresolved reference: ${reference.name}")
-            null
-        }
+        return reference.find(parent.closestTable)
     }
 
     private fun resolveType(type: Type): ResolvedTypeOrError {
@@ -209,8 +256,16 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
         return type.resolve(context)
     }
 
+    private fun unresolvedReference(position: Positionable, name: String): ErrorType =
+        semanticErrorType(position, "Unresolved reference: $name")
+
     private fun errorType(position: Positionable, message: String): ErrorType {
         unit.reportTypeError(position, message)
+        return ErrorType(message)
+    }
+
+    private fun semanticErrorType(position: Positionable, message: String): ErrorType {
+        unit.reportSemanticError(position, message)
         return ErrorType(message)
     }
 
@@ -223,6 +278,14 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
         is UnknownType -> ifUnknown()
         is ResolvedType -> type
         else -> resolveType(type)
+    }
+
+    private fun visitAndGetType(def: Definition): Type {
+        visit(def)
+        return when (val type = def.type) {
+            is UnknownType -> errorType(def, "Failed to resolve type.")
+            else -> type
+        }
     }
 
     // TODO: better name

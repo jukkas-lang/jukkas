@@ -35,7 +35,7 @@ object AnonymousFunctionParselet : PrefixParselet {
             val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
             val argEnd = consume(RIGHT_PAREN)
             val returnType = parseOptionalTypeDeclaration(ARROW)
-            val returnTypePosition = (returnType as? TypeName)?.position
+            val returnTypePosition = (returnType as? TypeName)
             val body = when {
                 match(EQUAL) -> {
                     // TODO: give warning for structures like 'fun() = return;' ?

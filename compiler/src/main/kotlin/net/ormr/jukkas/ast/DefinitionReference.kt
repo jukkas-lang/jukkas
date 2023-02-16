@@ -23,14 +23,16 @@ import net.ormr.jukkas.type.UnknownType
 class DefinitionReference(val name: String) : Expression() {
     override var type: Type = UnknownType
 
-    fun find(table: Table): Definition? = table.find(name)
+    fun find(table: Table): NamedDefinition? = table.find(name)
 
     override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitIdentifierReference(this)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is DefinitionReference && name == other.name && type.isStructurallyEquivalent(other.type)
+        other is DefinitionReference &&
+                name == other.name &&
+                type.isStructurallyEquivalent(other.type)
 
-    override fun toString(): String = name
+    override fun toString(): String = "DefinitionReference(name='$name', type=$type)"
 
     operator fun component1(): String = name
 

@@ -208,7 +208,7 @@ internal class TypeCheckingPhase(private val unit: CompilationUnit) : NodeVisito
     }
 
     private fun findPosition(node: Node, type: Type): Positionable = when (type) {
-        is TypeName -> type.position
+        is TypeName -> type
         else -> node
     }
 

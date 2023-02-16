@@ -37,11 +37,11 @@ class JukkasType private constructor(override val internalName: String) : Resolv
     override val declaredMembers: List<JukkasMember>
         get() = TODO("Not yet implemented")
 
-    override fun findMethod(name: String, types: List<ResolvedType>): TypeMember.Method? {
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method? {
         TODO("Not yet implemented")
     }
 
-    override fun findConstructor(types: List<ResolvedType>): TypeMember.Constructor? {
+    override fun findConstructor(types: List<ResolvedTypeOrError>): TypeMember.Constructor? {
         TODO("Not yet implemented")
     }
 

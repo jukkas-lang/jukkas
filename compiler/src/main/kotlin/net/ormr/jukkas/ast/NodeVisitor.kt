@@ -16,6 +16,8 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.type.TypeName
+
 interface NodeVisitor<T> {
     fun visitCompilationUnit(unit: CompilationUnit): T
     fun visitImport(import: Import): T

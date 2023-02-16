@@ -50,9 +50,9 @@ class JvmArrayType private constructor(val clz: Class<*>) : JvmType {
     override val declaredMembers: List<JvmMember>
         get() = emptyList()
 
-    override fun findMethod(name: String, types: List<ResolvedType>): JvmMember.Method? = null
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): JvmMember.Method? = null
 
-    override fun findConstructor(types: List<ResolvedType>): JvmMember.Constructor? = null
+    override fun findConstructor(types: List<ResolvedTypeOrError>): JvmMember.Constructor? = null
 
     override fun findField(name: String): JvmMember.Field? = null
 

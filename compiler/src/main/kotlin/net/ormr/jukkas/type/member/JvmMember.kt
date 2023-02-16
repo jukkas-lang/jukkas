@@ -17,7 +17,6 @@
 package net.ormr.jukkas.type.member
 
 import net.ormr.jukkas.type.AsmMethodType
-import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.ResolvedType
 import net.ormr.krautils.collections.asUnmodifiableList
 import java.lang.reflect.Constructor as JavaConstructor
@@ -31,6 +30,8 @@ sealed interface JvmMember : TypeMember {
             get() = method.name
 
         override val parameterTypes: List<ResolvedType> by lazy { createTypeList(method) }
+
+        override val returnType: ResolvedType by lazy { ResolvedType.of(method.returnType) }
 
         override fun toAsmType(): AsmMethodType = AsmMethodType.of(method)
     }
@@ -48,9 +49,9 @@ sealed interface JvmMember : TypeMember {
         override val name: String
             get() = this.field.name
 
-        override val type: ResolvedType by lazy { JvmType.of(field.type) }
+        override val type: ResolvedType by lazy { ResolvedType.of(field.type) }
     }
 }
 
 private fun createTypeList(executable: JavaExecutable): List<ResolvedType> =
-    executable.parameterTypes.map { JvmType.of(it) }.asUnmodifiableList()
+    executable.parameterTypes.map { ResolvedType.of(it) }.asUnmodifiableList()

@@ -46,9 +46,9 @@ class ErrorType(val description: String) : ResolvedTypeOrError {
     override val declaredMembers: List<TypeMember>
         get() = emptyList()
 
-    override fun findMethod(name: String, types: List<ResolvedType>): TypeMember.Method? = null
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method? = null
 
-    override fun findConstructor(types: List<ResolvedType>): TypeMember.Constructor? = null
+    override fun findConstructor(types: List<ResolvedTypeOrError>): TypeMember.Constructor? = null
 
     override fun findField(name: String): TypeMember.Field? = null
 
