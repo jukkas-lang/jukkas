@@ -18,6 +18,8 @@ package net.ormr.jukkas.phases
 
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
+import net.ormr.jukkas.ast.Node
+import net.ormr.jukkas.ast.reportSemanticError
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.reporter.MessageType
 
@@ -28,7 +30,15 @@ sealed class CompilerPhase(private val source: Source) {
         reporter.reportError(source, MessageType.Error.SEMANTIC, position, message)
     }
 
+    @JvmName("receiverReportSemanticError")
+    protected fun Node.reportSemanticError(message: String) {
+        reportSemanticError(this, message)
+    }
+
     protected fun reportTypeError(position: Positionable, message: String) {
         reporter.reportError(source, MessageType.Error.TYPE, position, message)
     }
+
+    protected inline fun <reified T : Any> unreachable(): Nothing =
+        error("Branch for <${T::class}> should never be reached")
 }

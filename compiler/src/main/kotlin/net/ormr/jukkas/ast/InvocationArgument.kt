@@ -20,7 +20,7 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
-class InvocationArgument(value: Expression, val name: String?) : Expression() {
+class InvocationArgument(value: Expression, val name: String?) : Expression(), HasMutableType {
     var value: Expression by child(value)
     override var type: Type = UnknownType
 

@@ -21,7 +21,7 @@ import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Return(value: Expression?) : Expression() {
+class Return(value: Expression?) : Expression(), HasMutableType {
     var value: Expression? by child(value)
     override var type: Type = UnknownType
 

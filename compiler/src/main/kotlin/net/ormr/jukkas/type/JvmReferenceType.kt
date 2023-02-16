@@ -74,7 +74,8 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         // TODO: is this sound?
         is JvmType -> when (other) {
             is JvmArrayType -> false
-            is JvmPrimitiveType -> false // a wrapper type is never allowed in place of a primitive
+            // TODO: allow primitives to be passed to wrappers
+            is JvmPrimitiveType -> false
             is JvmReferenceType -> other.clz.isAssignableFrom(clz) // TODO: is this the right order?
         }
     }

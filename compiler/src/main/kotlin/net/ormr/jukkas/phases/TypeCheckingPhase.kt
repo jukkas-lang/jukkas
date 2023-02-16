@@ -121,7 +121,7 @@ internal class TypeCheckingPhase(private val unit: CompilationUnit) : NodeVisito
     override fun visitIdentifierReference(reference: DefinitionReference) {
         // TODO: should we handle this potential error in a better manner?
         val parent = reference.parent ?: error("No parent found for $reference")
-        val definition = reference.find(parent.closestTable) ?: run {
+        val definition = reference.find(parent.getClosestTable()) ?: run {
             reportSemanticError(reference, "Unresolved reference: ${reference.name}")
             return
         }

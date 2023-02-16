@@ -16,7 +16,7 @@
 
 package net.ormr.jukkas.ast
 
-sealed interface Invokable : Definition, Node {
+sealed interface Invokable : Definition, Node, HasMutableType {
     val arguments: MutableNodeList<Argument>
     val body: Block?
 }

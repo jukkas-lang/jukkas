@@ -21,7 +21,7 @@ import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Block(override val table: Table, statements: List<Statement>) : Expression(), TableContainer {
+class Block(override val table: Table, statements: List<Statement>) : Expression(), TableContainer, HasMutableType {
     override var type: Type = UnknownType
     val statements: MutableNodeList<Statement> =
         statements.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)

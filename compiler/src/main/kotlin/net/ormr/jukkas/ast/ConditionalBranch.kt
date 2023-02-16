@@ -25,7 +25,7 @@ class ConditionalBranch(
     condition: Expression,
     thenBranch: Expression,
     elseBranch: Expression?,
-) : Expression() {
+) : Expression(), HasMutableType {
     var condition: Expression by child(condition)
     var thenBranch: Expression by child(thenBranch)
     var elseBranch: Expression? by child(elseBranch)

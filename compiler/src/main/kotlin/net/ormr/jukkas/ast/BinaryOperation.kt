@@ -24,7 +24,7 @@ class BinaryOperation(
     left: Expression,
     val operator: BinaryOperator,
     right: Expression,
-) : Expression() {
+) : Expression(), HasMutableType {
     var left: Expression by child(left)
     var right: Expression by child(right)
     override var type: Type = UnknownType

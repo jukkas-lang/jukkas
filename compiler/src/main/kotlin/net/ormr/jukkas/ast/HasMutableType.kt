@@ -18,9 +18,6 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
-sealed class Variable : Statement(), NamedDefinition, HasMutableType {
-    abstract val kind: PropertyKind
-    abstract override val name: String
-    abstract override var type: Type
-    abstract var initializer: Expression?
+sealed interface HasMutableType : HasType {
+    override var type: Type
 }

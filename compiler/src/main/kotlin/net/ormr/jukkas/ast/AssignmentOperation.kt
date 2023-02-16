@@ -25,7 +25,7 @@ class AssignmentOperation(
     left: Expression,
     val operator: AssignmentOperator,
     value: Expression,
-) : Expression() {
+) : Expression(), HasMutableType {
     var left: Expression by child(left)
     var value: Expression by child(value)
     override var type: Type = UnknownType

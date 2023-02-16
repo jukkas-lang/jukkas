@@ -20,7 +20,7 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
-class DefinitionReference(val name: String) : Expression() {
+class DefinitionReference(val name: String) : Expression(), HasMutableType {
     override var type: Type = UnknownType
 
     fun find(table: Table): NamedDefinition? = table.find(name)

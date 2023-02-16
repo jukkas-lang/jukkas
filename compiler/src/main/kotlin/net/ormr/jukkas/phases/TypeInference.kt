@@ -38,7 +38,7 @@ object TypeInference {
         is ConditionalBranch -> TODO()
         is Lambda -> inferDefinitionType(expr)
         is DefinitionReference -> expr
-            .find(expr.closestTable)
+            .find(expr.getClosestTable())
             ?.let(::inferDefinitionType) ?: errorType(expr, "Unknown name '${expr.name}'")
         is AnonymousFunctionInvocation -> TODO()
         is InfixInvocation -> TODO()

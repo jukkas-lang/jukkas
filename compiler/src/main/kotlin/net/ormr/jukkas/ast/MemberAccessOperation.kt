@@ -25,7 +25,7 @@ class MemberAccessOperation(
     left: Expression,
     right: Expression,
     val isSafe: Boolean,
-) : Expression() {
+) : Expression(), HasMutableType {
     var left: Expression by child(left)
     var right: Expression by child(right)
     override var type: Type = UnknownType

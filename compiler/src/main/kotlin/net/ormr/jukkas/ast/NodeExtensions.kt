@@ -19,11 +19,15 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.reporter.MessageType
 
-val Node.closestTable: Table
-    get() = ancestors
-        .filterIsInstance<TableContainer>()
-        .firstOrNull()
-        ?.table ?: error("Could not find a table anywhere in the scope for $this")
+fun Node.getClosestTable(): Table =
+    getClosestTableOrNull() ?: error("Could not find a table anywhere in the scope for $this")
+
+fun Node.getClosestTableOrNull(): Table? {
+    walkHierarchy {
+        if (it is TableContainer) return it.table
+    }
+    return null
+}
 
 /**
  * Walks up the hierarchy of `this` [Node] invoking [action] on its [parent][Node.parent] until none is left.
