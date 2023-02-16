@@ -50,20 +50,20 @@ class InfixInvocation(
     operator fun component3(): Expression = right
 }
 
-class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) : Invocation() {
-    var left: Expression by child(left)
+class FunctionInvocation(target: Expression, arguments: List<InvocationArgument>) : Invocation() {
+    var target: Expression by child(target)
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
     var member: TypeMember? = null
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionInvocation &&
-                left.isStructurallyEquivalent(other.left) &&
+                target.isStructurallyEquivalent(other.target) &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
                 type.isStructurallyEquivalent(other.type)
 
-    override fun toString(): String = "($left (${arguments.joinToString(separator = " ")}))"
+    override fun toString(): String = "($target (${arguments.joinToString(separator = " ")}))"
 
-    operator fun component1(): Expression = left
+    operator fun component1(): Expression = target
 
     operator fun component2(): MutableNodeList<InvocationArgument> = arguments
 }
