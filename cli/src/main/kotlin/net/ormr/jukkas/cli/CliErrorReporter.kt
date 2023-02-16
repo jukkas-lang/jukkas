@@ -50,7 +50,7 @@ class CliErrorReporter {
 
     private fun Terminal.printError(source: Source, message: Message.Error) {
         val (line, column) = message.position.startPoint
-        println("${bold("${italic("[${line + 1}:${column + 1}]")}: ${red("error")}")}: ${message.message}")
+        println("${bold("${"[${line + 1}:${column + 1}]"}: ${red("error")}")}: ${message.message}")
         printSource(source, message)
     }
 
@@ -68,7 +68,7 @@ class CliErrorReporter {
         // TODO: trim away useless leading indent from source
         val content = sourceText[start.line]
         print(INDENT)
-        println(content)
+        println(italic(content))
         print(INDENT)
         print(" ".repeat(start.column))
         println(bold(cyan("^".repeat(end.indices.last - start.indices.first))))
