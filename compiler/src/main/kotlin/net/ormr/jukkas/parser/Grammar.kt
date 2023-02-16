@@ -28,13 +28,13 @@ import net.ormr.jukkas.parser.Precedence.MULTIPLICATIVE
 import net.ormr.jukkas.parser.parselets.infix.AssignmentParselet
 import net.ormr.jukkas.parser.parselets.infix.BinaryOperationParselet
 import net.ormr.jukkas.parser.parselets.infix.MemberAccessOperationParselet
-import net.ormr.jukkas.parser.parselets.infix.FunctionInvocationParselet
+import net.ormr.jukkas.parser.parselets.infix.AnonymousFunctionInvocationParselet
 import net.ormr.jukkas.parser.parselets.infix.InfixInvocationParselet
 import net.ormr.jukkas.parser.parselets.infix.InfixParselet
 import net.ormr.jukkas.parser.parselets.prefix.BooleanParselet
 import net.ormr.jukkas.parser.parselets.prefix.FunctionLiteralParselet
 import net.ormr.jukkas.parser.parselets.prefix.AnonymousFunctionParselet
-import net.ormr.jukkas.parser.parselets.prefix.IdentifierParselet
+import net.ormr.jukkas.parser.parselets.prefix.ReferenceParselet
 import net.ormr.jukkas.parser.parselets.prefix.IfParselet
 import net.ormr.jukkas.parser.parselets.prefix.IntParselet
 import net.ormr.jukkas.parser.parselets.prefix.ParenthesizedExpressionParselet
@@ -48,7 +48,7 @@ internal object Grammar {
     private val infixParselets = hashMapOf<TokenType, InfixParselet>()
 
     init {
-        prefix<IdentifierLike>(IdentifierParselet)
+        prefix<IdentifierLike>(ReferenceParselet)
         prefix(SYMBOL_LITERAL, SymbolParselet)
         prefix(RETURN, ReturnParselet)
         prefix(FUN, AnonymousFunctionParselet)
@@ -61,7 +61,7 @@ internal object Grammar {
         prefix(LEFT_PAREN, ParenthesizedExpressionParselet)
 
         infix<Call>(MemberAccessOperationParselet) // 14
-        infix(LEFT_PAREN, FunctionInvocationParselet) // 14
+        infix(LEFT_PAREN, AnonymousFunctionInvocationParselet) // 14
         infix<Multiplicative>(BinaryOperationParselet(MULTIPLICATIVE)) // 11
         infix<Additive>(BinaryOperationParselet(ADDITIVE)) // 10
         infix<IdentifierLike>(InfixInvocationParselet) // 8

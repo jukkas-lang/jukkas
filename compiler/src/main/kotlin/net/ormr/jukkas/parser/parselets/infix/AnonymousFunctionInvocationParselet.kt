@@ -16,16 +16,17 @@
 
 package net.ormr.jukkas.parser.parselets.infix
 
+import net.ormr.jukkas.ast.AnonymousFunctionInvocation
 import net.ormr.jukkas.ast.Expression
-import net.ormr.jukkas.ast.MemberAccessOperation
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
-import net.ormr.jukkas.lexer.TokenType
+import net.ormr.jukkas.lexer.TokenType.COMMA
+import net.ormr.jukkas.lexer.TokenType.RIGHT_PAREN
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.Precedence
 
-object MemberAccessOperationParselet : InfixParselet {
+object AnonymousFunctionInvocationParselet : InfixParselet {
     override val precedence: Int
         get() = Precedence.POSTFIX
 
@@ -33,14 +34,9 @@ object MemberAccessOperationParselet : InfixParselet {
         parser: JukkasParser,
         left: Expression,
         token: Token,
-    ): MemberAccessOperation = parser with {
-        val isSafe = when (token.type) {
-            TokenType.DOT -> false
-            TokenType.HOOK_DOT -> true
-            else -> token syntaxError "Unknown call operator"
-        }
-        val right = parseExpression(precedence)
-        // TODO: createSpan(token, value.findPosition().startPoint.end) or something?
-        MemberAccessOperation(left, right, isSafe) withPosition createSpan(left, right)
+    ): AnonymousFunctionInvocation = parser with {
+        val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseInvocationArgument)
+        val end = consume(RIGHT_PAREN)
+        AnonymousFunctionInvocation(left, arguments) withPosition createSpan(token, end)
     }
 }

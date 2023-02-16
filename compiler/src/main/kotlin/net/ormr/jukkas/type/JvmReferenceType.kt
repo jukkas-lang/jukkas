@@ -47,8 +47,7 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         createMemberList(clz.declaredMethods, clz.declaredConstructors, clz.declaredFields)
     }
 
-    // TODO: is it safe to just do a direct check like this? or do we want to do some sort of priority sorted list
-    //       of potential candidates?
+    // TODO: we need have a smarter strategy for resolving overloads
     override fun findMethod(name: String, types: List<ResolvedTypeOrError>): JvmMember.Method? =
         findMember { it.name == name && typesMatch(types, it.parameterTypes) }
 

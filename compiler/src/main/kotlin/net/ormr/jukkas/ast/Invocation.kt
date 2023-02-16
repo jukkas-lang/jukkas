@@ -43,6 +43,8 @@ class InfixInvocation(
                 right.isStructurallyEquivalent(other.right) &&
                 type.isStructurallyEquivalent(other.type)
 
+    override fun toString(): String = "InfixInvocation(left=$left, name='$name', right=$right)"
+
     operator fun component1(): Expression = left
 
     operator fun component2(): String = name
@@ -50,18 +52,37 @@ class InfixInvocation(
     operator fun component3(): Expression = right
 }
 
-class FunctionInvocation(target: Expression, arguments: List<InvocationArgument>) : Invocation() {
-    var target: Expression by child(target)
+class FunctionInvocation(val name: String, arguments: List<InvocationArgument>) : Invocation() {
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
     var member: TypeMember? = null
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionInvocation &&
+                name == other.name &&
+                checkStructuralEquivalence(arguments, other.arguments) &&
+                type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String =
+        "FunctionInvocation(name='$name', arguments=$arguments, member=$member)"
+
+    operator fun component1(): String = name
+
+    operator fun component2(): MutableNodeList<InvocationArgument> = arguments
+}
+
+class AnonymousFunctionInvocation(target: Expression, arguments: List<InvocationArgument>) : Invocation() {
+    var target: Expression by child(target)
+    val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
+    var member: TypeMember? = null // TODO: I don't think an AnonymousFunctionInvocation has a member
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is AnonymousFunctionInvocation &&
                 target.isStructurallyEquivalent(other.target) &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
                 type.isStructurallyEquivalent(other.type)
 
-    override fun toString(): String = "($target (${arguments.joinToString(separator = " ")}))"
+    override fun toString(): String =
+        "AnonymousFunctionInvocation(target=$target, arguments=$arguments, member=$member)"
 
     operator fun component1(): Expression = target
 

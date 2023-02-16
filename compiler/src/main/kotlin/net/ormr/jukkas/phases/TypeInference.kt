@@ -17,7 +17,6 @@
 package net.ormr.jukkas.phases
 
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.Function
 import net.ormr.jukkas.ast.Lambda
 import net.ormr.jukkas.type.ErrorType
 import net.ormr.jukkas.type.Type
@@ -41,12 +40,13 @@ object TypeInference {
         is DefinitionReference -> expr
             .find(expr.closestTable)
             ?.let(::inferDefinitionType) ?: errorType(expr, "Unknown name '${expr.name}'")
-        is FunctionInvocation -> TODO()
+        is AnonymousFunctionInvocation -> TODO()
         is InfixInvocation -> TODO()
         is InvocationArgument -> TODO()
         is Literal -> expr.type
         is Return -> expr.type
         is StringTemplateExpression -> expr.type
+        else -> TODO()
     }
 
     fun inferDefinitionType(def: Definition): Type = error("lol")

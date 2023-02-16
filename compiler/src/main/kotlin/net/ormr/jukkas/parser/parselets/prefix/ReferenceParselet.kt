@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.parser.parselets.infix
+package net.ormr.jukkas.parser.parselets.prefix
 
+import net.ormr.jukkas.ast.DefinitionReference
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.FunctionInvocation
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.lexer.TokenType.COMMA
+import net.ormr.jukkas.lexer.TokenType.LEFT_PAREN
 import net.ormr.jukkas.lexer.TokenType.RIGHT_PAREN
 import net.ormr.jukkas.parser.JukkasParser
-import net.ormr.jukkas.parser.Precedence
 
-object FunctionInvocationParselet : InfixParselet {
-    override val precedence: Int
-        get() = Precedence.POSTFIX
-
-    override fun parse(
-        parser: JukkasParser,
-        left: Expression,
-        token: Token,
-    ): FunctionInvocation = parser with {
-        val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseInvocationArgument)
-        val end = consume(RIGHT_PAREN)
-        // TODO: verify amount of arguments passed in at a later stage
-        FunctionInvocation(left, arguments) withPosition createSpan(token, end)
+object ReferenceParselet : PrefixParselet {
+    override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
+        when {
+            match(LEFT_PAREN) -> {
+                val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseInvocationArgument)
+                val end = consume(RIGHT_PAREN)
+                FunctionInvocation(token.text, arguments) withPosition createSpan(token, end)
+            }
+            else -> DefinitionReference(token.text) withPosition token
+        }
     }
 }

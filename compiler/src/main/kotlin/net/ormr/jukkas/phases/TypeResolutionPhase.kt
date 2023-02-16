@@ -158,7 +158,8 @@ class TypeResolutionPhase private constructor(private val unit: CompilationUnit)
 
     override fun visitInvocation(invocation: Invocation) {
         invocation.type = when (invocation) {
-            is FunctionInvocation -> {
+            is FunctionInvocation -> TODO("FunctionInvocation")
+            is AnonymousFunctionInvocation -> {
                 val (left, arguments) = invocation
                 arguments.forEach(::visit)
                 when (left) {

@@ -23,11 +23,11 @@ import net.ormr.jukkas.type.member.TypeMember
 
 class MemberAccessOperation(
     left: Expression,
-    target: Expression,
+    right: Expression,
     val isSafe: Boolean,
 ) : Expression() {
     var left: Expression by child(left)
-    var right: Expression by child(target)
+    var right: Expression by child(right)
     override var type: Type = UnknownType
     var member: TypeMember? = null
 

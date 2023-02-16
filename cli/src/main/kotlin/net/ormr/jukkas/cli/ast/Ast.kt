@@ -197,13 +197,21 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             includeNode(node)
             put("name", node.name)
         }
-        is FunctionInvocation -> buildJsonObject {
-            includeNode(node)
-            put("target", toJson(node.target))
-            putNodeList("arguments", node.arguments)
-            put("member", toJson(node.member))
+        is Invocation -> when (node) {
+            is FunctionInvocation -> buildJsonObject {
+                includeNode(node)
+                put("name", node.name)
+                putNodeList("arguments", node.arguments)
+                put("member", toJson(node.member))
+            }
+            is AnonymousFunctionInvocation -> buildJsonObject {
+                includeNode(node)
+                put("target", toJson(node.target))
+                putNodeList("arguments", node.arguments)
+                put("member", toJson(node.member))
+            }
+            is InfixInvocation -> TODO()
         }
-        is InfixInvocation -> TODO()
         is InvocationArgument -> buildJsonObject {
             includeNode(node)
             put("name", node.name)
