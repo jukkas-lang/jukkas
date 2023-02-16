@@ -18,6 +18,6 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
-sealed interface Definition : Node, HasType {
-    override val type: Type
+sealed interface HasType : Node {
+    val type: Type
 }

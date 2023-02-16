@@ -18,6 +18,6 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
-sealed class Expression : Statement() {
-    abstract val type: Type
+sealed class Expression : Statement(), HasType {
+    abstract override val type: Type
 }
