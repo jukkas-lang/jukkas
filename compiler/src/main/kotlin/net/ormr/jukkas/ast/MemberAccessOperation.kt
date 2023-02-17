@@ -31,8 +31,6 @@ class MemberAccessOperation(
     override var type: Type = UnknownType
     var member: TypeMember? = null
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitMemberAccessOperation(this)
-
     // TODO: do we want to check for type here?
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is MemberAccessOperation &&

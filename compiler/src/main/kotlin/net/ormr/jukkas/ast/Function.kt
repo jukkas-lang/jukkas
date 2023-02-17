@@ -31,8 +31,6 @@ class Function(
         arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override var body: Block? by child(body)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitFunction(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Function &&
                 name == other.name &&

@@ -26,8 +26,6 @@ class Block(override val table: Table, statements: List<Statement>) : Expression
     val statements: MutableNodeList<Statement> =
         statements.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBlock(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Block &&
                 checkStructuralEquivalence(statements, other.statements) &&

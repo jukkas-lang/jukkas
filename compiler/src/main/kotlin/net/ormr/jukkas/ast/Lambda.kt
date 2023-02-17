@@ -30,8 +30,6 @@ class Lambda(
         arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override var body: Block by child(body)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLambda(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Lambda &&
                 checkStructuralEquivalence(arguments, other.arguments) &&

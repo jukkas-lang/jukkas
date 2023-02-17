@@ -42,8 +42,6 @@ sealed interface Node : Positionable, StructurallyComparable {
 
     override fun findPositionOrNull(): Position? = position
 
-    fun <T> accept(visitor: NodeVisitor<T>): T
-
     fun <T : Node> adopt(child: T): T
 
     fun <T : Node> disown(child: T): T

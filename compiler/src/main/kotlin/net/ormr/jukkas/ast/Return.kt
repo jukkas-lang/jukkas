@@ -25,8 +25,6 @@ class Return(value: Expression?) : Expression(), HasMutableType {
     var value: Expression? by child(value)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitReturn(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Return &&
                 checkStructuralEquivalence(value, other.value) &&

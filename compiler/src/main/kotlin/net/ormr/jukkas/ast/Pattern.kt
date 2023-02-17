@@ -19,7 +19,5 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 
 class Pattern : ChildNode() {
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitPattern(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean = other is Pattern
 }

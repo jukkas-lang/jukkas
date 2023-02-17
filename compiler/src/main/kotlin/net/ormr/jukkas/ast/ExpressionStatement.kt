@@ -21,8 +21,6 @@ import net.ormr.jukkas.StructurallyComparable
 class ExpressionStatement(expression: Expression) : Statement() {
     val expression: Expression by child(expression)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitExpressionStatement(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ExpressionStatement && expression.isStructurallyEquivalent(other.expression)
 

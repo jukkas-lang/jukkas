@@ -29,8 +29,6 @@ class LocalVariable(
     override var initializer: Expression? by child(initializer)
     var index: Int = -1
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLocalVariable(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is LocalVariable &&
                 kind == other.kind &&

@@ -29,8 +29,6 @@ class BinaryOperation(
     var right: Expression by child(right)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBinaryOperation(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is BinaryOperation &&
                 operator == other.operator &&

@@ -30,8 +30,6 @@ class AssignmentOperation(
     var value: Expression by child(value)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitAssignmentOperation(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is AssignmentOperation &&
                 operator == other.operator &&

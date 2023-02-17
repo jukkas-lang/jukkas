@@ -23,8 +23,6 @@ import net.ormr.jukkas.type.ResolvedType
 
 sealed class Literal : Expression() {
     abstract override val type: ResolvedType
-
-    final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLiteral(this)
 }
 
 class SymbolLiteral(val text: String) : Literal() {

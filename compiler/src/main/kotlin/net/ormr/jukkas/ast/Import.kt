@@ -23,8 +23,6 @@ class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
     val entries: NodeList<ImportEntry> = entries.toNodeList(this)
     val path: StringLiteral by child(path)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImport(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Import &&
                 path.isStructurallyEquivalent(other.path) &&

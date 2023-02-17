@@ -24,8 +24,6 @@ class InvocationArgument(value: Expression, val name: String?) : Expression(), H
     var value: Expression by child(value)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitInvocationArgument(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is InvocationArgument &&
                 name == other.name &&

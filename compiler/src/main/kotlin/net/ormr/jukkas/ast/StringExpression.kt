@@ -7,15 +7,11 @@ import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 sealed class StringTemplatePart : ChildNode() {
     class LiteralPart(val literal: StringLiteral) : StringTemplatePart() {
-        override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitLiteral(literal)
-
         override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
             other is LiteralPart && literal.isStructurallyEquivalent(other.literal)
     }
 
     class ExpressionPart(val expression: Expression) : StringTemplatePart() {
-        override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitExpression(expression)
-
         override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
             other is ExpressionPart && expression.isStructurallyEquivalent(other.expression)
     }
@@ -26,8 +22,6 @@ class StringTemplateExpression(parts: List<StringTemplatePart>) : Expression() {
 
     override val type: ResolvedType
         get() = JvmReferenceType.STRING
-
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitStringTemplateExpression(this)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is StringTemplateExpression &&

@@ -31,8 +31,6 @@ class ConditionalBranch(
     var elseBranch: Expression? by child(elseBranch)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitConditionalBranch(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ConditionalBranch &&
                 condition.isStructurallyEquivalent(other.condition) &&

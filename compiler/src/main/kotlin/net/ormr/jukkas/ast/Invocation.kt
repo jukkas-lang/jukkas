@@ -24,8 +24,6 @@ import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 sealed class Invocation : Expression(), HasMutableType {
     override var type: Type = UnknownType
-
-    final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitInvocation(this)
 }
 
 class InfixInvocation(

@@ -25,8 +25,6 @@ class DefinitionReference(val name: String) : Expression(), HasMutableType {
 
     fun find(table: Table): NamedDefinition? = table.find(name)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitIdentifierReference(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is DefinitionReference &&
                 name == other.name &&

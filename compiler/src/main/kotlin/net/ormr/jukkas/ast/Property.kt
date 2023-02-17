@@ -28,8 +28,6 @@ class Property(
 ) : Variable() {
     override var initializer: Expression? by child(initializer)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Property &&
                 kind == other.kind &&

@@ -37,8 +37,6 @@ class CompilationUnit(
     override val compilationUnit: CompilationUnit
         get() = this
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitCompilationUnit(this)
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is CompilationUnit &&
                 checkStructuralEquivalence(imports, other.imports) &&

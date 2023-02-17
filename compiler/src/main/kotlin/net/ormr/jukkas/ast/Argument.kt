@@ -19,9 +19,7 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 
-sealed class Argument : Statement() {
-    final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitArgument(this)
-}
+sealed class Argument : Statement()
 
 sealed class NamedArgument : Argument(), NamedDefinition, HasMutableType {
     abstract override val name: String
