@@ -56,14 +56,25 @@ class JvmArrayType private constructor(val clz: Class<*>) : JvmType {
 
     override fun findField(name: String): JvmMember.Field? = null
 
+    // TODO: we need to account for the weird variance Java arrays have
     override fun isCompatible(other: ResolvedTypeOrError): Boolean = when (other) {
         is ErrorType -> false
         is JukkasType -> TODO("isCompatible -> JukkasType")
         is JvmType -> when (other) {
-            // TODO: I don't think this is fully safe way of doing this, as arrays in Java behave really weirdly
-            //       with what can go in them due to the type variance they exhibit
-            is JvmArrayType -> other.clz.isAssignableFrom(clz)
+            // TODO: is this proper?
+            is JvmArrayType -> componentType isCompatible other.componentType
             is JvmPrimitiveType, is JvmReferenceType -> false
+        }
+    }
+
+    // TODO: we need to account for the weird variance Java arrays have
+    override fun compareCompatibility(other: ResolvedTypeOrError): Int = when (other) {
+        is ErrorType -> 0
+        is JukkasType -> TODO("JukkasType")
+        is JvmType -> when (other) {
+            // TODO: is this sane?
+            is JvmArrayType -> componentType.compareCompatibility(other.componentType)
+            is JvmPrimitiveType, is JvmReferenceType -> 0
         }
     }
 

@@ -54,6 +54,8 @@ class ErrorType(val description: String) : ResolvedTypeOrError {
 
     override fun isCompatible(other: ResolvedTypeOrError): Boolean = false
 
+    override fun compareCompatibility(other: ResolvedTypeOrError): Int = 0
+
     override fun isSameType(other: ResolvedTypeOrError): Boolean = false
 
     override fun toJvmDescriptor(): Nothing = error("ErrorType: $description")

@@ -48,11 +48,38 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
     }
 
     // TODO: we need have a smarter strategy for resolving overloads
-    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): JvmMember.Method? =
-        findMember { it.name == name && typesMatch(types, it.parameterTypes) }
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method? {
+        walkHierarchy { type ->
+            type.declaredMembers
+                .asSequence()
+                .filterIsInstance<TypeMember.Method>()
+                .filter { it.name == name }
+                .filter { argumentsMatch(it, types) }
+                .sortedWith(methodComparator)
+                .firstOrNull()
+                ?.let { return it }
+        }
+        return null
+    }
+
+    override fun findMethods(name: String): List<TypeMember.Method> = buildList {
+        walkHierarchy { type ->
+            for (member in type.declaredMembers) {
+                if (member is TypeMember.Method && member.name == name) {
+                    add(member)
+                }
+            }
+        }
+    }
 
     override fun findConstructor(types: List<ResolvedTypeOrError>): JvmMember.Constructor? =
         findDeclaredMember { typesMatch(types, it.parameterTypes) }
+
+    // TODO: handle varargs and static functions?
+    private fun argumentsMatch(
+        method: TypeMember.Method,
+        types: List<ResolvedTypeOrError>,
+    ): Boolean = typesMatch(types, method.parameterTypes)
 
     private fun typesMatch(a: List<ResolvedTypeOrError>, b: List<ResolvedTypeOrError>): Boolean {
         if (a.size != b.size) return false
@@ -74,11 +101,28 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         // TODO: is this sound?
         is JvmType -> when (other) {
             is JvmArrayType -> false
-            // TODO: allow primitives to be passed to wrappers
-            is JvmPrimitiveType -> false
-            is JvmReferenceType -> other.clz.isAssignableFrom(clz) // TODO: is this the right order?
+            is JvmPrimitiveType -> this == other.boxedType
+            is JvmReferenceType -> other isAssignableFrom this // TODO: is this the right order?
         }
     }
+
+    override fun compareCompatibility(other: ResolvedTypeOrError): Int = when (other) {
+        is ErrorType -> 0
+        is JukkasType -> TODO("JukkasType")
+        is JvmType -> when (other) {
+            is JvmArrayType -> 0
+            is JvmPrimitiveType -> compareCompatibility(other.boxedType)
+            is JvmReferenceType -> when {
+                // if 'this' is the parent of 'other' then this > other
+                this isAssignableFrom other -> 1
+                // if 'other' is the parent of 'this' then this < other
+                other isAssignableFrom this -> -1
+                else -> 0
+            }
+        }
+    }
+
+    private infix fun isAssignableFrom(other: JvmReferenceType): Boolean = clz.isAssignableFrom(other.clz)
 
     override fun toJvmDescriptor(): String = getDescriptor(clz)
 
@@ -96,6 +140,18 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
     override fun hashCode(): Int = clz.hashCode()
 
     companion object {
+        private val methodComparator = Comparator<TypeMember.Method> { o1, o2 ->
+            // TODO: support non JVM methods
+            require(o1 is JvmMember.Method) { "Only JVM methods allowed for now" }
+            require(o2 is JvmMember.Method) { "Only JVM methods allowed for now" }
+            when {
+                o1.method.isVarArgs && !(o2.method.isVarArgs) -> 1
+                // TODO: should it be 'o1' or 'o2' here
+                o2.method.isVarArgs && !(o1.method.isVarArgs) -> -1
+                else -> compareTypes(o1.parameterTypes, o2.parameterTypes)
+            }
+
+        }
         private val cache = hashMapOf<String, JvmReferenceType>()
 
         val OBJECT: JvmReferenceType = of<Any>()
@@ -135,6 +191,23 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
                 return null
             }
             return of(clz)
+        }
+
+        private fun compareTypes(a: List<ResolvedTypeOrError>, b: List<ResolvedTypeOrError>): Int {
+            when {
+                a.size != b.size -> return a.size.compareTo(b.size)
+                else -> {
+                    for (i in a.indices) {
+                        val cmp = a[i].compareCompatibility(b[i])
+
+                        if (cmp != 0) {
+                            return cmp
+                        }
+                    }
+
+                    return 0
+                }
+            }
         }
     }
 }

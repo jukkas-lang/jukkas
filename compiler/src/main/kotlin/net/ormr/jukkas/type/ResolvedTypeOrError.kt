@@ -36,6 +36,11 @@ sealed interface ResolvedTypeOrError : Type {
 
     fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method?
 
+    /**
+     * Returns a list of all the methods that match [name].
+     */
+    fun findMethods(name: String): List<TypeMember.Method> = emptyList()
+
     fun findConstructor(types: List<ResolvedTypeOrError>): TypeMember.Constructor?
 
     fun findField(name: String): TypeMember.Field?
@@ -53,9 +58,21 @@ sealed interface ResolvedTypeOrError : Type {
     // TODO: better name?
     infix fun isCompatible(other: ResolvedTypeOrError): Boolean
 
+    /**
+     * Compares `this` type with the [other] type.
+     *
+     * If `this` and `other` are *not* comparable, `0` is returned, this is so that the order is not changed
+     * in a stable sort.
+     */
+    fun compareCompatibility(other: ResolvedTypeOrError): Int
+
     infix fun isIncompatible(other: ResolvedTypeOrError): Boolean = !isCompatible(other)
 
     infix fun isSameType(other: ResolvedTypeOrError): Boolean
 
     infix fun isNotSameType(other: ResolvedTypeOrError): Boolean = !isSameType(other)
+
+    companion object {
+        val COMPARATOR: Comparator<ResolvedTypeOrError> = Comparator { o1, o2 -> o1.compareCompatibility(o2) }
+    }
 }

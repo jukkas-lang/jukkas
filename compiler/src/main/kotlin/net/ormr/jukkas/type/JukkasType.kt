@@ -55,6 +55,10 @@ class JukkasType private constructor(override val internalName: String) : Resolv
         is JvmType -> TODO("isCompatible -> JukkasType")
     }
 
+    override fun compareCompatibility(other: ResolvedTypeOrError): Int {
+        TODO("Not yet implemented")
+    }
+
     override fun isSameType(other: ResolvedTypeOrError): Boolean = when (other) {
         is ErrorType -> false
         is JukkasType -> TODO("isSameType -> JukkasType")

@@ -27,7 +27,8 @@ enum class JvmPrimitiveType(
     val boxedType: JvmReferenceType,
     override val internalName: String,
 ) : JvmType {
-    VOID(primitive<Void>(), JvmReferenceType.VOID, "jukkas/Unit"), // TODO: this isn't entirely correct
+    // TODO: this isn't entirely correct
+    VOID(primitive<Void>(), JvmReferenceType.VOID, "jukkas/Unit"),
     BOOLEAN(primitive<Boolean>(), JvmReferenceType.BOOLEAN, "jukkas/Boolean"),
     CHAR(primitive<Char>(), JvmReferenceType.CHAR, "jukkas/Char"),
     BYTE(primitive<Byte>(), JvmReferenceType.BYTE, "jukkas/Int8"),
@@ -70,7 +71,18 @@ enum class JvmPrimitiveType(
         is JvmType -> when (other) {
             is JvmArrayType -> false
             is JvmPrimitiveType -> this == other
-            is JvmReferenceType -> false // TODO: allow primitives in place of wrapper types
+            is JvmReferenceType -> boxedType isCompatible other
+        }
+    }
+
+    override fun compareCompatibility(other: ResolvedTypeOrError): Int = when (other) {
+        is ErrorType -> 0
+        is JukkasType -> TODO("JukkasType")
+        is JvmType -> when (other) {
+            is JvmArrayType -> 0
+            // TODO: is this proper for allowing primitives to be passed in to wrappers?
+            is JvmPrimitiveType -> boxedType.compareCompatibility(other.boxedType)
+            is JvmReferenceType -> boxedType.compareCompatibility(other)
         }
     }
 
