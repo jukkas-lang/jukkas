@@ -100,8 +100,15 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
 
         val OBJECT: JvmReferenceType = of<Any>()
         val STRING: JvmReferenceType = of<String>()
-        val INT: JvmReferenceType = of<Int>()
+        val CHAR: JvmReferenceType = of<Char>()
         val BOOLEAN: JvmReferenceType = of<Boolean>()
+        val VOID: JvmReferenceType = of<Void>()
+        val BYTE: JvmReferenceType = of<Byte>()
+        val SHORT: JvmReferenceType = of<Short>()
+        val INT: JvmReferenceType = of<Int>()
+        val LONG: JvmReferenceType = of<Long>()
+        val FLOAT: JvmReferenceType = of<Float>()
+        val DOUBLE: JvmReferenceType = of<Double>()
 
         private inline fun <reified T : Any> of(): JvmReferenceType = of(T::class.javaObjectType)
 

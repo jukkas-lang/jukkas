@@ -22,16 +22,20 @@ import net.ormr.jukkas.utils.getDescriptor
 import net.ormr.krautils.collections.getOrThrow
 import kotlin.reflect.typeOf
 
-enum class JvmPrimitiveType(val clz: Class<*>, override val internalName: String) : JvmType {
-    VOID(primitive<Void>(), "jukkas/Unit"), // TODO: this isn't entirely correct
-    BOOLEAN(primitive<Boolean>(), "jukkas/Boolean"),
-    CHAR(primitive<Char>(), "jukkas/Char"),
-    BYTE(primitive<Byte>(), "jukkas/Int8"),
-    SHORT(primitive<Short>(), "jukkas/Int16"),
-    INT(primitive<Int>(), "jukkas/Int32"),
-    LONG(primitive<Long>(), "jukkas/Int64"),
-    FLOAT(primitive<Float>(), "jukkas/Float32"),
-    DOUBLE(primitive<Double>(), "jukkas/Float64");
+enum class JvmPrimitiveType(
+    val clz: Class<*>,
+    val boxedType: JvmReferenceType,
+    override val internalName: String,
+) : JvmType {
+    VOID(primitive<Void>(), JvmReferenceType.VOID, "jukkas/Unit"), // TODO: this isn't entirely correct
+    BOOLEAN(primitive<Boolean>(), JvmReferenceType.BOOLEAN, "jukkas/Boolean"),
+    CHAR(primitive<Char>(), JvmReferenceType.CHAR, "jukkas/Char"),
+    BYTE(primitive<Byte>(), JvmReferenceType.BYTE, "jukkas/Int8"),
+    SHORT(primitive<Short>(), JvmReferenceType.SHORT, "jukkas/Int16"),
+    INT(primitive<Int>(), JvmReferenceType.INT, "jukkas/Int32"),
+    LONG(primitive<Long>(), JvmReferenceType.LONG, "jukkas/Int64"),
+    FLOAT(primitive<Float>(), JvmReferenceType.FLOAT, "jukkas/Float32"),
+    DOUBLE(primitive<Double>(), JvmReferenceType.DOUBLE, "jukkas/Float64");
 
     override val simpleName: String
         get() = clz.name
