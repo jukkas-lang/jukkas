@@ -22,6 +22,7 @@ import net.ormr.jukkas.ast.Node
 import net.ormr.jukkas.ast.reportSemanticError
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.reporter.MessageType
+import net.ormr.jukkas.type.Type
 
 sealed class CompilerPhase(private val source: Source) {
     protected val reporter: MessageReporter = MessageReporter()
@@ -38,6 +39,9 @@ sealed class CompilerPhase(private val source: Source) {
     protected fun reportTypeError(position: Positionable, message: String) {
         reporter.reportError(source, MessageType.Error.TYPE, position, message)
     }
+
+    protected fun formatIncompatibleTypes(expected: Type, got: Type): String =
+        "Expected type <${expected.internalName}> got <${got.internalName}>"
 
     protected inline fun <reified T : Any> unreachable(): Nothing =
         error("Branch for <${T::class}> should never be reached")

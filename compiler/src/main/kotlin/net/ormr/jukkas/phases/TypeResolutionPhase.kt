@@ -85,8 +85,8 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
         when (this) {
             is Definition -> resolveDefinition(this)
             is AssignmentOperation -> {
-                check(left)
-                resolve(value)
+                check(value)
+                resolve(left)
             }
             is BinaryOperation -> {
                 // TODO: resolve these as functions when we have operator overloading setup
@@ -246,9 +246,9 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
 
     private fun incompatibleTypes(
         position: Positionable,
-        a: Type,
-        b: Type,
-    ): ErrorType = errorType(position, "Expected type <${a.internalName}> got <${b.internalName}>")
+        expected: Type,
+        got: Type,
+    ): ErrorType = errorType(position, formatIncompatibleTypes(expected, got))
 
     private fun findDefinition(reference: DefinitionReference): NamedDefinition? {
         val parent = reference.parent

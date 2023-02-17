@@ -17,208 +17,89 @@
 package net.ormr.jukkas.phases
 
 import net.ormr.jukkas.Positionable
+import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.ast.Function
-import net.ormr.jukkas.ast.Lambda
-import net.ormr.jukkas.type.ErrorType
 import net.ormr.jukkas.type.ResolvedTypeOrError
 import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.TypeCache
-import net.ormr.jukkas.type.TypeName
-import net.ormr.jukkas.type.TypeResolutionContext
-import net.ormr.jukkas.type.UnknownType
 
-/**
- * Performs type checking.
- *
- * Note that this needs to be run *after* [TypeResolutionPhase], or this phase will most likely fail fatally, as it
- * expects that types have already been resolved.
- */
-internal class TypeCheckingPhase(private val unit: CompilationUnit) : NodeVisitor<Unit> {
-    private val context = object : TypeResolutionContext {
-        override val cache: TypeCache
-            get() = unit.types
-
-        override fun reportSemanticError(position: Positionable, message: String) {
-            unit.reportSemanticError(position, message)
+class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(source) {
+    private fun typeCheck(node: Node) {
+        when (node) {
+            is CompilationUnit -> checkTypes(node.children)
+            is DefaultArgument -> {
+                val (_, type, default) = node
+                typeCheck(default)
+                checkCompatibility(default, type, default.type)
+            }
+            is AssignmentOperation -> {
+                val (left, _, value) = node
+                typeCheck(left)
+                typeCheck(value)
+                checkCompatibility(value, left.type, value.type)
+            }
+            is BinaryOperation -> {
+                val (left, _, right) = node
+                typeCheck(left)
+                typeCheck(right)
+                checkCompatibility(node, left.type, right.type)
+            }
+            is Block -> TODO("Block")
+            is ConditionalBranch -> TODO("ConditionalBranch")
+            is AnonymousFunctionInvocation -> TODO("AnonymousFunctionInvocation")
+            is FunctionInvocation -> TODO("FunctionInvocation")
+            is InfixInvocation -> TODO("InfixInvocation")
+            is Lambda -> TODO("Lambda")
+            is MemberAccessOperation -> TODO("MemberAccessOperation")
+            is StringTemplateExpression -> TODO("StringTemplateExpression")
+            is ExpressionStatement -> typeCheck(node.expression)
+            is Function -> TODO("Function")
+            is LocalVariable -> {
+                val (_, _, type, initializer) = node
+                if (initializer != null) {
+                    typeCheck(initializer)
+                    checkCompatibility(initializer, type, initializer.type)
+                }
+            }
+            is Property -> TODO("Property")
+            is StringTemplatePart -> TODO("StringTemplatePart")
+            // unreachable
+            is Import -> unreachable<Import>()
+            is ImportEntry -> unreachable<ImportEntry>()
+            // nothing to type check
+            is Pattern -> {}
+            is BasicArgument -> {}
+            is PatternArgument -> {}
+            is DefinitionReference -> {}
+            is BooleanLiteral -> {}
+            is IntLiteral -> {}
+            is StringLiteral -> {}
+            is SymbolLiteral -> {}
+            is InvocationArgument -> {}
+            // type checking of return expressions is done where they're placed
+            is Return -> {}
         }
+    }
 
-        override fun reportTypeError(position: Positionable, message: String) {
-            unit.reportTypeError(position, message)
+    private fun <T : Node> checkTypes(nodes: List<T>) {
+        nodes.forEach(::typeCheck)
+    }
+
+    private fun checkCompatibility(position: Positionable, a: Type, b: Type) {
+        require(a is ResolvedTypeOrError) { notResolved(a) }
+        require(b is ResolvedTypeOrError) { notResolved(b) }
+        if (a isIncompatible b) {
+            reportIncompatibleTypes(position, a, b)
         }
     }
 
-    override fun visitCompilationUnit(unit: CompilationUnit) {
-        unit.children.forEach(::visit)
-    }
-
-    override fun visitArgument(argument: Argument) {
-        if (argument is NamedArgument) {
-            val type = argument.type
-            argument.type = resolveType(type)
-        }
-
-        if (argument is DefaultArgument) {
-            val (_, argumentType, default) = argument
-            val defaultType = visitAndGetType(default)
-            checkCompatibility(default, argumentType, defaultType)
-        }
-    }
-
-    override fun visitAssignmentOperation(operation: AssignmentOperation) {
-        val (left, _, value) = operation
-        val leftType = visitAndGetType(left)
-        val valueType = visitAndGetType(value)
-        checkCompatibility(value, leftType, valueType)
-    }
-
-    override fun visitBinaryOperation(operation: BinaryOperation) {
-        val (left, _, right) = operation
-        val leftType = visitAndGetType(left)
-        val rightType = visitAndGetType(right)
-        // TODO: for now we report the error being the right side, but it might make more sense to report
-        //       the operator as the error point once we have operator overloading, as then a type mismatch
-        //       is just a failure to find a matching function
-        checkCompatibility(right, leftType, rightType)
-    }
-
-    override fun visitBlock(block: Block) {
-        block.statements.forEach(::visit)
-        TODO("Not yet implemented")
-    }
-
-    override fun visitMemberAccessOperation(operation: MemberAccessOperation) {
-        // TODO: do we want to report error or warning if it is safe access but left isn't nullable?
-        visit(operation.left)
-        val rightType = visitAndGetType(operation.right)
-        operation.type = rightType
-    }
-
-    override fun visitConditionalBranch(conditional: ConditionalBranch) {
-        // TODO: do we want to only resolve and infer types for a conditional branch if it's actually used as
-        //       an expression? could potentially improve performance, as type inference and resolution can be
-        //       relatively costly.
-        val (condition, thenBranch, elseBranch) = conditional
-        visit(condition)
-        visit(thenBranch)
-        visit(elseBranch)
-        // TODO: resolve type ourselves
-        conditional.type = TypeInference.inferType(conditional)
-    }
-
-    override fun visitExpressionStatement(statement: ExpressionStatement) {
-        visit(statement.expression)
-    }
-
-    override fun visitLambda(lambda: Lambda) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitFunction(function: Function) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitIdentifierReference(reference: DefinitionReference) {
-        // TODO: should we handle this potential error in a better manner?
-        val parent = reference.parent ?: error("No parent found for $reference")
-        val definition = reference.find(parent.getClosestTable()) ?: run {
-            reportSemanticError(reference, "Unresolved reference: ${reference.name}")
-            return
-        }
-        visit(definition)
-    }
-
-    override fun visitImport(import: Import) {
-        // nothing to type check or resolve
-    }
-
-    override fun visitInvocation(invocation: Invocation) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitInvocationArgument(argument: InvocationArgument) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitLiteral(literal: Literal) {
-        // nothing to type check or resolve
-    }
-
-    override fun visitPattern(pattern: Pattern) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitProperty(property: Property) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitReturn(expr: Return) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitLocalVariable(variable: LocalVariable) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitStringTemplateExpression(variable: StringTemplateExpression) {
-        TODO("Not yet implemented")
-    }
-
-    override fun visitImportEntry(entry: ImportEntry) {
-        TODO("Not yet implemented")
-    }
-
-    // nodes with nothing to type check or resolve
-
-    // ...
-    private fun reportSemanticError(position: Positionable, message: String) {
-        unit.reportSemanticError(position, message)
-    }
-
-    private fun reportTypeError(position: Positionable, message: String) {
-        unit.reportTypeError(position, message)
-    }
+    private fun notResolved(type: Type): String = "Type <$type> is not resolved. Was type resolution skipped?"
 
     private fun reportIncompatibleTypes(
         position: Positionable,
-        parent: Type,
-        type: Type,
+        expected: Type,
+        got: Type,
     ) {
-        reportTypeError(position, "Expected type <${parent.internalName}> got <${type.internalName}>")
-    }
-
-    private fun checkCompatibility(
-        position: Positionable,
-        parent: Type,
-        type: Type,
-    ) {
-        ifResolved(type) { a ->
-            ifResolved(parent) { b ->
-                if (a isIncompatible b) {
-                    reportIncompatibleTypes(position, parent, type)
-                }
-            }
-        }
-    }
-
-    // TODO: better name
-    private fun visitAndGetType(expr: Expression): Type {
-        visit(expr)
-        return expr.type
-    }
-
-    private fun findPosition(node: Node, type: Type): Positionable = when (type) {
-        is TypeName -> type
-        else -> node
-    }
-
-    private fun resolveType(type: Type): ResolvedTypeOrError {
-        require(type !is UnknownType) { "Can't resolve an UnknownType. Was type inference skipped?" }
-        return type.resolve(context)
-    }
-
-    private inline fun ifResolved(type: Type, action: (ResolvedTypeOrError) -> Unit) {
-        require(type is ResolvedTypeOrError) { "Type should be ResolvedType, was <$type>" }
-        if (type !is ErrorType) action(type)
+        reportTypeError(position, formatIncompatibleTypes(expected, got))
     }
 }
