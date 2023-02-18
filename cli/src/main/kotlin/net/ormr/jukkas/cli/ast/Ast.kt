@@ -45,7 +45,6 @@ import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.flatMap
 import net.ormr.jukkas.getOrElse
 import net.ormr.jukkas.parser.JukkasParser
-import net.ormr.jukkas.phases.BytecodeGenerationPhase
 import net.ormr.jukkas.phases.TypeCheckingPhase
 import net.ormr.jukkas.phases.TypeResolutionPhase
 import net.ormr.jukkas.type.Type

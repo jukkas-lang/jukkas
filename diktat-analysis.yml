@@ -100,6 +100,9 @@
 - name: VARIABLE_NAME_INCORRECT_FORMAT
   enabled: false
 
+- name: VARIABLE_NAME_INCORRECT
+  enabled: false
+
 - name: GENERIC_VARIABLE_WRONG_DECLARATION
   enabled: false
 

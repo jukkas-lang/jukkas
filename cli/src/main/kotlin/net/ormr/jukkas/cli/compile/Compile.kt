@@ -44,7 +44,6 @@ class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true
         .help("The directory to output the class files to")
         .path(canBeFile = false)
 
-
     // TODO: this is temporary for now
     private val runClass by option("-r", "--run")
         .help("Should the class be ran after compilation")
