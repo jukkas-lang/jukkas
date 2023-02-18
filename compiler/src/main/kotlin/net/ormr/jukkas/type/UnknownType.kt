@@ -22,7 +22,5 @@ object UnknownType : Type {
 
     override fun resolve(context: TypeResolutionContext): Nothing = error("Can't resolve an UnknownType")
 
-    override fun toJvmDescriptor(): Nothing = error("UnknownType")
-
     override fun toString(): String = "UnknownType"
 }

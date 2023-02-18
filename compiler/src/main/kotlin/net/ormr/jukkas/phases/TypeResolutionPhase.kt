@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.phases
 
+import net.ormr.jukkas.CompilerContext
 import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
@@ -33,7 +34,11 @@ import net.ormr.jukkas.type.UnknownType
 /**
  * Performs type resolution and type inference, and some light type checking.
  */
-class TypeResolutionPhase private constructor(source: Source, private val types: TypeCache) : CompilerPhase(source) {
+class TypeResolutionPhase private constructor(
+    source: Source,
+    private val types: TypeCache,
+    private val compilerContext: CompilerContext,
+) : CompilerPhase(source) {
     private val context = object : TypeResolutionContext {
         override val cache: TypeCache
             get() = types
@@ -54,7 +59,7 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
                 val path = node.path.value
                 for (entry in node.entries) {
                     val (name, alias) = entry
-                    val type = ResolvedType.find(Type.buildJavaName(path, name))
+                    val type = compilerContext.resolveType(path, name)
                     if (type != null) {
                         types.define(entry, type, alias)
                     } else {
@@ -158,6 +163,7 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
             }
             is Return -> resolveIfPossible(value) { JvmPrimitiveType.VOID } // TODO: JukkasType.UNIT
             is StringTemplateExpression -> type
+            else -> errorType(this, "Could not resolve type.")
         }
     }
 
@@ -181,6 +187,7 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
                     }
                 }
             }
+            else -> errorType(this, "Could not resolve type.")
         }
     }
 
@@ -275,10 +282,16 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
     }
 
     companion object {
-        fun run(unit: CompilationUnit): JukkasResult<CompilationUnit> = run(unit, unit.source, unit.types)
+        fun run(unit: CompilationUnit, compilerContext: CompilerContext): JukkasResult<CompilationUnit> =
+            run(unit, unit.source, unit.types, compilerContext)
 
-        fun <T : Node> run(node: T, source: Source, types: TypeCache): JukkasResult<T> {
-            val phase = TypeResolutionPhase(source, types)
+        fun <T : Node> run(
+            node: T,
+            source: Source,
+            types: TypeCache,
+            compilerContext: CompilerContext,
+        ): JukkasResult<T> {
+            val phase = TypeResolutionPhase(source, types, compilerContext)
             phase.check(node)
             return phase.reporter.toResult { node }
         }

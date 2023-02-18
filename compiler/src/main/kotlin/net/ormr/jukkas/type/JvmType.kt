@@ -23,6 +23,16 @@ sealed interface JvmType : ResolvedType {
     override val interfaces: List<ResolvedType>
     override val declaredMembers: List<JvmMember>
 
+    val jvmName: String
+        get() = internalName.replace('.', '$').replace('/', '.')
+
+    infix fun jvmDescriptorMatches(other: Type): Boolean =
+        other is JvmType && toJvmDescriptor() == other.toJvmDescriptor()
+
+    fun toAsmType(): AsmFieldType = AsmReferenceType.fromDescriptor(toJvmDescriptor())
+
+    fun toJvmDescriptor(): String
+
     override fun isSameType(other: ResolvedTypeOrError): Boolean = when (other) {
         is ErrorType -> false
         // TODO: handle cases with jukkas types, like 'Jukkas.Int = int', and like 'jukkas.Array[Int] = Integer[]'

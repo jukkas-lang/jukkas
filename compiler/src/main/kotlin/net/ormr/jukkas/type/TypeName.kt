@@ -26,11 +26,7 @@ class TypeName(val position: Position, override val internalName: String) : Posi
     // TODO: handle jukkas classes
     override fun resolve(context: TypeResolutionContext): ResolvedTypeOrError =
         context.cache.find(internalName)
-            ?: JvmReferenceType.find(jvmName)
             ?: context.errorType(this, "Can't find type '$internalName'")
-
-    // TODO: should we throw an error here instead?
-    override fun toJvmDescriptor(): String = "L${internalName.replace('.', '$')};"
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is TypeName && internalName == other.internalName
