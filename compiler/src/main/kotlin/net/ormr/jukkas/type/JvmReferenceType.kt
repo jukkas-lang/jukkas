@@ -31,7 +31,7 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         clz.interfaces.map { of(it) }.asUnmodifiableList()
     }
 
-    override val internalName: String = Type.buildJukkasName(clz.packageName, clz.simpleName)
+    override val internalName: String = JvmTypeResolver.buildJukkasName(clz.packageName, clz.simpleName)
 
     // empty if located in root package
     override val packageName: String = clz.packageName.replace('.', '/')

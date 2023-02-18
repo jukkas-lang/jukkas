@@ -16,7 +16,6 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.asmkt.types.MethodType
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
@@ -40,11 +39,4 @@ class FunctionDeclaration(
                 type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "Function(name='$name', type=$type, arguments=$arguments, body=$body)"
-    fun toMethodType(): MethodType {
-        val descriptor = buildString {
-            arguments.joinTo(this, "", "(", ")") { it.type.toJvmDescriptor() }
-            append(type.toJvmDescriptor())
-        }
-        return MethodType.fromDescriptor(descriptor)
-    }
 }

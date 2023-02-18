@@ -22,11 +22,13 @@ import net.ormr.asmkt.BytecodeVersion
 import net.ormr.asmkt.Modifiers
 import net.ormr.asmkt.defineClass
 import net.ormr.asmkt.defineMethod
+import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
 import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.type.AsmReferenceType
+import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.member.TypeMember
 import net.ormr.krautils.lang.ifNotNull
@@ -63,7 +65,7 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
     private fun BytecodeClass.generateFunction(
         node: FunctionDeclaration,
         extraModifiers: Int,
-    ) = defineMethod(node.name, Modifiers.PUBLIC or extraModifiers, node.toMethodType()) {
+    ) = defineMethod(node.name, Modifiers.PUBLIC or extraModifiers, getMethodType(node)) {
         val start = mark()
         node.body?.statements?.forEach { generateLocal(it) }
         val end = mark()
@@ -82,7 +84,7 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
                 // TODO: support references to properties when they're implemented
                 val member = requireNotNull(node.member) { "Non static reference has no member <$node>" }
                 val ownerType = getAsmReferenceType(member)
-                getField(ownerType, member.name, member.type.toAsmType())
+                getField(ownerType, member.name, (member.type as JvmType).toAsmType())
             }
             is Invocation -> when (node) {
                 is AnonymousFunctionInvocation -> TODO("AnonymousFunctionInvocation")
@@ -116,9 +118,9 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
                 // TODO: this looks ugly, we should have separate `DefinitionReference` types to make
                 //       something like this cleaner to handle
                 if (left is DefinitionReference && left.isStaticReference) {
-                    val ownerType = getAsmReferenceType(left.type)
+                    val ownerType = getAsmReferenceType(left.type as JvmType)
                     if (right is DefinitionReference) {
-                        val fieldType = right.type.toAsmType()
+                        val fieldType = (right.type as JvmType).toAsmType()
                         getStaticField(ownerType, right.name, fieldType)
                     } else {
                         generateLocal(right)
@@ -140,14 +142,14 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
     }
 
     private fun getAsmReferenceType(member: TypeMember): AsmReferenceType {
-        val asmType = member.declaringType.toAsmType()
+        val asmType = (member.declaringType as JvmType).toAsmType()
         check(asmType is ReferenceType) {
             "Member <$member> does not belong to a reference type. This should never happen."
         }
         return asmType
     }
 
-    private fun getAsmReferenceType(type: Type): AsmReferenceType {
+    private fun getAsmReferenceType(type: JvmType): AsmReferenceType {
         val asmType = type.toAsmType()
         check(asmType is ReferenceType) { "Type <$type> is not a reference type" }
         return asmType
@@ -155,6 +157,14 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
 
     private fun addResult(clz: BytecodeClass) {
         results += BytecodeResult(clz.internalName, clz.toByteArray())
+    }
+
+    private fun getMethodType(function: FunctionDeclaration): MethodType {
+        val descriptor = buildString {
+            function.arguments.joinTo(this, "", "(", ")") { (it.type as JvmType).toJvmDescriptor() }
+            append((function.type as JvmType).toJvmDescriptor())
+        }
+        return MethodType.fromDescriptor(descriptor)
     }
 
     class BytecodeResult(val name: String, val bytes: ByteArray) {

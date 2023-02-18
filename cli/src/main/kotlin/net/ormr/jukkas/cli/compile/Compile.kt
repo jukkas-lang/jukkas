@@ -17,11 +17,12 @@
 package net.ormr.jukkas.cli.compile
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
+import net.ormr.jukkas.buildCompilationContext
 import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.flatMap
 import net.ormr.jukkas.getOrElse
@@ -29,6 +30,7 @@ import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.phases.BytecodeGenerationPhase
 import net.ormr.jukkas.phases.TypeCheckingPhase
 import net.ormr.jukkas.phases.TypeResolutionPhase
+import net.ormr.jukkas.type.JvmTypeResolver
 import net.ormr.krautils.lang.ifNotNull
 import net.ormr.krautils.reflection.isStatic
 import kotlin.io.path.createDirectories
@@ -36,10 +38,9 @@ import kotlin.io.path.writeBytes
 
 class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true) {
     private val reporter = CliErrorReporter()
-    private val file by option("-f", "--file")
-        .help("The file to read input from")
+    private val file by argument("file", "The file to read input from")
         .path(mustExist = true, canBeDir = false, mustBeReadable = true)
-        .required()
+
     private val output by option("-o", "--output")
         .help("The directory to output the class files to")
         .path(canBeFile = false)
@@ -51,12 +52,19 @@ class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true
 
     override fun run() {
         val terminal = currentContext.terminal
+        val context = buildCompilationContext {
+            types {
+                resolver(JvmTypeResolver)
+            }
+        }
+
         val classes = JukkasParser
             .parseFile(file)
-            .flatMap { TypeResolutionPhase.run(it.value) }
+            .flatMap { TypeResolutionPhase.run(it.value, context) }
             .flatMap { TypeCheckingPhase.run(it.value) }
             .flatMap { BytecodeGenerationPhase.run(it.value) }
             .getOrElse { reporter.printErrors(terminal, it) }
+
         output ifNotNull { output ->
             val root = output.createDirectories()
             for ((name, bytes) in classes) {
@@ -64,6 +72,7 @@ class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true
                 file.writeBytes(bytes)
             }
         }
+
         if (runClass) {
             val (name, bytes) = classes.single()
             val loader = ByteClassLoader()

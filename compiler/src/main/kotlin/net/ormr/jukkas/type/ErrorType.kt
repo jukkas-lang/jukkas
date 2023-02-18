@@ -58,7 +58,5 @@ class ErrorType(val description: String) : ResolvedTypeOrError {
 
     override fun isSameType(other: ResolvedTypeOrError): Boolean = false
 
-    override fun toJvmDescriptor(): Nothing = error("ErrorType: $description")
-
     override fun toString(): String = "ErrorType[$description]"
 }
