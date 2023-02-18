@@ -60,7 +60,7 @@ class ImportParsingTest : FunSpec({
         }
 
         test("import Foo as Fooy, Bar") {
-            parseImport("import \"foo/bar\" { Foo as Fooy }") shouldBeSuccess { import, _ ->
+            parseImport("import \"foo/bar\" { Foo as Fooy, Bar }") shouldBeSuccess { import, _ ->
                 import shouldBeStructurallyEquivalentTo Import(
                     listOf(
                         ImportEntry("Foo", "Fooy"),

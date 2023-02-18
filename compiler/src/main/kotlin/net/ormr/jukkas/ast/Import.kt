@@ -28,5 +28,5 @@ class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode(), Top
                 path.isStructurallyEquivalent(other.path) &&
                 checkStructuralEquivalence(entries, other.entries)
 
-    override fun toString(): String = "(import (${entries.joinToString(separator = " ")}) (from $path))"
+    override fun toString(): String = "Import(entries=$entries, path=$path)"
 }

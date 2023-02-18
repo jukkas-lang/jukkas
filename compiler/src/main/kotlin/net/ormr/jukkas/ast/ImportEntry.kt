@@ -22,7 +22,7 @@ class ImportEntry(val name: String, val alias: String? = null) : ChildNode() {
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ImportEntry && name == other.name && alias == other.alias
 
-    override fun toString(): String = alias?.let { "(as $it $name)" } ?: name
+    override fun toString(): String = "ImportEntry(name='$name', alias=$alias)"
 
     operator fun component1(): String = name
 
