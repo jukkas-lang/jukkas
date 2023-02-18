@@ -16,13 +16,79 @@
 
 package net.ormr.jukkas.type
 
-sealed interface ResolvedType : Type {
-    val packageName: String
+import net.ormr.jukkas.type.member.TypeMember
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
-    val simpleName: String
+sealed interface ResolvedType : ResolvedTypeOrError {
+    companion object {
+        // TODO: make it handle any potential jukkas sources too
+        fun of(clz: Class<*>): ResolvedType = JvmType.of(clz)
 
-    /**
-     * Returns `this`.
-     */
-    override fun resolve(context: TypeResolutionContext): ResolvedType = this
+        // TODO: make it look for any potential jukkas sources too
+        fun find(name: String): ResolvedType? = JvmReferenceType.find(name)
+    }
+}
+
+/**
+ * Returns the first member that matches [predicate], or `null` if none is found.
+ *
+ * Note that this uses the [walkHierarchy] function to traverse the hierarchy, rather than using the
+ * [members][ResolvedTypeOrError.members] list. This is so that we can guarantee that we get the closest match possible.
+ *
+ * @see [findDeclaredMember]
+ * @see [walkHierarchy]
+ */
+inline fun <reified T : TypeMember> ResolvedType.findMember(predicate: (T) -> Boolean): T? {
+    contract {
+        callsInPlace(predicate, InvocationKind.UNKNOWN)
+    }
+
+    walkHierarchy {
+        for (member in declaredMembers) {
+            if (member !is T) continue
+            if (predicate(member)) return member
+        }
+    }
+    return null
+}
+
+/**
+ * Returns the first declared member from [declaredMembers][ResolvedTypeOrError.declaredMembers] that matches
+ * [predicate], or `null` if none is found.
+ *
+ * @see [findMember]
+ */
+inline fun <reified T : TypeMember> ResolvedType.findDeclaredMember(predicate: (T) -> Boolean): T? {
+    contract {
+        callsInPlace(predicate, InvocationKind.UNKNOWN)
+    }
+
+    for (member in declaredMembers) {
+        if (member !is T) continue
+        if (predicate(member)) return member
+    }
+
+    return null
+}
+
+/**
+ * Walks up the hierarchy chain of `this` [ResolvedTypeOrError] invoking [action] on its
+ * [superType][ResolvedTypeOrError.superType]s and [interfaces][ResolvedTypeOrError.interfaces].
+ *
+ * Note that the first invocation of [action] will be with `this` as its argument.
+ *
+ * The [superType][ResolvedTypeOrError.superType] will be passed in before any of the
+ * [interfaces][ResolvedTypeOrError.interfaces] get passed in to `action`. This means that `superType` has higher
+ * priority than `interfaces`.
+ */
+inline fun ResolvedType.walkHierarchy(action: (ResolvedTypeOrError) -> Unit) {
+    var current: ResolvedTypeOrError? = this
+    while (current != null) {
+        action(current)
+        for (iface in interfaces) {
+            action(iface)
+        }
+        current = current.superType
+    }
 }

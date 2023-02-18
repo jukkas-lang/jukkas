@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.utils
+package net.ormr.jukkas.ast
 
-import io.github.classgraph.ClassGraph
-import io.github.classgraph.ClassInfo
-import io.github.classgraph.ScanResult
+import net.ormr.jukkas.type.Type
 
-internal fun scanForClass(name: String): ClassInfo? = scanClassGraph { it.getClassInfo(name) }
-
-internal inline fun <R> scanClassGraph(
-    builder: ClassGraph.() -> Unit = { enableAllInfo() },
-    block: (ScanResult) -> R,
-): R {
-    val graph = ClassGraph().apply(builder)
-    return graph.scan().use(block)
+sealed interface HasMutableType : HasType {
+    override var type: Type
 }

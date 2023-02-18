@@ -16,14 +16,14 @@
 
 package net.ormr.jukkas
 
-import net.ormr.jukkas.ast.Expression
-import net.ormr.jukkas.ast.Node
-import net.ormr.jukkas.parser.JukkasParser
-
-inline fun <T : Node> parseNode(
-    source: String,
-    crossinline fn: (JukkasParser) -> T,
-): JukkasResult<T> = JukkasParser.parse(Source.Text(source), fn)
-
-fun parseExpression(source: String): JukkasResult<Expression> =
-    JukkasParser.parse(Source.Text(source), JukkasParser::parseExpression)
+interface StructurallyComparable {
+    /**
+     * Returns `true` if [other] is structurally equivalent to `this` instance.
+     *
+     * Two instances being structurally equivalent does *not* guarantee that they will also be [equal][Any.equals].
+     *
+     * Structural equivalence checks are intended for use via unit tests, and should probably not be used outside
+     * unit tests.
+     */
+    fun isStructurallyEquivalent(other: StructurallyComparable): Boolean
+}

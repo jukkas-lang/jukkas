@@ -16,25 +16,33 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
-import net.ormr.jukkas.utils.bothNullOrEquivalent
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class ConditionalBranch(
     condition: Expression,
     thenBranch: Expression,
     elseBranch: Expression?,
-) : Expression() {
+) : Expression(), HasMutableType {
     var condition: Expression by child(condition)
     var thenBranch: Expression by child(thenBranch)
     var elseBranch: Expression? by child(elseBranch)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitConditionalBranch(this)
-
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ConditionalBranch &&
                 condition.isStructurallyEquivalent(other.condition) &&
                 thenBranch.isStructurallyEquivalent(other.thenBranch) &&
-                bothNullOrEquivalent(elseBranch, other.elseBranch) { a, b -> a.isStructurallyEquivalent(b) }
+                checkStructuralEquivalence(elseBranch, other.elseBranch) &&
+                type.isStructurallyEquivalent(other.type)
+
+    operator fun component1(): Expression = condition
+
+    operator fun component2(): Expression = thenBranch
+
+    operator fun component3(): Expression? = elseBranch
+
+    operator fun component4(): Type = type
 }

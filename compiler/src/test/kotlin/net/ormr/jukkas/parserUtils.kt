@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.parser.parselets.prefix
+package net.ormr.jukkas
 
-import net.ormr.jukkas.ast.DefinitionReference
-import net.ormr.jukkas.ast.withPosition
-import net.ormr.jukkas.lexer.Token
+import net.ormr.jukkas.ast.Expression
+import net.ormr.jukkas.ast.Node
+import net.ormr.jukkas.ast.Statement
 import net.ormr.jukkas.parser.JukkasParser
 
-object IdentifierParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): DefinitionReference =
-        DefinitionReference(token.text) withPosition token
-}
+inline fun <T : Node> parseNode(
+    source: String,
+    crossinline fn: (JukkasParser) -> T,
+): JukkasResult<T> = JukkasParser.parse(Source.Text(source), fn)
+
+fun parseStatement(source: String): JukkasResult<Statement> =
+    JukkasParser.parse(Source.Text(source), JukkasParser::parseStatement)
+
+fun parseExpression(source: String): JukkasResult<Expression> =
+    JukkasParser.parse(Source.Text(source), JukkasParser::parseExpression)

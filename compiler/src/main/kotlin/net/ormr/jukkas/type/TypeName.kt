@@ -18,36 +18,31 @@ package net.ormr.jukkas.type
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
-import net.ormr.jukkas.utils.scanForClass
+import net.ormr.jukkas.StructurallyComparable
 
-class TypeName(val position: Position, val name: String) : Type, Positionable {
-    override val jvmName: String
-        get() = name.replace('.', '/')
-
+class TypeName(val position: Position, override val internalName: String) : Positionable, Type {
     override fun findPositionOrNull(): Position = position
 
     // TODO: handle jukkas classes
-    override fun resolve(context: TypeResolutionContext): ResolvedType = context.cache.find(name) ?: run {
-        val info = scanForClass(name) ?: return@run run {
-            context.reportSemanticError(position, "Can't find type '$name'")
-            ErrorType("Can't find type '$name'")
-        }
-        JvmType(info)
-    }
+    override fun resolve(context: TypeResolutionContext): ResolvedTypeOrError =
+        context.cache.find(internalName)
+            ?: JvmReferenceType.find(jvmName)
+            ?: context.errorType(this, "Can't find type '$internalName'")
 
-    override fun toDescriptor(): String = "L$jvmName;"
+    // TODO: should we throw an error here instead?
+    override fun toJvmDescriptor(): String = "L${internalName.replace('.', '$')};"
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is TypeName && internalName == other.internalName
+
+    override fun toString(): String = "TypeName(internalName='$internalName')"
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is TypeName -> false
-        position != other.position -> false
-        name != other.name -> false
+        internalName != other.internalName -> false
         else -> true
     }
 
-    override fun hashCode(): Int {
-        var result = position.hashCode()
-        result = 31 * result + name.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = internalName.hashCode()
 }

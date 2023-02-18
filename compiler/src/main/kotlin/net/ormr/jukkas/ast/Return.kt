@@ -16,17 +16,26 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.type.JukkasType
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.utils.bothNullOrEquivalent
+import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Return(value: Expression?) : Expression() {
+class Return(value: Expression?) : Expression(), HasMutableType {
     var value: Expression? by child(value)
-    override val type: Type
-        get() = value?.type ?: JukkasType.UNIT
+    override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitReturn(this)
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is Return &&
+                checkStructuralEquivalence(value, other.value) &&
+                type.isStructurallyEquivalent(other.type)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Return && bothNullOrEquivalent(value, other.value) { a, b -> a.isStructurallyEquivalent(b) }
+    override fun toString(): String = when (value) {
+        null -> "return"
+        else -> "(return $value)"
+    }
+
+    operator fun component1(): Expression? = value
+
+    operator fun component2(): Type = type
 }

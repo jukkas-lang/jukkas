@@ -16,31 +16,18 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Block(override val table: Table, statements: List<Statement>) : Expression(), TableContainer {
+class Block(override val table: Table, statements: List<Statement>) : Expression(), TableContainer, HasMutableType {
     override var type: Type = UnknownType
-    val statements: MutableNodeList<Statement> = statements.toMutableNodeList(this, ::onAddChild, ::onRemoveChild)
+    val statements: MutableNodeList<Statement> =
+        statements.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBlock(this)
-
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Block &&
-                statements.size == other.statements.size &&
-                (this.statements zip other.statements).all { (a, b) -> a.isStructurallyEquivalent(b) }
-
-    private fun onAddChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
-            table.define(name, node)
-        }
-    }
-
-    private fun onRemoveChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
-            table.undefine(name)
-        }
-    }
+                checkStructuralEquivalence(statements, other.statements) &&
+                type.isStructurallyEquivalent(other.type)
 }

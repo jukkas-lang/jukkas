@@ -16,20 +16,26 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 
-sealed class Argument : Statement() {
-    final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitArgument(this)
-}
+sealed class Argument : ChildNode()
 
-sealed class NamedArgument : Argument(), Definition {
-    abstract val name: String
+sealed class NamedArgument : Argument(), NamedDefinition, HasMutableType {
+    abstract override val name: String
     abstract override var type: Type
+    var index: Int = -1
+
+    operator fun component1(): String = name
+
+    operator fun component2(): Type = type
 }
 
 class BasicArgument(override val name: String, override var type: Type) : NamedArgument() {
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is BasicArgument && name == other.name
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is BasicArgument && name == other.name && type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String = "BasicArgument(name='$name', type=$type)"
 }
 
 class DefaultArgument(
@@ -39,8 +45,15 @@ class DefaultArgument(
 ) : NamedArgument() {
     var default: Expression by child(default)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is DefaultArgument && name == other.name && default.isStructurallyEquivalent(other.default)
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is DefaultArgument &&
+                name == other.name &&
+                default.isStructurallyEquivalent(other.default) &&
+                type.isStructurallyEquivalent(other.type)
+
+    operator fun component3(): Expression = default
+
+    override fun toString(): String = "DefaultArgument(name='$name', type=$type, default=$default)"
 }
 
 // TODO: we probably don't want to support arbitrary pattern matching for arguments,
@@ -49,6 +62,6 @@ class DefaultArgument(
 class PatternArgument(pattern: Pattern) : Argument() {
     var pattern: Pattern by child(pattern)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is PatternArgument && pattern.isStructurallyEquivalent(other.pattern)
 }

@@ -25,10 +25,15 @@ class TypeCache internal constructor(private val unit: CompilationUnit) {
 
     fun find(name: String): ResolvedType? = entries[name]
 
-    fun define(position: Positionable, type: ResolvedType) {
-        addType(position, type.simpleName, type)
-        if (type.toString() != type.simpleName) {
-            addType(position, type.toString(), type)
+    fun define(position: Positionable, type: ResolvedType, alias: String? = null) {
+        if (alias == null) {
+            addType(position, type.simpleName, type)
+            if (type.internalName != type.simpleName) {
+                addType(position, type.internalName, type)
+            }
+        } else {
+            // TODO: is this the proper way of handling aliases?
+            addType(position, alias, type)
         }
     }
 

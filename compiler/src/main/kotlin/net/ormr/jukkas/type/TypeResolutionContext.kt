@@ -22,4 +22,11 @@ interface TypeResolutionContext {
     val cache: TypeCache
 
     fun reportSemanticError(position: Positionable, message: String)
+
+    fun reportTypeError(position: Positionable, message: String)
+}
+
+fun TypeResolutionContext.errorType(position: Positionable, message: String): ErrorType {
+    reportSemanticError(position, message)
+    return ErrorType(message)
 }

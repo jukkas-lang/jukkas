@@ -144,7 +144,6 @@ TemplateStart = \\\{
 ``` { pushState(QUOTE); return QUOTE_START.INSTANCE; }
 
 // keywords
-"import" { return IMPORT.INSTANCE; }
 "fun" { return FUN.INSTANCE; }
 "val" { return VAL.INSTANCE; }
 "var" { return VAR.INSTANCE; }
@@ -156,8 +155,11 @@ TemplateStart = \\\{
 "and" { return AND.INSTANCE; }
 "or" { return OR.INSTANCE; }
 "not" { return NOT.INSTANCE; }
+// TODO: add lexing for this as binary operator with 'as?'
+"as" { return AS.INSTANCE; }
 
 // soft keywords
+"import" { return IMPORT.INSTANCE; }
 "set" { return SET.INSTANCE; }
 "get" { return GET.INSTANCE; }
 

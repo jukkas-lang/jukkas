@@ -43,7 +43,7 @@ object AssignmentParselet : InfixParselet {
     ): AssignmentOperation = parser with {
         val operator =
             AssignmentOperator.fromSymbolOrNull(token.text) ?: (token syntaxError "Unknown assignment operator")
-        val value = parseExpression()
+        val value = parseExpression(precedence - 1) // left to right
         AssignmentOperation(left, operator, value) withPosition createSpan(left, value)
     }
 }

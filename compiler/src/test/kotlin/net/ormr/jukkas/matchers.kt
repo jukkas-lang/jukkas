@@ -60,23 +60,26 @@ fun JukkasResult<*>.shouldBeSuccess() {
 fun beStructurallyEquivalentTo(other: Node) = object : Matcher<Node> {
     override fun test(value: Node): MatcherResult = MatcherResult(
         value.isStructurallyEquivalent(other),
-        { "<$value> is should equivalent to <$other>" },
-        { "<$value> is not structurally equivalent to <$other>" },
+        { "<$value> should be equivalent to <$other>" },
+        { "<$value> should not be structurally equivalent to <$other>" },
     )
 }
 
 fun beFailure() = object : Matcher<JukkasResult<*>> {
     override fun test(value: JukkasResult<*>): MatcherResult = MatcherResult(
         value is JukkasResult.Failure,
-        { "$value should be Failure" },
-        { "$value should be Success" },
+        { "Expected Failure, got Success: <$value>" },
+        { "Expected Success, got Failure(s): <${errorMessages(value)}>" },
     )
 }
 
 fun <A> beSuccess() = object : Matcher<JukkasResult<A>> {
     override fun test(value: JukkasResult<A>): MatcherResult = MatcherResult(
         value is JukkasResult.Success,
-        { "$value should be Success" },
-        { "$value should be Failure" },
+        { "Expected Success, got Failure(s): <${errorMessages(value)}>" },
+        { "Expected Failure, got Success: <$value>" },
     )
 }
+
+private fun errorMessages(value: JukkasResult<*>): String =
+    (value as JukkasResult.Failure).messages.joinToString { "\"${it.message}\"" }

@@ -18,39 +18,27 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.Position
 import net.ormr.jukkas.Source
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.type.TypeCache
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class CompilationUnit(
     val source: Source,
     override val position: Position,
-    children: List<Statement>,
-) : Node(), TableContainer {
-    override val table: Table = Table()
+    imports: List<Import>,
+    children: List<TopLevel>,
+    override val table: Table,
+) : AbstractNode(), TableContainer {
+    val imports: MutableNodeList<Import> = imports.toMutableNodeList(this)
     val types: TypeCache = TypeCache(this)
     val reporter: MessageReporter = MessageReporter()
-    val children: MutableNodeList<Statement> = children.toMutableNodeList(this, ::onAddChild, ::onRemoveChild)
+    val children: MutableNodeList<TopLevel> = children.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override val compilationUnit: CompilationUnit
         get() = this
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitCompilationUnit(this)
-
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is CompilationUnit &&
-                children.size == other.children.size &&
-                (children zip other.children).all { (first, second) -> first.isStructurallyEquivalent(second) }
-
-    private fun onAddChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
-            table.define(name, node)
-        }
-    }
-
-    private fun onRemoveChild(index: Int, node: Statement) {
-        if (node is Definition) {
-            val name = node.name ?: return
-            table.undefine(name)
-        }
-    }
+                checkStructuralEquivalence(imports, other.imports) &&
+                checkStructuralEquivalence(children, other.children)
 }

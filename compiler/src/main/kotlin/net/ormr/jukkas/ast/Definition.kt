@@ -18,14 +18,6 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.Type
 
-val Definition.name: String?
-    get() = when (this) {
-        is Function -> name
-        is Property -> name
-        is Variable -> name
-        is NamedArgument -> name
-    }
-
-sealed interface Definition {
-    val type: Type
+sealed interface Definition : Node, HasType {
+    override val type: Type
 }

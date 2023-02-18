@@ -16,15 +16,30 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class Property(
-    val kind: PropertyKind,
-    val name: String,
+    override val kind: PropertyKind,
+    override val name: String,
     override var type: Type,
-) : Statement(), Definition {
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitProperty(this)
+    initializer: Expression?,
+) : ChildNode(), Variable, TopLevel {
+    override var initializer: Expression? by child(initializer)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is Property && kind == other.kind && name == other.name
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is Property &&
+                kind == other.kind &&
+                name == other.name &&
+                checkStructuralEquivalence(initializer, other.initializer) &&
+                type.isStructurallyEquivalent(other.type)
+
+    operator fun component1(): PropertyKind = kind
+
+    operator fun component2(): String = name
+
+    operator fun component3(): Type = type
+
+    operator fun component4(): Expression? = initializer
 }

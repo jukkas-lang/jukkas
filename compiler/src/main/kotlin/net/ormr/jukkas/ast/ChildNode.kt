@@ -20,7 +20,7 @@ import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
 
 // TODO: better name
-abstract class ChildNode : Node() {
+sealed class ChildNode : AbstractNode() {
     override var position: Position? = null
 
     override val compilationUnit: CompilationUnit

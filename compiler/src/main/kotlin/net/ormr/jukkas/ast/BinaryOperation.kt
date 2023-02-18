@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
@@ -23,20 +24,27 @@ class BinaryOperation(
     left: Expression,
     val operator: BinaryOperator,
     right: Expression,
-) : Expression() {
+) : Expression(), HasMutableType {
     var left: Expression by child(left)
     var right: Expression by child(right)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitBinaryOperation(this)
-
-    override fun isStructurallyEquivalent(other: Node): Boolean =
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is BinaryOperation &&
                 operator == other.operator &&
                 left.isStructurallyEquivalent(other.left) &&
-                right.isStructurallyEquivalent(other.right)
+                right.isStructurallyEquivalent(other.right) &&
+                type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "(${operator.symbol} $left $right)"
+
+    operator fun component1(): Expression = left
+
+    operator fun component2(): BinaryOperator = operator
+
+    operator fun component3(): Expression = right
+
+    operator fun component4(): Type = type
 }
 
 enum class BinaryOperator(override val symbol: String) : Operator {

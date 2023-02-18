@@ -16,37 +16,24 @@
 
 package net.ormr.jukkas.type
 
-import io.github.classgraph.ClassInfo
-import net.ormr.jukkas.utils.scanForClass
+import net.ormr.jukkas.type.member.JvmMember
 
-class JvmType(val classInfo: ClassInfo) : ResolvedType {
-    override val jvmName: String
-        get() = classInfo.toString()
+sealed interface JvmType : ResolvedType {
+    override val superType: ResolvedType?
+    override val interfaces: List<ResolvedType>
+    override val declaredMembers: List<JvmMember>
 
-    override val packageName: String
-        get() = classInfo.packageName
-
-    override val simpleName: String
-        get() = classInfo.simpleName
-
-    override fun toDescriptor(): String = "L$jvmName;"
-
-    override fun toString(): String = classInfo.toString()
-
-    override fun equals(other: Any?): Boolean = when {
-        this === other -> true
-        other !is JvmType -> false
-        classInfo != other.classInfo -> false
-        else -> true
+    override fun isSameType(other: ResolvedTypeOrError): Boolean = when (other) {
+        is ErrorType -> false
+        // TODO: handle cases with jukkas types, like 'Jukkas.Int = int', and like 'jukkas.Array[Int] = Integer[]'
+        else -> this jvmDescriptorMatches other
     }
 
-    override fun hashCode(): Int = classInfo.hashCode()
     companion object {
-        val OBJECT = native("java.lang.Object")
-        val STRING = native("java.lang.String")
-        val BOOLEAN = native("java.lang.Boolean")
-
-        private fun native(name: String): JvmType =
-            JvmType(scanForClass(name) ?: error("Could not find native Java class '$name'"))
+        fun of(clz: Class<*>): JvmType = when {
+            clz.isArray -> JvmArrayType.of(clz)
+            clz.isPrimitive -> JvmPrimitiveType.of(clz)
+            else -> JvmReferenceType.of(clz)
+        }
     }
 }

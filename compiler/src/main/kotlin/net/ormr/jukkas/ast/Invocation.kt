@@ -16,34 +16,73 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.member.TypeMember
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-sealed class Invocation : Expression() {
+sealed class Invocation : Expression(), HasMutableType {
     override var type: Type = UnknownType
-
-    final override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitInvocation(this)
 }
 
 class InfixInvocation(
-left: Expression,
- val name: String,
- right: Expression,
+    left: Expression,
+    val name: String,
+    right: Expression,
 ) : Invocation() {
     var left: Expression by child(left)
     var right: Expression by child(right)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is InfixInvocation && name == other.name && left.isStructurallyEquivalent(other.left) &&
- right.isStructurallyEquivalent(other.right)
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is InfixInvocation &&
+                name == other.name &&
+                left.isStructurallyEquivalent(other.left) &&
+                right.isStructurallyEquivalent(other.right) &&
+                type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String = "InfixInvocation(left=$left, name='$name', right=$right)"
+
+    operator fun component1(): Expression = left
+
+    operator fun component2(): String = name
+
+    operator fun component3(): Expression = right
 }
 
-class FunctionInvocation(left: Expression, arguments: List<InvocationArgument>) : Invocation() {
-    var left: Expression by child(left)
+class FunctionInvocation(val name: String, arguments: List<InvocationArgument>) : Invocation() {
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
+    var member: TypeMember.Executable? = null
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is FunctionInvocation && left.isStructurallyEquivalent(other.left) &&
- arguments.size == other.arguments.size &&
- (arguments zip other.arguments).all { (first, second) -> first.isStructurallyEquivalent(second) }
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is FunctionInvocation &&
+                name == other.name &&
+                checkStructuralEquivalence(arguments, other.arguments) &&
+                type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String =
+        "FunctionInvocation(name='$name', arguments=$arguments, member=$member)"
+
+    operator fun component1(): String = name
+
+    operator fun component2(): MutableNodeList<InvocationArgument> = arguments
+}
+
+class AnonymousFunctionInvocation(target: Expression, arguments: List<InvocationArgument>) : Invocation() {
+    var target: Expression by child(target)
+    val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
+    var member: TypeMember? = null // TODO: I don't think an AnonymousFunctionInvocation has a member
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is AnonymousFunctionInvocation &&
+                target.isStructurallyEquivalent(other.target) &&
+                checkStructuralEquivalence(arguments, other.arguments) &&
+                type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String =
+        "AnonymousFunctionInvocation(target=$target, arguments=$arguments, member=$member)"
+
+    operator fun component1(): Expression = target
+
+    operator fun component2(): MutableNodeList<InvocationArgument> = arguments
 }

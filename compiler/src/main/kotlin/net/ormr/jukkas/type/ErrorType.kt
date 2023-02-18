@@ -16,8 +16,22 @@
 
 package net.ormr.jukkas.type
 
-class ErrorType(val description: String) : ResolvedType {
-    override val jvmName: Nothing
+import net.ormr.jukkas.type.member.TypeMember
+
+/**
+ * Represents a type that has been created when a type error was encountered.
+ *
+ * If a type is an instance of [ErrorType] that means that the AST tree is in a corrupt state and should no longer
+ * be worked with.
+ */
+class ErrorType(val description: String) : ResolvedTypeOrError {
+    override val superType: ResolvedType?
+        get() = null
+
+    override val interfaces: List<ResolvedType>
+        get() = emptyList()
+
+    override val internalName: Nothing
         get() = error("ErrorType: $description")
 
     override val packageName: Nothing
@@ -26,5 +40,25 @@ class ErrorType(val description: String) : ResolvedType {
     override val simpleName: Nothing
         get() = error("ErrorType: $description")
 
-    override fun toDescriptor(): Nothing = error("ErrorType: $description")
+    override val members: List<TypeMember>
+        get() = emptyList()
+
+    override val declaredMembers: List<TypeMember>
+        get() = emptyList()
+
+    override fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method? = null
+
+    override fun findConstructor(types: List<ResolvedTypeOrError>): TypeMember.Constructor? = null
+
+    override fun findField(name: String): TypeMember.Field? = null
+
+    override fun isCompatible(other: ResolvedTypeOrError): Boolean = false
+
+    override fun compareCompatibility(other: ResolvedTypeOrError): Int = 0
+
+    override fun isSameType(other: ResolvedTypeOrError): Boolean = false
+
+    override fun toJvmDescriptor(): Nothing = error("ErrorType: $description")
+
+    override fun toString(): String = "ErrorType[$description]"
 }

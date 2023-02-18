@@ -16,15 +16,28 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
 
-class InvocationArgument(val name: String?, value: Expression) : Expression() {
+class InvocationArgument(value: Expression, val name: String?) : Expression(), HasMutableType {
     var value: Expression by child(value)
     override var type: Type = UnknownType
 
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitInvocationArgument(this)
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is InvocationArgument &&
+                name == other.name &&
+                value.isStructurallyEquivalent(other.value) &&
+                type.isStructurallyEquivalent(other.type)
 
-    override fun isStructurallyEquivalent(other: Node): Boolean =
-        other is InvocationArgument && name == other.name && value.isStructurallyEquivalent(other.value)
+    override fun toString(): String = when (name) {
+        null -> value.toString()
+        else -> "($name $value)"
+    }
+
+    operator fun component1(): String? = name
+
+    operator fun component2(): Expression = value
+
+    operator fun component3(): Type = type
 }

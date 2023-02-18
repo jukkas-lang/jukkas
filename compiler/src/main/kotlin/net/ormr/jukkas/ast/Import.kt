@@ -16,8 +16,17 @@
 
 package net.ormr.jukkas.ast
 
-class Import : Statement() {
-    override fun <T> accept(visitor: NodeVisitor<T>): T = visitor.visitImport(this)
+import net.ormr.jukkas.StructurallyComparable
+import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-    override fun isStructurallyEquivalent(other: Node): Boolean = other is Import
+class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode(), TopLevel {
+    val entries: NodeList<ImportEntry> = entries.toNodeList(this)
+    val path: StringLiteral by child(path)
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is Import &&
+                path.isStructurallyEquivalent(other.path) &&
+                checkStructuralEquivalence(entries, other.entries)
+
+    override fun toString(): String = "Import(entries=$entries, path=$path)"
 }
