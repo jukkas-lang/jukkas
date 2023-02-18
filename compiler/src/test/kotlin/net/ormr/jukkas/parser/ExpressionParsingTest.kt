@@ -17,18 +17,18 @@
 package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
-import net.ormr.jukkas.invArg
 import net.ormr.jukkas.ast.BinaryOperator.DIVISION
 import net.ormr.jukkas.ast.BinaryOperator.MINUS
 import net.ormr.jukkas.ast.BinaryOperator.MULTIPLICATION
 import net.ormr.jukkas.ast.BinaryOperator.PLUS
-import net.ormr.jukkas.ast.AnonymousFunctionInvocation
+import net.ormr.jukkas.ast.FunctionInvocation
 import net.ormr.jukkas.ast.MemberAccessOperation
 import net.ormr.jukkas.ast.StringTemplateExpression
 import net.ormr.jukkas.ast.StringTemplatePart
 import net.ormr.jukkas.binary
 import net.ormr.jukkas.boolean
 import net.ormr.jukkas.int
+import net.ormr.jukkas.invArg
 import net.ormr.jukkas.parseExpression
 import net.ormr.jukkas.reference
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
@@ -86,8 +86,8 @@ class ExpressionParsingTest : FunSpec({
 
     test("'foo(1, bar = 2, 3)' should parse to FunctionInvocation(...)") {
         parseExpression("foo(1, bar = 2, 3)") shouldBeSuccess { expr, _ ->
-            expr shouldBeStructurallyEquivalentTo AnonymousFunctionInvocation(
-                reference("foo"),
+            expr shouldBeStructurallyEquivalentTo FunctionInvocation(
+                "foo",
                 listOf(
                     invArg(int(1)),
                     invArg(int(2), "bar"),
@@ -99,15 +99,15 @@ class ExpressionParsingTest : FunSpec({
 
     test("'foo.bar(1)' should parse to (foo.bar (1))") {
         parseExpression("foo.bar(1)") shouldBeSuccess { expr, _ ->
-            expr shouldBeStructurallyEquivalentTo AnonymousFunctionInvocation(
-                MemberAccessOperation(
-                    reference("foo"),
-                    reference("bar"),
-                    isSafe = false,
+            expr shouldBeStructurallyEquivalentTo MemberAccessOperation(
+                reference("foo"),
+                FunctionInvocation(
+                    "bar",
+                    listOf(
+                        invArg(int(1)),
+                    ),
                 ),
-                listOf(
-                    invArg(int(1)),
-                ),
+                isSafe = false,
             )
         }
     }
