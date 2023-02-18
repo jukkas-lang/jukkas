@@ -25,7 +25,7 @@ class Property(
     override val name: String,
     override var type: Type,
     initializer: Expression?,
-) : Variable() {
+) : ChildNode(), Variable, TopLevel {
     override var initializer: Expression? by child(initializer)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =

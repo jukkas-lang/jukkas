@@ -41,11 +41,12 @@ import net.ormr.jukkas.Position
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.Span
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.Function
 import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.flatMap
 import net.ormr.jukkas.getOrElse
 import net.ormr.jukkas.parser.JukkasParser
+import net.ormr.jukkas.phases.BytecodeGenerationPhase
+import net.ormr.jukkas.phases.TypeCheckingPhase
 import net.ormr.jukkas.phases.TypeResolutionPhase
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.member.JukkasMember
@@ -85,6 +86,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         val unit = JukkasParser
             .parseFile(file)
             .flatMap { TypeResolutionPhase.run(it.value) }
+            .flatMap { TypeCheckingPhase.run(it.value) }
             .getOrElse { reporter.printErrors(terminal, it) }
         terminal.println(json.encodeToString(toJson(unit)))
     }
@@ -217,7 +219,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             put("name", node.name)
             put("value", toJson(node.value))
         }
-        is Lambda -> TODO()
+        is LambdaDeclaration -> TODO()
         is Literal -> buildJsonObject {
             includeNode(node)
             val value = when (node) {
@@ -240,7 +242,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             includeNode(node)
             put("expression", toJson(node.expression))
         }
-        is Function -> buildJsonObject {
+        is FunctionDeclaration -> buildJsonObject {
             includeNode(node)
             put("name", node.name)
             putNodeList("arguments", node.arguments)

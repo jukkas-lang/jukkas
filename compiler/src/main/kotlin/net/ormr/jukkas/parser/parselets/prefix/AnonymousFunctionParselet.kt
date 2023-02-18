@@ -17,7 +17,7 @@
 package net.ormr.jukkas.parser.parselets.prefix
 
 import net.ormr.jukkas.ast.Block
-import net.ormr.jukkas.ast.Lambda
+import net.ormr.jukkas.ast.LambdaDeclaration
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -27,7 +27,7 @@ import net.ormr.jukkas.parser.JukkasParser.Companion.IDENTIFIERS
 import net.ormr.jukkas.type.TypeName
 
 object AnonymousFunctionParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): Lambda = parser with {
+    override fun parse(parser: JukkasParser, token: Token): LambdaDeclaration = parser with {
         newBlock {
             val name = consumeIfMatch(IDENTIFIERS, "identifier")
             name?.syntaxError("Anonymous functions with names are prohibited")
@@ -46,7 +46,7 @@ object AnonymousFunctionParselet : PrefixParselet {
                 match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
                 else -> createSpan(token, returnTypePosition ?: argEnd) syntaxError "Function must have a body"
             }
-            Lambda(arguments, body, returnType, table) withPosition createSpan(token, body)
+            LambdaDeclaration(arguments, body, returnType, table) withPosition createSpan(token, body)
         }
     }
 }

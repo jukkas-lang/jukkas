@@ -19,11 +19,12 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 
-sealed class Argument : Statement()
+sealed class Argument : ChildNode()
 
 sealed class NamedArgument : Argument(), NamedDefinition, HasMutableType {
     abstract override val name: String
     abstract override var type: Type
+    var index: Int = -1
 
     operator fun component1(): String = name
 

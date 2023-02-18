@@ -20,7 +20,6 @@ import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.Function
 import net.ormr.jukkas.type.ErrorType
 import net.ormr.jukkas.type.JukkasType
 import net.ormr.jukkas.type.JvmPrimitiveType
@@ -107,8 +106,18 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
                 JukkasType.UNIT
             }
             is DefinitionReference -> when (val definition = findDefinition(this)) {
-                // if no direct definition could be found then we check the type cache for any matching symbols
-                null -> types.find(name) ?: unresolvedReference(this, name)
+                null -> {
+                    // if no direct definition could be found then we check the type cache for any matching type names
+                    val type = types.find(name)
+                    // if a matching type name was found, that means that we're accessing a static reference
+                    // TODO: this behavior is only true until we've implemented 'object' containers, as those
+                    //       look like static references, but need to be handled completely differently
+                    //       it might be better to have different types of `DefinitionReference` later on
+                    if (type != null) {
+                        isStaticReference = true
+                    }
+                    type ?: unresolvedReference(this, name)
+                }
                 else -> resolveDefinition(definition)
             }
             is Invocation -> resolveInvocation(this)
@@ -139,6 +148,7 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
                             null -> unresolvedReference(right, name)
                             else -> {
                                 member = field
+                                right.member = field
                                 field.type
                             }
                         }.updateNode(right)
@@ -153,14 +163,14 @@ class TypeResolutionPhase private constructor(source: Source, private val types:
 
     private fun resolveDefinition(node: Definition): ResolvedTypeOrError = node resolveIfNeeded {
         when (this) {
-            is Invokable -> when (this) {
-                is Function -> {
+            is Invokable<*> -> when (this) {
+                is FunctionDeclaration -> {
                     arguments.forEach(::check)
                     check(body)
                     // TODO: actually infer the type
                     resolveTypeIfNeeded(type) { JvmPrimitiveType.VOID }
                 }
-                is Lambda -> TODO("Lambda")
+                is LambdaDeclaration -> TODO("Lambda")
             }
             is NamedArgument -> resolveTypeIfNeeded(type) { unresolvedType(this) }
             is Variable -> when (this) {

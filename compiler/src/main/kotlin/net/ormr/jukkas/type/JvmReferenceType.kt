@@ -47,6 +47,9 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
         createMemberList(clz.declaredMethods, clz.declaredConstructors, clz.declaredFields)
     }
 
+    override val isInterface: Boolean
+        get() = clz.isInterface
+
     // TODO: we need have a smarter strategy for resolving overloads
     override fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method? {
         walkHierarchy { type ->

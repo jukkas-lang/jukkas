@@ -19,13 +19,23 @@ package net.ormr.jukkas.type.member
 import net.ormr.jukkas.type.AsmMethodType
 import net.ormr.jukkas.type.ResolvedType
 import net.ormr.krautils.collections.asUnmodifiableList
+import net.ormr.krautils.reflection.isStatic
+import java.lang.reflect.Member
 import java.lang.reflect.Constructor as JavaConstructor
 import java.lang.reflect.Executable as JavaExecutable
 import java.lang.reflect.Field as JavaField
+import java.lang.reflect.Member as JavaMember
 import java.lang.reflect.Method as JavaMethod
 
-sealed interface JvmMember : TypeMember {
-    data class Method(val method: JavaMethod) : TypeMember.Method, JvmMember {
+sealed class JvmMember : TypeMember {
+    protected abstract val member: JavaMember
+
+    override val isStatic: Boolean
+        get() = member.isStatic
+
+    final override val declaringType: ResolvedType by lazy { ResolvedType.of(member.declaringClass) }
+
+    data class Method(val method: JavaMethod) : TypeMember.Method, JvmMember() {
         override val name: String
             get() = method.name
 
@@ -33,23 +43,35 @@ sealed interface JvmMember : TypeMember {
 
         override val returnType: ResolvedType by lazy { ResolvedType.of(method.returnType) }
 
+        override val member: Member
+            get() = method
+
         override fun toAsmType(): AsmMethodType = AsmMethodType.of(method)
     }
 
-    data class Constructor(val constructor: JavaConstructor<*>) : TypeMember.Constructor, JvmMember {
+    data class Constructor(val constructor: JavaConstructor<*>) : TypeMember.Constructor, JvmMember() {
         override val name: String
             get() = constructor.name
 
         override val parameterTypes: List<ResolvedType> by lazy { createTypeList(constructor) }
 
+        override val returnType: ResolvedType
+            get() = declaringType
+
+        override val member: Member
+            get() = constructor
+
         override fun toAsmType(): AsmMethodType = AsmMethodType.of(constructor)
     }
 
-    data class Field(val field: JavaField) : TypeMember.Field, JvmMember {
+    data class Field(val field: JavaField) : TypeMember.Field, JvmMember() {
         override val name: String
             get() = this.field.name
 
         override val type: ResolvedType by lazy { ResolvedType.of(field.type) }
+
+        override val member: Member
+            get() = this.field
     }
 }
 

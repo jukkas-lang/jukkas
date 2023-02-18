@@ -21,8 +21,11 @@ import net.ormr.jukkas.type.ResolvedType
 
 sealed interface TypeMember {
     val name: String
+    val declaringType: ResolvedType
 
-    sealed interface Method : TypeMember {
+    val isStatic: Boolean
+
+    sealed interface Executable : TypeMember {
         val parameterTypes: List<ResolvedType>
 
         val returnType: ResolvedType
@@ -30,11 +33,9 @@ sealed interface TypeMember {
         fun toAsmType(): AsmMethodType
     }
 
-    sealed interface Constructor : TypeMember {
-        val parameterTypes: List<ResolvedType>
+    sealed interface Method : Executable
 
-        fun toAsmType(): AsmMethodType
-    }
+    sealed interface Constructor : Executable
 
     sealed interface Field : TypeMember {
         val type: ResolvedType

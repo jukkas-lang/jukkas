@@ -27,13 +27,13 @@ class CompilationUnit(
     val source: Source,
     override val position: Position,
     imports: List<Import>,
-    children: List<Statement>,
+    children: List<TopLevel>,
     override val table: Table,
 ) : AbstractNode(), TableContainer {
     val imports: MutableNodeList<Import> = imports.toMutableNodeList(this)
     val types: TypeCache = TypeCache(this)
     val reporter: MessageReporter = MessageReporter()
-    val children: MutableNodeList<Statement> = children.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
+    val children: MutableNodeList<TopLevel> = children.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override val compilationUnit: CompilationUnit
         get() = this
 

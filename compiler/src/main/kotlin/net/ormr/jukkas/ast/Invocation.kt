@@ -52,7 +52,7 @@ class InfixInvocation(
 
 class FunctionInvocation(val name: String, arguments: List<InvocationArgument>) : Invocation() {
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
-    var member: TypeMember? = null
+    var member: TypeMember.Executable? = null
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionInvocation &&

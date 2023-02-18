@@ -86,7 +86,7 @@ enum class JvmPrimitiveType(
         }
     }
 
-    override fun toJvmDescriptor(): String = internalName
+    override fun toJvmDescriptor(): String = clz.descriptorString()
 
     override fun toAsmType(): AsmPrimitiveType = AsmPrimitiveType.of(clz)
 

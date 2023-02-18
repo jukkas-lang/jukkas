@@ -16,23 +16,35 @@
 
 package net.ormr.jukkas.ast
 
+import net.ormr.asmkt.types.MethodType
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Lambda(
-    arguments: List<Argument>,
-    body: Block,
+class FunctionDeclaration(
+    override val name: String,
+    arguments: List<NamedArgument>,
+    body: Block?,
     override var type: Type,
     override val table: Table,
-) : Expression(), Invokable, TableContainer {
-    override val arguments: MutableNodeList<Argument> =
+) : Statement(), Invokable<NamedArgument>, NamedDefinition, TableContainer, TopLevel {
+    override val arguments: MutableNodeList<NamedArgument> =
         arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
-    override var body: Block by child(body)
+    override var body: Block? by child(body)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is Lambda &&
+        other is FunctionDeclaration &&
+                name == other.name &&
                 checkStructuralEquivalence(arguments, other.arguments) &&
-                body.isStructurallyEquivalent(other.body) &&
+                checkStructuralEquivalence(body, other.body) &&
                 type.isStructurallyEquivalent(other.type)
+
+    override fun toString(): String = "Function(name='$name', type=$type, arguments=$arguments, body=$body)"
+    fun toMethodType(): MethodType {
+        val descriptor = buildString {
+            arguments.joinTo(this, "", "(", ")") { it.type.toJvmDescriptor() }
+            append(type.toJvmDescriptor())
+        }
+        return MethodType.fromDescriptor(descriptor)
+    }
 }

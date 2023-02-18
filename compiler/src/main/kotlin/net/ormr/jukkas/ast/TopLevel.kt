@@ -16,11 +16,4 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.type.Type
-
-sealed interface Variable : Node, NamedDefinition, HasMutableType {
-    val kind: PropertyKind
-    override val name: String
-    override var type: Type
-    var initializer: Expression?
-}
+sealed interface TopLevel : Node

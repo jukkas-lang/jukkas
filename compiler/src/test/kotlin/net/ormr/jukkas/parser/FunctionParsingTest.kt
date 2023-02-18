@@ -18,7 +18,7 @@ package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
 import net.ormr.jukkas.arg
-import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.FunctionDeclaration
 import net.ormr.jukkas.ast.Table
 import net.ormr.jukkas.parseStatement
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
@@ -31,7 +31,7 @@ class FunctionParsingTest : FunSpec({
         context("Explicit return type") {
             test("fun foo() -> Unit") {
                 parseStatement("fun foo() -> Unit") shouldBeSuccess { stmt, _ ->
-                    stmt shouldBeStructurallyEquivalentTo Function(
+                    stmt shouldBeStructurallyEquivalentTo FunctionDeclaration(
                         name = "foo",
                         arguments = emptyList(),
                         body = null,
@@ -43,7 +43,7 @@ class FunctionParsingTest : FunSpec({
 
             test("fun foo(bar: Bar) -> Unit") {
                 parseStatement("fun foo(bar: Bar) -> Unit") shouldBeSuccess { stmt, _ ->
-                    stmt shouldBeStructurallyEquivalentTo Function(
+                    stmt shouldBeStructurallyEquivalentTo FunctionDeclaration(
                         name = "foo",
                         arguments = listOf(
                             arg("bar", typeName("Bar")),
@@ -59,7 +59,7 @@ class FunctionParsingTest : FunSpec({
         context("Implicit return type") {
             test("fun foo() -> Unit") {
                 parseStatement("fun foo()") shouldBeSuccess { stmt, _ ->
-                    stmt shouldBeStructurallyEquivalentTo Function(
+                    stmt shouldBeStructurallyEquivalentTo FunctionDeclaration(
                         name = "foo",
                         arguments = emptyList(),
                         body = null,
@@ -71,7 +71,7 @@ class FunctionParsingTest : FunSpec({
 
             test("fun foo(bar: Bar) -> Unit") {
                 parseStatement("fun foo(bar: Bar)") shouldBeSuccess { stmt, _ ->
-                    stmt shouldBeStructurallyEquivalentTo Function(
+                    stmt shouldBeStructurallyEquivalentTo FunctionDeclaration(
                         name = "foo",
                         arguments = listOf(
                             arg("bar", typeName("Bar")),

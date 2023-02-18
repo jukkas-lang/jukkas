@@ -19,7 +19,7 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode() {
+class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode(), TopLevel {
     val entries: NodeList<ImportEntry> = entries.toNodeList(this)
     val path: StringLiteral by child(path)
 

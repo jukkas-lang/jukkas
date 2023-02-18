@@ -19,9 +19,20 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.member.TypeMember
 
 class DefinitionReference(val name: String) : Expression(), HasMutableType {
     override var type: Type = UnknownType
+
+    // TODO: support references to property members too
+    var member: TypeMember.Field? = null
+
+    /**
+     * Whether `this` represents a static reference.
+     *
+     * A static reference is something like `System.out` where `System` is just a type name.
+     */
+    var isStaticReference: Boolean = false
 
     fun find(table: Table): NamedDefinition? = table.find(name)
 

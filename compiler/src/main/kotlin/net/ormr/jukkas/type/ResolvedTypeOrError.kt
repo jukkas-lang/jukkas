@@ -34,6 +34,9 @@ sealed interface ResolvedTypeOrError : Type {
 
     val declaredMembers: List<TypeMember>
 
+    val isInterface: Boolean
+        get() = false
+
     fun findMethod(name: String, types: List<ResolvedTypeOrError>): TypeMember.Method?
 
     /**

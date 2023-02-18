@@ -28,7 +28,7 @@ sealed interface Type : StructurallyComparable {
 
     fun resolve(context: TypeResolutionContext): ResolvedTypeOrError
 
-    fun toAsmType(): AsmType = AsmReferenceType.fromDescriptor(toJvmDescriptor())
+    fun toAsmType(): AsmFieldType = AsmReferenceType.fromDescriptor(toJvmDescriptor())
 
     fun toJvmDescriptor(): String
 

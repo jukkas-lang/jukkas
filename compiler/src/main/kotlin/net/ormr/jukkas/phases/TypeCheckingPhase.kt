@@ -16,48 +16,55 @@
 
 package net.ormr.jukkas.phases
 
+import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.Function
 import net.ormr.jukkas.type.ResolvedTypeOrError
 import net.ormr.jukkas.type.Type
+import net.ormr.krautils.lang.ifNotNull
 
 class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(source) {
-    private fun typeCheck(node: Node) {
+    private fun checkType(node: Node) {
         when (node) {
             is CompilationUnit -> checkTypes(node.children)
             is DefaultArgument -> {
                 val (_, type, default) = node
-                typeCheck(default)
+                checkType(default)
                 checkCompatibility(default, type, default.type)
             }
             is AssignmentOperation -> {
                 val (left, _, value) = node
-                typeCheck(left)
-                typeCheck(value)
+                checkType(left)
+                checkType(value)
                 checkCompatibility(value, left.type, value.type)
             }
             is BinaryOperation -> {
                 val (left, _, right) = node
-                typeCheck(left)
-                typeCheck(right)
+                checkType(left)
+                checkType(right)
                 checkCompatibility(node, left.type, right.type)
             }
-            is Block -> TODO("Block")
+            is Block -> checkTypes(node.statements)
             is ConditionalBranch -> TODO("ConditionalBranch")
             is AnonymousFunctionInvocation -> TODO("AnonymousFunctionInvocation")
-            is FunctionInvocation -> TODO("FunctionInvocation")
             is InfixInvocation -> TODO("InfixInvocation")
-            is Lambda -> TODO("Lambda")
-            is MemberAccessOperation -> TODO("MemberAccessOperation")
+            is LambdaDeclaration -> TODO("Lambda")
+            is MemberAccessOperation -> {
+                checkType(node.left)
+                checkType(node.right)
+            }
             is StringTemplateExpression -> TODO("StringTemplateExpression")
-            is ExpressionStatement -> typeCheck(node.expression)
-            is Function -> TODO("Function")
+            is ExpressionStatement -> checkType(node.expression)
+            is FunctionDeclaration -> {
+                // TODO: type check all returns
+                checkTypes(node.arguments)
+                node.body ifNotNull { checkType(it) }
+            }
             is LocalVariable -> {
                 val (_, _, type, initializer) = node
                 if (initializer != null) {
-                    typeCheck(initializer)
+                    checkType(initializer)
                     checkCompatibility(initializer, type, initializer.type)
                 }
             }
@@ -78,11 +85,13 @@ class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(sour
             is InvocationArgument -> {}
             // type checking of return expressions is done where they're placed
             is Return -> {}
+            // it's already been "type checked" in the type resolution phase
+            is FunctionInvocation -> {}
         }
     }
 
     private fun <T : Node> checkTypes(nodes: List<T>) {
-        nodes.forEach(::typeCheck)
+        nodes.forEach(::checkType)
     }
 
     private fun checkCompatibility(position: Positionable, a: Type, b: Type) {
@@ -101,5 +110,15 @@ class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(sour
         got: Type,
     ) {
         reportTypeError(position, formatIncompatibleTypes(expected, got))
+    }
+
+    companion object {
+        fun run(unit: CompilationUnit): JukkasResult<CompilationUnit> = run(unit, unit.source)
+
+        fun <T : Node> run(node: T, source: Source): JukkasResult<T> {
+            val phase = TypeCheckingPhase(source)
+            phase.checkType(node)
+            return phase.reporter.toResult { node }
+        }
     }
 }

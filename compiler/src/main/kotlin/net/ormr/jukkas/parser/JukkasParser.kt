@@ -21,7 +21,7 @@ import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.Function
+import net.ormr.jukkas.ast.FunctionDeclaration
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.lexer.TokenStream
@@ -148,7 +148,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         return ImportEntry(name.identifierName, alias?.identifierName) withPosition position
     }
 
-    private fun parseTopLevel(): Statement? = withSynchronization(
+    private fun parseTopLevel(): TopLevel? = withSynchronization(
         { check<TopSynch>() },
         { null },
     ) {
@@ -180,7 +180,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         else -> start.findPosition()
     }
 
-    private fun parseFunction(): Function = newBlock {
+    private fun parseFunction(): FunctionDeclaration = newBlock {
         val keyword = consume(FUN)
         val name = consumeIdentifier().identifierName
         consume(LEFT_PAREN)
@@ -201,7 +201,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
             else -> null
         }
         val position = createSpan(keyword, body ?: returnTypePosition ?: argEnd)
-        return Function(name, arguments, body, returnType, table) withPosition position
+        return FunctionDeclaration(name, arguments, body, returnType, table) withPosition position
     }
 
     private fun parseProperty(): Property = TODO()
@@ -237,7 +237,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         return BasicArgument(name.identifierName, type) withPosition createSpan(name, type)
     }
 
-    fun parseDefaultArgument(): Argument {
+    fun parseDefaultArgument(): NamedArgument {
         val name = consumeIdentifier()
         val identifierName = name.identifierName
         val type = parseTypeDeclaration()
