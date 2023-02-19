@@ -1,9 +1,11 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
+import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 
 plugins {
     kotlin("jvm") version "1.8.0"
     id("com.adarshr.test-logger") version "3.2.0"
+    id("io.gitlab.arturbosch.detekt").version("1.22.0")
 }
 
 group = "net.ormr.jukkas"
@@ -15,10 +17,34 @@ repositories {
 
 val kotestVersion: String by project
 
-testlogger {
-    theme = MOCHA
-    showSummary = true
-    showOnlySlow = false
+allprojects {
+    apply(plugin = "com.adarshr.test-logger")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    testlogger {
+        theme = MOCHA
+        showSummary = true
+        showOnlySlow = false
+    }
+
+    detekt {
+        config = rootProject.files("config/detekt/detekt.yml")
+        buildUponDefaultConfig = true
+    }
+
+    dependencies {
+        detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0")
+    }
+
+    tasks {
+        detekt.configure {
+            basePath = rootProject.projectDir.absolutePath
+        }
+    }
+}
+
+val reportMerge by tasks.registering(ReportMergeTask::class) {
+    output.set(rootProject.layout.buildDirectory.file("reports/detekt/merge.sarif"))
 }
 
 subprojects {
@@ -27,12 +53,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-    }
-
-    testlogger {
-        theme = MOCHA
-        showSummary = true
-        showOnlySlow = false
     }
 
     dependencies {
@@ -45,6 +65,19 @@ subprojects {
     }
 
     tasks {
+        detekt.configure {
+            finalizedBy(reportMerge)
+
+            reportMerge.configure {
+                input.from(sarifReportFile)
+            }
+
+            reports {
+                sarif.required.set(true)
+                sarif.outputLocation.set(file("build/reports/detekt.sarif"))
+            }
+        }
+
         compileKotlin {
             compilerOptions {
                 jvmTarget.set(JVM_17)

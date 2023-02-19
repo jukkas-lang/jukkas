@@ -1,0 +1,30 @@
+name: Detekt linting
+
+on:
+  pull_request:
+    branches:
+      - master
+    push:
+
+jobs:
+  run_detekt:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: ./.github/actions/setup_gradle
+      - name: Run Detekt
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          # --continue so we can aggregate all errors
+          arguments: detekt --continue
+      - name: Upload SARIF Report
+        uses: github/codeql-action/upload-sarif@v2
+        if: ${{ always() }}
+        with:
+          sarif_file: build/reports/detekt/detekt.sarif
