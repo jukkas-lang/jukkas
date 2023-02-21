@@ -19,13 +19,12 @@
 package net.ormr.jukkas.lexer
 
 import net.ormr.jukkas.utils.joinWithOr
-import net.ormr.krautils.collections.asUnmodifiableList
 
 @Suppress("diktat")
 sealed interface TokenType {
     companion object {
         val values: List<TokenType> by lazy {
-            AbstractTokenType::class.sealedSubclasses.mapNotNull { it.objectInstance }.asUnmodifiableList()
+            AbstractTokenType::class.sealedSubclasses.mapNotNull { it.objectInstance }
         }
 
         inline fun <reified T : TokenType> ofType(): List<T> = values.filterIsInstance<T>()

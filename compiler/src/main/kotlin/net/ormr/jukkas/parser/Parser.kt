@@ -25,9 +25,8 @@ import net.ormr.jukkas.lexer.TokenType.SEMICOLON
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.reporter.MessageType
 import net.ormr.jukkas.utils.joinWithOr
-import java.io.Closeable
 
-abstract class Parser(private val tokens: TokenStream) : Closeable {
+abstract class Parser(private val tokens: TokenStream) {
     private val buffer = mutableListOf<Token>()
     private val consumed = ArrayDeque<Token>()
     val reporter: MessageReporter = MessageReporter()
@@ -188,9 +187,5 @@ abstract class Parser(private val tokens: TokenStream) : Closeable {
     } catch (_: JukkasParseException) {
         synchronize(predicate)
         onFail()
-    }
-
-    override fun close() {
-        tokens.close()
     }
 }
