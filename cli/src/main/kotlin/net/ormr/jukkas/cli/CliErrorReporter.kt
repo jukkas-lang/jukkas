@@ -28,6 +28,7 @@ import net.ormr.jukkas.endPoint
 import net.ormr.jukkas.groupedMessages
 import net.ormr.jukkas.reporter.Message
 import net.ormr.jukkas.startPoint
+import kotlin.math.abs
 import kotlin.system.exitProcess
 
 class CliErrorReporter {
@@ -71,7 +72,7 @@ class CliErrorReporter {
         println(italic(content))
         print(INDENT)
         print(" ".repeat(start.column))
-        println(bold(cyan("^".repeat(end.indices.last - start.indices.first))))
+        println(bold(cyan("^".repeat(abs(end.column - start.column)))))
     }
 
     private companion object {
