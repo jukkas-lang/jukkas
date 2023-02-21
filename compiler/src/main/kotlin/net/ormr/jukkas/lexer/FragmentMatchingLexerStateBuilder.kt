@@ -27,6 +27,7 @@ class FragmentMatchingLexerStateBuilder<Type> {
     fun build() = FragmentMatchingLexerState(fragments, extendedStates)
 }
 
+@Suppress("FunctionNaming")
 inline fun <reified Type> State(
     builder: FragmentMatchingLexerStateBuilder<Type>.() -> Unit
 ): FragmentMatchingLexerState<Type> {

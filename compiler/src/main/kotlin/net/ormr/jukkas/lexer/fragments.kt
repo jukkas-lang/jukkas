@@ -75,4 +75,3 @@ class LexerFragmentOneOrMore(val fragment: LexerFragment) : LexerFragment {
         return FragmentMatchResult(span, segment)
     }
 }
-

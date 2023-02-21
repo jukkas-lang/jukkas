@@ -20,7 +20,10 @@ import net.ormr.jukkas.Point
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.Span
 
-class TokenStream private constructor(private val lexer: Lexer<Token, TokenType>, val source: Source) : Iterator<Token> {
+class TokenStream private constructor(
+    private val lexer: Lexer<Token, TokenType>,
+    val source: Source
+) : Iterator<Token> {
     private var previous: Token? = null
 
     private val eof: Token by lazy {

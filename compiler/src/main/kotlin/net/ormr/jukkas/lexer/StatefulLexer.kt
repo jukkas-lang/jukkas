@@ -23,7 +23,10 @@ abstract class StatefulLexer<Token, Type>(source: String) : Lexer<Token, Type> {
         val match = currentState.match(scanner)
         if (match == null) {
             if (scanner.hasMore) {
-                // TODO: complain about unexpected token? Emmit some "garbage" token until something valid is recognized?
+                /*
+                 * TODO: complain about unexpected token?
+                 * Emmit some "garbage" token until something valid is recognized?
+                 */
             }
             isFinished = !scanner.hasMore
             return null
