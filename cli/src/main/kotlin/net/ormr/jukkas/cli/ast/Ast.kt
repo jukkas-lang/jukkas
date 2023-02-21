@@ -95,10 +95,6 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         is Point -> buildJsonObject {
             put("line", position.line)
             put("column", position.column)
-            putJsonObject("indices") {
-                put("first", position.indices.first)
-                put("last", position.indices.last)
-            }
         }
         is Span -> buildJsonObject {
             put("start", jsonPosition(position.start))

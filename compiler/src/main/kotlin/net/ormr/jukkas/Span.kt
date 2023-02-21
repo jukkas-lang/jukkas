@@ -18,7 +18,7 @@ package net.ormr.jukkas
 
 data class Span(val start: Point, val end: Point) : Comparable<Span>, Position {
     init {
-        require(start < end) { "'start' must not occur before 'end'. ($start < $end)" }
+        require(start <= end) { "'start' must not occur before 'end'. ($start <= $end)" }
     }
 
     override fun compareTo(other: Span): Int = when {

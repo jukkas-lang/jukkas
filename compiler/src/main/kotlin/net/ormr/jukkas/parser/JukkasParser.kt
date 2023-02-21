@@ -303,7 +303,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         inline fun <T> parse(source: Source, crossinline action: JukkasParser.() -> T): JukkasResult<T> {
             val parser = of(source)
             return try {
-                parser.reporter.toResult { parser.use(action) }
+                parser.reporter.toResult { action.invoke(parser) }
             } catch (_: JukkasParseException) {
                 JukkasResult.Failure(parser.reporter.messages)
             }

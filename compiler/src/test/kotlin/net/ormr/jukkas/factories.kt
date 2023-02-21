@@ -46,6 +46,6 @@ fun arg(name: String, type: Type): BasicArgument = BasicArgument(name, type)
 
 fun arg(name: String, type: Type, default: Expression): DefaultArgument = DefaultArgument(name, type, default)
 
-private val rootPoint = Point.of(0, 0, 0, 0)
+private val rootPoint = Point(0, 0)
 
 fun typeName(name: String, position: Position = rootPoint): TypeName = TypeName(position, name)

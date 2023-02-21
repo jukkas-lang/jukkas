@@ -19,7 +19,6 @@ package net.ormr.jukkas
 data class Point(
     val line: Int,
     val column: Int,
-    val indices: IntRange,
 ) : Comparable<Point>, Position {
     init {
         require(line >= 0) { "'line' must be positive" }
@@ -34,13 +33,5 @@ data class Point(
         else -> 0
     }
 
-    companion object {
-        @JvmStatic
-        fun of(
-            line: Int,
-            column: Int,
-            startIndex: Int,
-            endIndex: Int,
-        ): Point = Point(line, column, startIndex..endIndex)
-    }
+    override fun toString(): String = "$line:$column"
 }

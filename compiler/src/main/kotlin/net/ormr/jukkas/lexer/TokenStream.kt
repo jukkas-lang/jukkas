@@ -18,25 +18,24 @@ package net.ormr.jukkas.lexer
 
 import net.ormr.jukkas.Point
 import net.ormr.jukkas.Source
-import java.io.Closeable
+import net.ormr.jukkas.Span
 
-class TokenStream private constructor(private val lexer: Lexer, val source: Source) : Iterator<Token>, Closeable {
+class TokenStream private constructor(
+    private val lexer: Lexer<Token, TokenType>,
+    val source: Source
+) : Iterator<Token> {
     private var previous: Token? = null
 
     private val eof: Token by lazy {
-        val point = previous?.point ?: Point(0, 0, 0..0)
-        Token(TokenType.END_OF_FILE, "<eof>", point)
+        val point = previous?.span?.end ?: Point(0, 0)
+        Token(TokenType.END_OF_FILE, "<eof>", Span(point, point))
     }
 
-    override fun hasNext(): Boolean = !lexer.isAtEnd
+    override fun hasNext(): Boolean = !lexer.isFinished
 
     override fun next(): Token = lexer.advance()?.also { previous = it } ?: eof
 
-    override fun close() {
-        lexer.close()
-    }
-
     companion object {
-        fun from(source: Source): TokenStream = TokenStream(Lexer(source.reader()), source)
+        fun from(source: Source): TokenStream = TokenStream(JukkasLexer(source.readContent()), source)
     }
 }
