@@ -60,6 +60,8 @@ complexity:
   CyclomaticComplexMethod:
     ignoreSingleWhenExpression: true
     ignoreSimpleWhenEntries: true
+  NestedBlockDepth:
+    threshold: 6
 
 style:
   active: true
