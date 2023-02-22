@@ -25,7 +25,6 @@ import net.ormr.jukkas.lexer.TokenType.COMMA
 import net.ormr.jukkas.lexer.TokenType.RIGHT_BRACE
 import net.ormr.jukkas.lexer.TokenType.VERTICAL_LINE
 import net.ormr.jukkas.parser.JukkasParser
-import net.ormr.jukkas.type.UnknownType
 
 /**
  * Parses an empty block as a function.
@@ -64,7 +63,7 @@ object FunctionLiteralParselet : PrefixParselet {
             // TODO: set the end of the position of this block to its last child
             val body = parseBlock(RIGHT_BRACE)
             val end = previous()
-            LambdaDeclaration(arguments, body, UnknownType, table) withPosition createSpan(token, end)
+            LambdaDeclaration(arguments, body, table) withPosition createSpan(token, end)
         }
     }
 }

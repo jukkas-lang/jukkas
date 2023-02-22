@@ -17,47 +17,31 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.TypeOrError
-import net.ormr.jukkas.type.JvmPrimitiveType
-import net.ormr.jukkas.type.JvmReferenceType
 
-sealed class Literal : Expression() {
-    abstract override val resolvedType: TypeOrError?
-}
+sealed class Literal : Expression()
 
 class SymbolLiteral(val text: String) : Literal() {
-    override lateinit var resolvedType: TypeOrError?
-
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is SymbolLiteral && text == other.text
 }
 
 class IntLiteral(val value: Int) : Literal() {
-    override val resolvedType: TypeOrError?
-        get() = JvmPrimitiveType.INT
-
     override fun toString(): String = value.toString()
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is IntLiteral && value == other.value && resolvedType.isStructurallyEquivalent(other.resolvedType)
+        other is IntLiteral && value == other.value
 }
 
 class BooleanLiteral(val value: Boolean) : Literal() {
-    override val resolvedType: TypeOrError?
-        get() = JvmPrimitiveType.BOOLEAN
-
     override fun toString(): String = value.toString()
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is BooleanLiteral && value == other.value && resolvedType.isStructurallyEquivalent(other.resolvedType)
+        other is BooleanLiteral && value == other.value
 }
 
 class StringLiteral(val value: String) : Literal() {
-    override val resolvedType: TypeOrError?
-        get() = JvmReferenceType.STRING
-
     override fun toString(): String = "\"$value\""
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is StringLiteral && value == other.value && resolvedType.isStructurallyEquivalent(other.resolvedType)
+        other is StringLiteral && value == other.value
 }

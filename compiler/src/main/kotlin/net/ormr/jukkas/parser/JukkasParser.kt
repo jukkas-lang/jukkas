@@ -29,7 +29,6 @@ import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
 import net.ormr.jukkas.parser.parselets.prefix.StringParselet
 import net.ormr.jukkas.utils.identifierName
 import java.nio.file.Path
-import net.ormr.jukkas.type.TypeName as OldTypeName
 
 class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     private val tables = ArrayDeque<Table>()

@@ -20,9 +20,9 @@ import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.Node
 import net.ormr.jukkas.ast.reportSemanticError
-import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.reporter.MessageType
+import net.ormr.jukkas.type.Type
 
 sealed class CompilerPhase(private val source: Source) {
     protected val reporter: MessageReporter = MessageReporter()
