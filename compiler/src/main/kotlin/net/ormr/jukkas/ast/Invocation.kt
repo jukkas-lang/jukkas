@@ -36,10 +36,10 @@ class InfixInvocation(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is InfixInvocation &&
-                name == other.name &&
-                left.isStructurallyEquivalent(other.left) &&
-                right.isStructurallyEquivalent(other.right) &&
-                type.isStructurallyEquivalent(other.type)
+            name == other.name &&
+            left.isStructurallyEquivalent(other.left) &&
+            right.isStructurallyEquivalent(other.right) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "InfixInvocation(left=$left, name='$name', right=$right)"
 
@@ -56,9 +56,9 @@ class FunctionInvocation(val name: String, arguments: List<InvocationArgument>) 
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionInvocation &&
-                name == other.name &&
-                checkStructuralEquivalence(arguments, other.arguments) &&
-                type.isStructurallyEquivalent(other.type)
+            name == other.name &&
+            checkStructuralEquivalence(arguments, other.arguments) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String =
         "FunctionInvocation(name='$name', arguments=$arguments, member=$member)"
@@ -75,9 +75,9 @@ class AnonymousFunctionInvocation(target: Expression, arguments: List<Invocation
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is AnonymousFunctionInvocation &&
-                target.isStructurallyEquivalent(other.target) &&
-                checkStructuralEquivalence(arguments, other.arguments) &&
-                type.isStructurallyEquivalent(other.type)
+            target.isStructurallyEquivalent(other.target) &&
+            checkStructuralEquivalence(arguments, other.arguments) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String =
         "AnonymousFunctionInvocation(target=$target, arguments=$arguments, member=$member)"

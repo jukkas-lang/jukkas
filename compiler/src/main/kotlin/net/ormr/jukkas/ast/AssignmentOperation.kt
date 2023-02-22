@@ -32,10 +32,10 @@ class AssignmentOperation(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is AssignmentOperation &&
-                operator == other.operator &&
-                left.isStructurallyEquivalent(other.left) &&
-                value.isStructurallyEquivalent(other.value) &&
-                type.isStructurallyEquivalent(other.type)
+            operator == other.operator &&
+            left.isStructurallyEquivalent(other.left) &&
+            value.isStructurallyEquivalent(other.value) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "(= $left $value)"
 

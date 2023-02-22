@@ -20,6 +20,7 @@ import net.ormr.jukkas.Point
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.Span
 
+@Suppress("IteratorNotThrowingNoSuchElementException")
 class TokenStream private constructor(
     private val lexer: Lexer<Token, TokenType>,
     val source: Source

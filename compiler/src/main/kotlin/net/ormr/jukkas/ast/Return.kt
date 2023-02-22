@@ -27,8 +27,8 @@ class Return(value: Expression?) : Expression(), HasMutableType {
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Return &&
-                checkStructuralEquivalence(value, other.value) &&
-                type.isStructurallyEquivalent(other.type)
+            checkStructuralEquivalence(value, other.value) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = when (value) {
         null -> "return"

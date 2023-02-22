@@ -29,7 +29,6 @@ import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.type.AsmReferenceType
 import net.ormr.jukkas.type.JvmType
-import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.type.member.TypeMember
 import net.ormr.krautils.lang.ifNotNull
 import kotlin.io.path.name
@@ -62,6 +61,7 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
         }
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun BytecodeClass.generateFunction(
         node: FunctionDeclaration,
         extraModifiers: Int,

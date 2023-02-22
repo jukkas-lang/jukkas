@@ -28,6 +28,6 @@ class Block(override val table: Table, statements: List<Statement>) : Expression
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Block &&
-                checkStructuralEquivalence(statements, other.statements) &&
-                type.isStructurallyEquivalent(other.type)
+            checkStructuralEquivalence(statements, other.statements) &&
+            type.isStructurallyEquivalent(other.type)
 }

@@ -153,7 +153,6 @@ class JvmReferenceType private constructor(val clz: Class<*>) : JvmType {
                 o2.method.isVarArgs && !(o1.method.isVarArgs) -> -1
                 else -> compareTypes(o1.parameterTypes, o2.parameterTypes)
             }
-
         }
         private val cache = hashMapOf<String, JvmReferenceType>()
 

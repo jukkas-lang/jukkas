@@ -33,10 +33,10 @@ class ConditionalBranch(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ConditionalBranch &&
-                condition.isStructurallyEquivalent(other.condition) &&
-                thenBranch.isStructurallyEquivalent(other.thenBranch) &&
-                checkStructuralEquivalence(elseBranch, other.elseBranch) &&
-                type.isStructurallyEquivalent(other.type)
+            condition.isStructurallyEquivalent(other.condition) &&
+            thenBranch.isStructurallyEquivalent(other.thenBranch) &&
+            checkStructuralEquivalence(elseBranch, other.elseBranch) &&
+            type.isStructurallyEquivalent(other.type)
 
     operator fun component1(): Expression = condition
 

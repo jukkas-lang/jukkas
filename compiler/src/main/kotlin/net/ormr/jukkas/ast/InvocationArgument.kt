@@ -26,9 +26,9 @@ class InvocationArgument(value: Expression, val name: String?) : Expression(), H
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is InvocationArgument &&
-                name == other.name &&
-                value.isStructurallyEquivalent(other.value) &&
-                type.isStructurallyEquivalent(other.type)
+            name == other.name &&
+            value.isStructurallyEquivalent(other.value) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = when (name) {
         null -> value.toString()

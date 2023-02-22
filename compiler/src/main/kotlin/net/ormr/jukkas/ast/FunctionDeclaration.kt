@@ -33,10 +33,10 @@ class FunctionDeclaration(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionDeclaration &&
-                name == other.name &&
-                checkStructuralEquivalence(arguments, other.arguments) &&
-                checkStructuralEquivalence(body, other.body) &&
-                type.isStructurallyEquivalent(other.type)
+            name == other.name &&
+            checkStructuralEquivalence(arguments, other.arguments) &&
+            checkStructuralEquivalence(body, other.body) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "Function(name='$name', type=$type, arguments=$arguments, body=$body)"
 }
