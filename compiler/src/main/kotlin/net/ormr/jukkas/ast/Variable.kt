@@ -16,11 +16,11 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.type.Type
-
-sealed interface Variable : Node, NamedDefinition, HasMutableType {
+sealed interface Variable : Node, NamedDefinition {
     val kind: PropertyKind
     override val name: String
-    override var type: Type
+    val type: TypeName
     var initializer: Expression?
+
+    override fun findTypeName(): TypeName = type
 }

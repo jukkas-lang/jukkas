@@ -161,7 +161,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         return BasicTypeName(identifier.identifierName) withPosition identifier
     }
 
-    fun parseTypeDeclaration(separator: TokenType = COLON): TypeName {
+    fun parseTypeDeclaration(separator: TokenType = COLON): DefinedTypeName {
         consume(separator)
         return parseBasicTypeName()
     }

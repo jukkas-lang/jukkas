@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.newtype
+package net.ormr.jukkas.type
 
-interface TypeResolver {
-    fun resolve(path: String, symbol: String): Type?
+sealed interface TypeOrError {
+    fun asString(): String
+}
+
+inline fun TypeOrError.flatMap(transformer: (Type) -> TypeOrError): TypeOrError = when (this) {
+    is Type -> transformer(this)
+    is ErrorType -> this
 }

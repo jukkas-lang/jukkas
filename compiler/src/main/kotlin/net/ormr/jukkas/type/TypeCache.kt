@@ -16,36 +16,24 @@
 
 package net.ormr.jukkas.type
 
-import net.ormr.jukkas.Positionable
-import net.ormr.jukkas.ast.CompilationUnit
-import net.ormr.jukkas.ast.reportSemanticError
+class TypeCache {
+    private val cache = hashMapOf<String, TypeOrError>()
 
-class TypeCache internal constructor(private val unit: CompilationUnit) {
-    private val entries = hashMapOf<String, ResolvedType>()
+    fun find(name: String): TypeOrError? = cache[name]
 
-    fun find(name: String): ResolvedType? = entries[name]
+    operator fun contains(name: String): Boolean = name in cache
 
-    fun define(position: Positionable, type: ResolvedType, alias: String? = null) {
-        if (alias == null) {
-            addType(position, type.simpleName, type)
-            if (type.internalName != type.simpleName) {
-                addType(position, type.internalName, type)
-            }
-        } else {
-            // TODO: is this the proper way of handling aliases?
-            addType(position, alias, type)
-        }
+    fun define(name: String, type: TypeOrError) {
+        require(name !in cache) { "Redefining type name: $name" }
+        cache[name] = type
     }
 
-    private fun addType(
-        position: Positionable,
-        name: String,
-        type: ResolvedType,
-    ) {
-        if (name in entries) {
-            unit.reportSemanticError(position, "Redefining name: $name")
-        } else {
-            entries[name] = type
+    inline fun findOrDefine(name: String, defaultType: () -> TypeOrError): TypeOrError = when (val type = find(name)) {
+        null -> {
+            val newType = defaultType()
+            define(name, newType)
+            newType
         }
+        else -> type
     }
 }

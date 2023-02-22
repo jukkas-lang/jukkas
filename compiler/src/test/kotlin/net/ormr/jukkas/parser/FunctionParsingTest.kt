@@ -20,10 +20,10 @@ import io.kotest.core.spec.style.FunSpec
 import net.ormr.jukkas.arg
 import net.ormr.jukkas.ast.FunctionDeclaration
 import net.ormr.jukkas.ast.Table
+import net.ormr.jukkas.ast.UndefinedTypeName
 import net.ormr.jukkas.parseStatement
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
-import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.typeName
 
 class FunctionParsingTest : FunSpec({
@@ -35,7 +35,7 @@ class FunctionParsingTest : FunSpec({
                         name = "foo",
                         arguments = emptyList(),
                         body = null,
-                        type = typeName("Unit"),
+                        returnType = typeName("Unit"),
                         table = Table(),
                     )
                 }
@@ -49,7 +49,7 @@ class FunctionParsingTest : FunSpec({
                             arg("bar", typeName("Bar")),
                         ),
                         body = null,
-                        type = typeName("Unit"),
+                        returnType = typeName("Unit"),
                         table = Table(),
                     )
                 }
@@ -63,7 +63,7 @@ class FunctionParsingTest : FunSpec({
                         name = "foo",
                         arguments = emptyList(),
                         body = null,
-                        type = UnknownType,
+                        returnType = UndefinedTypeName(),
                         table = Table(),
                     )
                 }
@@ -77,7 +77,7 @@ class FunctionParsingTest : FunSpec({
                             arg("bar", typeName("Bar")),
                         ),
                         body = null,
-                        type = UnknownType,
+                        returnType = UndefinedTypeName(),
                         table = Table(),
                     )
                 }

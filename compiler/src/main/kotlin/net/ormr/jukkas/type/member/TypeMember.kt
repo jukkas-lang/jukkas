@@ -16,28 +16,17 @@
 
 package net.ormr.jukkas.type.member
 
-import net.ormr.jukkas.type.AsmMethodType
-import net.ormr.jukkas.type.ResolvedType
+import net.ormr.jukkas.type.Type
 
+@Suppress("UnnecessaryAbstractClass")
 sealed interface TypeMember {
     val name: String
-    val declaringType: ResolvedType
+    val returnType: Type
+    val isPublic: Boolean
 
-    val isStatic: Boolean
+    abstract class Property : TypeMember
 
-    sealed interface Executable : TypeMember {
-        val parameterTypes: List<ResolvedType>
+    sealed interface Executable : TypeMember
 
-        val returnType: ResolvedType
-
-        fun toAsmType(): AsmMethodType
-    }
-
-    sealed interface Method : Executable
-
-    sealed interface Constructor : Executable
-
-    sealed interface Field : TypeMember {
-        val type: ResolvedType
-    }
+    abstract class Function : Executable
 }

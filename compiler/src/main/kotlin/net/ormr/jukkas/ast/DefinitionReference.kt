@@ -17,15 +17,12 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.member.TypeMember
 
-class DefinitionReference(val name: String) : Expression(), HasMutableType {
-    override var type: Type = UnknownType
-
+class DefinitionReference(val name: String) : Expression() {
     // TODO: support references to property members too
-    var member: TypeMember.Field? = null
+    var member: TypeMember.Property? = null
 
     /**
      * Whether `this` represents a static reference.
@@ -37,13 +34,11 @@ class DefinitionReference(val name: String) : Expression(), HasMutableType {
     fun find(table: Table): NamedDefinition? = table.find(name)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is DefinitionReference &&
-            name == other.name &&
-            type.isStructurallyEquivalent(other.type)
+        other is DefinitionReference && name == other.name
 
-    override fun toString(): String = "DefinitionReference(name='$name', type=$type)"
+    override fun toString(): String = "DefinitionReference(name='$name', type=$resolvedType)"
 
     operator fun component1(): String = name
 
-    operator fun component2(): Type = type
+    operator fun component2(): TypeOrError? = resolvedType
 }

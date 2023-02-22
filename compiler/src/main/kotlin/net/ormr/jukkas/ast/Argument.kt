@@ -17,21 +17,27 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.type.TypeOrError
 
 sealed class Argument : ChildNode()
 
-sealed class NamedArgument : Argument(), NamedDefinition, HasMutableType {
+sealed class NamedArgument : Argument(), NamedDefinition {
     abstract override val name: String
-    abstract override var type: Type
+    abstract val type: DefinedTypeName
     var index: Int = -1
+
+    override fun findTypeName(): TypeName {
+        TODO("Not yet implemented")
+    }
 
     operator fun component1(): String = name
 
-    operator fun component2(): Type = type
+    operator fun component2(): TypeOrError? = findTypeName().resolvedType
 }
 
-class BasicArgument(override val name: String, override var type: Type) : NamedArgument() {
+class BasicArgument(override val name: String, type: DefinedTypeName) : NamedArgument() {
+    override val type: DefinedTypeName by child(type)
+
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is BasicArgument && name == other.name && type.isStructurallyEquivalent(other.type)
 
@@ -40,9 +46,10 @@ class BasicArgument(override val name: String, override var type: Type) : NamedA
 
 class DefaultArgument(
     override val name: String,
-    override var type: Type,
+    type: DefinedTypeName,
     default: Expression,
 ) : NamedArgument() {
+    override val type: DefinedTypeName by child(type)
     var default: Expression by child(default)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =

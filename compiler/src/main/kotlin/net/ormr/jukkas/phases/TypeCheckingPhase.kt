@@ -20,30 +20,33 @@ import net.ormr.jukkas.JukkasResult
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.type.ResolvedTypeOrError
 import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.type.TypeOrError
+import net.ormr.jukkas.type.isIncompatible
 import net.ormr.krautils.lang.ifNotNull
 
 class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(source) {
-    private fun checkType(node: Node) {
+    @JvmName("nullableCheckType")
+    private fun <T : Node> checkType(node: T?): T? = node?.let(::checkType)
+
+    @Suppress("CyclomaticComplexMethod")
+    private fun <T : Node> checkType(node: T): T {
         when (node) {
             is CompilationUnit -> checkTypes(node.children)
             is DefaultArgument -> {
-                val (_, type, default) = node
-                checkType(default)
-                checkCompatibility(default, type, default.type)
+                val type = node.type
+                val default = checkType(node.default)
+                checkCompatibility(default, type.resolvedType, default.resolvedType)
             }
             is AssignmentOperation -> {
-                val (left, _, value) = node
-                checkType(left)
-                checkType(value)
-                checkCompatibility(value, left.type, value.type)
+                val left = checkType(node.left)
+                val value = checkType(node.value)
+                checkCompatibility(value, left.resolvedType, value.resolvedType)
             }
             is BinaryOperation -> {
-                val (left, _, right) = node
-                checkType(left)
-                checkType(right)
-                checkCompatibility(node, left.type, right.type)
+                val left = checkType(node.left)
+                val right = checkType(node.right)
+                checkCompatibility(node, left.resolvedType, right.resolvedType)
             }
             is Block -> checkTypes(node.statements)
             is ConditionalBranch -> TODO("ConditionalBranch")
@@ -63,10 +66,9 @@ class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(sour
             }
             is LocalVariable -> {
                 val type = node.type
-                val initializer = node.initializer
+                val initializer = checkType(node.initializer)
                 if (initializer != null) {
-                    checkType(initializer)
-                    checkCompatibility(initializer, type, initializer.type)
+                    checkCompatibility(initializer, type.resolvedType, initializer.resolvedType)
                 }
             }
             is Property -> TODO("Property")
@@ -88,22 +90,27 @@ class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(sour
             is Return -> {}
             // it's already been "type checked" in the type resolution phase
             is FunctionInvocation -> {}
+            is TypeName -> {}
         }
+        return node
     }
 
     private fun <T : Node> checkTypes(nodes: List<T>) {
         nodes.forEach(::checkType)
     }
 
-    private fun checkCompatibility(position: Positionable, a: Type, b: Type) {
-        require(a is ResolvedTypeOrError) { notResolved(a) }
-        require(b is ResolvedTypeOrError) { notResolved(b) }
+    private fun checkCompatibility(position: Positionable, a: TypeOrError?, b: TypeOrError?) {
+        require(a is Type) { notResolved(a) }
+        require(b is Type) { notResolved(b) }
         if (a isIncompatible b) {
             reportIncompatibleTypes(position, a, b)
         }
     }
 
-    private fun notResolved(type: Type): String = "Type <$type> is not resolved. Was type resolution skipped?"
+    private fun notResolved(type: TypeOrError?): String = when (type) {
+        null -> "Undefined type encountered. Was type resolution skipped?"
+        else -> "Error type encountered. Were inputs not filtered?"
+    }
 
     private fun reportIncompatibleTypes(
         position: Positionable,

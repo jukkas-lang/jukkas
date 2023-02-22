@@ -26,6 +26,7 @@ import net.ormr.jukkas.lexer.TokenType.*
 import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.JukkasParser.Companion.IDENTIFIERS
 
+// TODO: remove anonymous functions
 object AnonymousFunctionParselet : PrefixParselet {
     override fun parse(parser: JukkasParser, token: Token): LambdaDeclaration = parser with {
         newBlock {
@@ -46,7 +47,7 @@ object AnonymousFunctionParselet : PrefixParselet {
                 match(LEFT_BRACE) -> parseBlock(RIGHT_BRACE)
                 else -> createSpan(token, returnTypePosition ?: argEnd) syntaxError "Function must have a body"
             }
-            LambdaDeclaration(arguments, body, returnType, table) withPosition createSpan(token, body)
+            LambdaDeclaration(arguments, body, table) withPosition createSpan(token, body)
         }
     }
 }

@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.newtype.member
+package net.ormr.jukkas.type
 
-import net.ormr.jukkas.newtype.Type
+import net.ormr.jukkas.type.member.TypeMember
 
-@Suppress("UnnecessaryAbstractClass")
-sealed interface TypeMember {
+interface ContainerType : Type {
     val name: String
-    val returnType: Type
-    val isPublic: Boolean
+    val simpleName: String
+    val isObject: Boolean
 
-    abstract class Property : TypeMember
+    fun isSuperType(other: Type): Boolean
 
-    abstract class Function : TypeMember
+    fun isSubType(other: Type): Boolean
+
+    fun findProperty(name: String): TypeMember.Property?
+
+    fun findFunction(name: String, typeParameters: List<Type>): TypeMember.Function?
 }

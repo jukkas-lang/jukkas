@@ -17,13 +17,11 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class LambdaDeclaration(
     arguments: List<Argument>,
     body: Block,
-    override var type: Type,
     override val table: Table,
 ) : Expression(), Invokable<Argument>, TableContainer {
     override val arguments: MutableNodeList<Argument> =
@@ -33,6 +31,5 @@ class LambdaDeclaration(
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is LambdaDeclaration &&
             checkStructuralEquivalence(arguments, other.arguments) &&
-            body.isStructurallyEquivalent(other.body) &&
-            type.isStructurallyEquivalent(other.type)
+            body.isStructurallyEquivalent(other.body)
 }

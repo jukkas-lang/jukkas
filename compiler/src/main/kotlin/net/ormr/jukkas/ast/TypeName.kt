@@ -17,7 +17,7 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.newtype.TypeOrError
+import net.ormr.jukkas.type.TypeOrError
 
 sealed class TypeName : ChildNode() {
     var resolvedType: TypeOrError? = null

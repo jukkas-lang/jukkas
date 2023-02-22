@@ -20,7 +20,6 @@ import net.ormr.jukkas.Position
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.reporter.MessageReporter
-import net.ormr.jukkas.type.TypeCache
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class CompilationUnit(
@@ -31,7 +30,6 @@ class CompilationUnit(
     override val table: Table,
 ) : AbstractNode(), TableContainer {
     val imports: MutableNodeList<Import> = imports.toMutableNodeList(this)
-    val types: TypeCache = TypeCache(this)
     val reporter: MessageReporter = MessageReporter()
     val children: MutableNodeList<TopLevel> = children.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override val compilationUnit: CompilationUnit
