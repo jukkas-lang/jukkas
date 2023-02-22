@@ -16,17 +16,18 @@
 
 package net.ormr.jukkas.type
 
-import net.ormr.jukkas.Positionable
+import net.ormr.jukkas.type.member.TypeMember
 
-interface TypeResolutionContext {
-    val cache: TypeCache
+interface ContainerType : Type {
+    val name: String
+    val simpleName: String
+    val isObject: Boolean
 
-    fun reportSemanticError(position: Positionable, message: String)
+    fun isSuperType(other: Type): Boolean
 
-    fun reportTypeError(position: Positionable, message: String)
-}
+    fun isSubType(other: Type): Boolean
 
-fun TypeResolutionContext.errorType(position: Positionable, message: String): ErrorType {
-    reportSemanticError(position, message)
-    return ErrorType(message)
+    fun findProperty(name: String): TypeMember.Property?
+
+    fun findFunction(name: String, typeParameters: List<Type>): TypeMember.Function?
 }

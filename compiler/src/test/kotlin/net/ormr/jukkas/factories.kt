@@ -17,17 +17,17 @@
 package net.ormr.jukkas
 
 import net.ormr.jukkas.ast.BasicArgument
+import net.ormr.jukkas.ast.BasicTypeName
 import net.ormr.jukkas.ast.BinaryOperation
 import net.ormr.jukkas.ast.BinaryOperator
 import net.ormr.jukkas.ast.BooleanLiteral
 import net.ormr.jukkas.ast.DefaultArgument
+import net.ormr.jukkas.ast.DefinedTypeName
 import net.ormr.jukkas.ast.DefinitionReference
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.IntLiteral
 import net.ormr.jukkas.ast.InvocationArgument
 import net.ormr.jukkas.ast.StringLiteral
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.TypeName
 
 fun boolean(value: Boolean): BooleanLiteral = BooleanLiteral(value)
 
@@ -42,10 +42,9 @@ fun binary(left: Expression, operator: BinaryOperator, right: Expression): Binar
 
 fun invArg(value: Expression, name: String? = null): InvocationArgument = InvocationArgument(value, name)
 
-fun arg(name: String, type: Type): BasicArgument = BasicArgument(name, type)
+fun arg(name: String, type: DefinedTypeName): BasicArgument = BasicArgument(name, type)
 
-fun arg(name: String, type: Type, default: Expression): DefaultArgument = DefaultArgument(name, type, default)
+fun arg(name: String, type: DefinedTypeName, default: Expression): DefaultArgument =
+    DefaultArgument(name, type, default)
 
-private val rootPoint = Point(0, 0)
-
-fun typeName(name: String, position: Position = rootPoint): TypeName = TypeName(position, name)
+fun typeName(name: String): BasicTypeName = BasicTypeName(name)

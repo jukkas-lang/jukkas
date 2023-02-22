@@ -41,7 +41,7 @@ sealed class CompilerPhase(private val source: Source) {
     }
 
     protected fun formatIncompatibleTypes(expected: Type, got: Type): String =
-        "Expected type <${expected.internalName}> got <${got.internalName}>"
+        "Expected type <${expected.asString()}> got <${got.asString()}>"
 
     protected inline fun <reified T : Any> unreachable(): Nothing =
         error("Branch for <${T::class}> should never be reached")

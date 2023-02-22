@@ -17,18 +17,16 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.member.TypeMember
 
 class MemberAccessOperation(
     left: Expression,
     right: Expression,
     val isSafe: Boolean,
-) : Expression(), HasMutableType {
+) : Expression() {
     var left: Expression by child(left)
     var right: Expression by child(right)
-    override var type: Type = UnknownType
     var member: TypeMember? = null
 
     // TODO: do we want to check for type here?
@@ -37,15 +35,14 @@ class MemberAccessOperation(
             isSafe == other.isSafe &&
             left.isStructurallyEquivalent(other.left) &&
             right.isStructurallyEquivalent(other.right) &&
-            type.isStructurallyEquivalent(other.type) &&
             member == other.member
 
     override fun toString(): String =
-        "MemberAccessOperation(isSafe=$isSafe, left=$left, right=$right, type=$type, member=$member)"
+        "MemberAccessOperation(isSafe=$isSafe, left=$left, right=$right, type=$resolvedType, member=$member)"
 
     operator fun component1(): Expression = left
 
     operator fun component2(): Expression = right
 
-    operator fun component3(): Type = type
+    operator fun component3(): TypeOrError? = resolvedType
 }

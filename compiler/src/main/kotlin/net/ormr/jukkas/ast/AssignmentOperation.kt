@@ -17,25 +17,22 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.TypeOrError
 
 // assignments are *not* expressions
 class AssignmentOperation(
     left: Expression,
     val operator: AssignmentOperator,
     value: Expression,
-) : Expression(), HasMutableType {
+) : Expression() {
     var left: Expression by child(left)
     var value: Expression by child(value)
-    override var type: Type = UnknownType
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is AssignmentOperation &&
             operator == other.operator &&
             left.isStructurallyEquivalent(other.left) &&
-            value.isStructurallyEquivalent(other.value) &&
-            type.isStructurallyEquivalent(other.type)
+            value.isStructurallyEquivalent(other.value)
 
     override fun toString(): String = "(= $left $value)"
 
@@ -45,7 +42,7 @@ class AssignmentOperation(
 
     operator fun component3(): Expression = value
 
-    operator fun component4(): Type = type
+    operator fun component4(): TypeOrError? = resolvedType
 }
 
 enum class AssignmentOperator(override val symbol: String) : Operator {

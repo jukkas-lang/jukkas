@@ -17,26 +17,23 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class ConditionalBranch(
     condition: Expression,
     thenBranch: Expression,
     elseBranch: Expression?,
-) : Expression(), HasMutableType {
+) : Expression() {
     var condition: Expression by child(condition)
     var thenBranch: Expression by child(thenBranch)
     var elseBranch: Expression? by child(elseBranch)
-    override var type: Type = UnknownType
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is ConditionalBranch &&
             condition.isStructurallyEquivalent(other.condition) &&
             thenBranch.isStructurallyEquivalent(other.thenBranch) &&
-            checkStructuralEquivalence(elseBranch, other.elseBranch) &&
-            type.isStructurallyEquivalent(other.type)
+            checkStructuralEquivalence(elseBranch, other.elseBranch)
 
     operator fun component1(): Expression = condition
 
@@ -44,5 +41,5 @@ class ConditionalBranch(
 
     operator fun component3(): Expression? = elseBranch
 
-    operator fun component4(): Type = type
+    operator fun component4(): TypeOrError? = resolvedType
 }

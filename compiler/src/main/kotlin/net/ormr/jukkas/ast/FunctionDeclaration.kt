@@ -17,26 +17,28 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
 class FunctionDeclaration(
     override val name: String,
     arguments: List<NamedArgument>,
     body: Block?,
-    override var type: Type,
+    returnType: TypeName,
     override val table: Table,
 ) : Statement(), Invokable<NamedArgument>, NamedDefinition, TableContainer, TopLevel {
     override val arguments: MutableNodeList<NamedArgument> =
         arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
+    val returnType: TypeName by child(returnType)
     override var body: Block? by child(body)
+
+    override fun findTypeName(): TypeName = returnType
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is FunctionDeclaration &&
             name == other.name &&
             checkStructuralEquivalence(arguments, other.arguments) &&
             checkStructuralEquivalence(body, other.body) &&
-            type.isStructurallyEquivalent(other.type)
+            returnType.isStructurallyEquivalent(other.returnType)
 
-    override fun toString(): String = "Function(name='$name', type=$type, arguments=$arguments, body=$body)"
+    override fun toString(): String = "Function(name='$name', arguments=$arguments, returnType=$returnType, body=$body)"
 }

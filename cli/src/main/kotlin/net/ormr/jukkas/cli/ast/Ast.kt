@@ -22,7 +22,6 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -38,13 +37,7 @@ import kotlinx.serialization.json.putJsonArray
 import net.ormr.jukkas.*
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.cli.CliErrorReporter
-import net.ormr.jukkas.parser.JukkasParser
-import net.ormr.jukkas.phases.TypeCheckingPhase
-import net.ormr.jukkas.phases.TypeResolutionPhase
-import net.ormr.jukkas.type.JvmTypeResolver
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.member.JukkasMember
-import net.ormr.jukkas.type.member.JvmMember
+import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.member.TypeMember
 import net.ormr.krautils.reflection.isAbstract
 import net.ormr.krautils.reflection.isFinal
@@ -61,6 +54,7 @@ import net.ormr.krautils.reflection.isVolatile
 import kotlin.io.path.name
 import java.lang.reflect.Member as JavaMember
 
+@Suppress("UnusedPrivateMember")
 class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
     private val reporter = CliErrorReporter()
     private val file by option("-f", "--file")
@@ -76,7 +70,8 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
     }
 
     override fun run() {
-        val terminal = currentContext.terminal
+        error("Not implemented for now")
+        /*val terminal = currentContext.terminal
         val context = buildCompilationContext {
             types {
                 resolver(JvmTypeResolver)
@@ -87,7 +82,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             .flatMap { TypeResolutionPhase.run(it.value, context) }
             .flatMap { TypeCheckingPhase.run(it.value) }
             .getOrElse { reporter.printErrors(terminal, it) }
-        terminal.println(json.encodeToString(toJson(unit)))
+        terminal.println(json.encodeToString(toJson(unit)))*/
     }
 
     private fun jsonPosition(position: Position): JsonObject = when (position) {
@@ -107,9 +102,9 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
     private fun JsonObjectBuilder.includeNode(node: Node) {
         put("nodeType", node.javaClass.simpleName)
         if (node is Expression) {
-            put("type", toJson(node.type))
+            put("type", toJson(node.resolvedType))
         } else if (node is Definition) {
-            put("type", toJson(node.type))
+            put("type", toJson(node.findTypeName().resolvedType))
         }
         if (includePosition) put("position", jsonPosition(node.position))
         // TODO: add table keys if node is TableContainer
@@ -123,13 +118,8 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
 
     // TODO: better dumping of members
     private fun toJson(member: TypeMember?): JsonElement = when (member) {
-        is JvmMember -> when (member) {
-            is JvmMember.Constructor -> JsonPrimitive(member.constructor.toString())
-            is JvmMember.Field -> JsonPrimitive(member.field.toString())
-            is JvmMember.Method -> JsonPrimitive(member.method.toString())
-        }
-        is JukkasMember -> TODO("JukkasMember")
         null -> JsonNull
+        else -> JsonPrimitive(member.name)
     }
 
     @Suppress("UnusedPrivateMember")
@@ -148,7 +138,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         if (member.isStrict) add("strict")
     }
 
-    private fun toJson(type: Type): JsonElement = JsonPrimitive(type.internalName)
+    private fun toJson(type: TypeOrError?): JsonElement = JsonPrimitive(type?.asString())
 
     @JvmName("nullableToJson")
     private fun toJson(node: Node?): JsonElement = node?.let(::toJson) ?: JsonNull
@@ -248,6 +238,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         is LocalVariable -> TODO()
         is StringTemplatePart.ExpressionPart -> TODO()
         is StringTemplatePart.LiteralPart -> TODO()
+        is TypeName -> TODO("TypeName")
     }
 
     private fun fileName(source: Source): String = when (source) {

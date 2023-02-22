@@ -16,8 +16,8 @@
 
 package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.type.Type
+import net.ormr.jukkas.type.TypeOrError
 
 sealed class Expression : Statement(), HasType {
-    abstract override val type: Type
+    open var resolvedType: TypeOrError? = null
 }

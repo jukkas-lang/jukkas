@@ -1,9 +1,10 @@
 package net.ormr.jukkas
 
-import net.ormr.jukkas.type.ResolvedType
-import net.ormr.jukkas.type.TypeResolver
+import net.ormr.jukkas.type.BuiltinTypes
+import net.ormr.jukkas.type.Type
 
-class CompilerContext(val typeResolvers: List<TypeResolver>) {
-    fun resolveType(path: String, symbol: String): ResolvedType? =
-        typeResolvers.firstNotNullOfOrNull { it.resolve(path, symbol) }
+interface CompilerContext {
+    val builtinTypes: BuiltinTypes
+
+    fun resolveType(path: String, symbol: String): Type?
 }

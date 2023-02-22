@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.ast
+package net.ormr.jukkas.type
 
-import net.ormr.jukkas.type.Type
-
-sealed interface HasMutableType : HasType {
-    override var type: Type
+interface BuiltinTypes {
+    val any: ContainerType
+    val nothing: ContainerType
+    val unit: ContainerType
+    val string: ContainerType
+    val boolean: ContainerType
+    val char: ContainerType
+    val int8: ContainerType
+    val int16: ContainerType
+    val int32: ContainerType
+    val int64: ContainerType
+    val float32: ContainerType
+    val float64: ContainerType
 }

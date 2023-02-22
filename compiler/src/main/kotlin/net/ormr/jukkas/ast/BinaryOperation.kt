@@ -17,24 +17,21 @@
 package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.UnknownType
+import net.ormr.jukkas.type.TypeOrError
 
 class BinaryOperation(
     left: Expression,
     val operator: BinaryOperator,
     right: Expression,
-) : Expression(), HasMutableType {
+) : Expression() {
     var left: Expression by child(left)
     var right: Expression by child(right)
-    override var type: Type = UnknownType
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is BinaryOperation &&
             operator == other.operator &&
             left.isStructurallyEquivalent(other.left) &&
-            right.isStructurallyEquivalent(other.right) &&
-            type.isStructurallyEquivalent(other.type)
+            right.isStructurallyEquivalent(other.right)
 
     override fun toString(): String = "(${operator.symbol} $left $right)"
 
@@ -44,7 +41,7 @@ class BinaryOperation(
 
     operator fun component3(): Expression = right
 
-    operator fun component4(): Type = type
+    operator fun component4(): TypeOrError? = resolvedType
 }
 
 enum class BinaryOperator(override val symbol: String) : Operator {

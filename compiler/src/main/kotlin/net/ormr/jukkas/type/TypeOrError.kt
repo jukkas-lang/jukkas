@@ -16,9 +16,11 @@
 
 package net.ormr.jukkas.type
 
-typealias AsmType = net.ormr.asmkt.types.Type
-typealias AsmArrayType = net.ormr.asmkt.types.ArrayType
-typealias AsmFieldType = net.ormr.asmkt.types.FieldType
-typealias AsmMethodType = net.ormr.asmkt.types.MethodType
-typealias AsmPrimitiveType = net.ormr.asmkt.types.PrimitiveType
-typealias AsmReferenceType = net.ormr.asmkt.types.ReferenceType
+sealed interface TypeOrError {
+    fun asString(): String
+}
+
+inline fun TypeOrError.flatMap(transformer: (Type) -> TypeOrError): TypeOrError = when (this) {
+    is Type -> transformer(this)
+    is ErrorType -> this
+}
