@@ -31,10 +31,10 @@ class BinaryOperation(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is BinaryOperation &&
-                operator == other.operator &&
-                left.isStructurallyEquivalent(other.left) &&
-                right.isStructurallyEquivalent(other.right) &&
-                type.isStructurallyEquivalent(other.type)
+            operator == other.operator &&
+            left.isStructurallyEquivalent(other.left) &&
+            right.isStructurallyEquivalent(other.right) &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "(${operator.symbol} $left $right)"
 

@@ -25,8 +25,8 @@ class Import(entries: List<ImportEntry>, path: StringLiteral) : ChildNode(), Top
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is Import &&
-                path.isStructurallyEquivalent(other.path) &&
-                checkStructuralEquivalence(entries, other.entries)
+            path.isStructurallyEquivalent(other.path) &&
+            checkStructuralEquivalence(entries, other.entries)
 
     override fun toString(): String = "Import(entries=$entries, path=$path)"
 }

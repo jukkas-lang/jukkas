@@ -46,4 +46,3 @@ sealed interface Node : Positionable, StructurallyComparable {
 
     fun <T : Node> disown(child: T): T
 }
-

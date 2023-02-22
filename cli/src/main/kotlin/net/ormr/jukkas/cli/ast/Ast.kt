@@ -35,7 +35,6 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
 import net.ormr.jukkas.*
 import net.ormr.jukkas.ast.*
 import net.ormr.jukkas.cli.CliErrorReporter
@@ -133,6 +132,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
         null -> JsonNull
     }
 
+    @Suppress("UnusedPrivateMember")
     private fun buildModifiers(member: JavaMember): JsonArray = buildJsonArray {
         if (member.isPublic) add("public")
         if (member.isPrivate) add("private")

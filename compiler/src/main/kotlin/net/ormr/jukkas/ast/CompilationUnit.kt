@@ -39,6 +39,6 @@ class CompilationUnit(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is CompilationUnit &&
-                checkStructuralEquivalence(imports, other.imports) &&
-                checkStructuralEquivalence(children, other.children)
+            checkStructuralEquivalence(imports, other.imports) &&
+            checkStructuralEquivalence(children, other.children)
 }

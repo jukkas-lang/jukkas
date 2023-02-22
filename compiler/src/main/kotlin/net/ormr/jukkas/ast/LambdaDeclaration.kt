@@ -32,7 +32,7 @@ class LambdaDeclaration(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is LambdaDeclaration &&
-                checkStructuralEquivalence(arguments, other.arguments) &&
-                body.isStructurallyEquivalent(other.body) &&
-                type.isStructurallyEquivalent(other.type)
+            checkStructuralEquivalence(arguments, other.arguments) &&
+            body.isStructurallyEquivalent(other.body) &&
+            type.isStructurallyEquivalent(other.type)
 }

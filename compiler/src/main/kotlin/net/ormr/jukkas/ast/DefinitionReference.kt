@@ -38,8 +38,8 @@ class DefinitionReference(val name: String) : Expression(), HasMutableType {
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is DefinitionReference &&
-                name == other.name &&
-                type.isStructurallyEquivalent(other.type)
+            name == other.name &&
+            type.isStructurallyEquivalent(other.type)
 
     override fun toString(): String = "DefinitionReference(name='$name', type=$type)"
 

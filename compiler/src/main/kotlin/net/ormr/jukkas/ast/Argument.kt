@@ -47,9 +47,9 @@ class DefaultArgument(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is DefaultArgument &&
-                name == other.name &&
-                default.isStructurallyEquivalent(other.default) &&
-                type.isStructurallyEquivalent(other.type)
+            name == other.name &&
+            default.isStructurallyEquivalent(other.default) &&
+            type.isStructurallyEquivalent(other.type)
 
     operator fun component3(): Expression = default
 

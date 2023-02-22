@@ -25,6 +25,6 @@ class StringTemplateExpression(parts: List<StringTemplatePart>) : Expression() {
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is StringTemplateExpression &&
-                checkStructuralEquivalence(parts, other.parts) &&
-                type.isStructurallyEquivalent(other.type)
+            checkStructuralEquivalence(parts, other.parts) &&
+            type.isStructurallyEquivalent(other.type)
 }

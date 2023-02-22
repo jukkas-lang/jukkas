@@ -62,7 +62,8 @@ class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(sour
                 node.body ifNotNull { checkType(it) }
             }
             is LocalVariable -> {
-                val (_, _, type, initializer) = node
+                val type = node.type
+                val initializer = node.initializer
                 if (initializer != null) {
                     checkType(initializer)
                     checkCompatibility(initializer, type, initializer.type)

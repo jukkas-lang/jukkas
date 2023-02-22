@@ -31,10 +31,10 @@ class LocalVariable(
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is LocalVariable &&
-                kind == other.kind &&
-                name == other.name &&
-                checkStructuralEquivalence(initializer, other.initializer) &&
-                type.isStructurallyEquivalent(other.type)
+            kind == other.kind &&
+            name == other.name &&
+            checkStructuralEquivalence(initializer, other.initializer) &&
+            type.isStructurallyEquivalent(other.type)
 
     operator fun component1(): PropertyKind = kind
 

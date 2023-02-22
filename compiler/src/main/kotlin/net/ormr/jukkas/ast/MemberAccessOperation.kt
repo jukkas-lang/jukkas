@@ -34,11 +34,11 @@ class MemberAccessOperation(
     // TODO: do we want to check for type here?
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
         other is MemberAccessOperation &&
-                isSafe == other.isSafe &&
-                left.isStructurallyEquivalent(other.left) &&
-                right.isStructurallyEquivalent(other.right) &&
-                type.isStructurallyEquivalent(other.type) &&
-                member == other.member
+            isSafe == other.isSafe &&
+            left.isStructurallyEquivalent(other.left) &&
+            right.isStructurallyEquivalent(other.right) &&
+            type.isStructurallyEquivalent(other.type) &&
+            member == other.member
 
     override fun toString(): String =
         "MemberAccessOperation(isSafe=$isSafe, left=$left, right=$right, type=$type, member=$member)"

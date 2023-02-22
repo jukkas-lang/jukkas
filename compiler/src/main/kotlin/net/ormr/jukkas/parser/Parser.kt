@@ -26,6 +26,7 @@ import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.reporter.MessageType
 import net.ormr.jukkas.utils.joinWithOr
 
+@Suppress("UnnecessaryAbstractClass")
 abstract class Parser(private val tokens: TokenStream) {
     private val buffer = mutableListOf<Token>()
     private val consumed = ArrayDeque<Token>()

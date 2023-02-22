@@ -20,6 +20,7 @@ sealed interface TableContainer : Node {
     val table: Table
 }
 
+@Suppress("UnusedPrivateMember")
 internal fun TableContainer.handleAddChild(index: Int, node: Node) {
     if (node is NamedDefinition) {
         val name = node.name
@@ -27,6 +28,7 @@ internal fun TableContainer.handleAddChild(index: Int, node: Node) {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 internal fun TableContainer.handleRemoveChild(index: Int, node: Node) {
     if (node is NamedDefinition) {
         val name = node.name

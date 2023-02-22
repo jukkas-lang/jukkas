@@ -63,7 +63,7 @@ class TypeResolutionPhase private constructor(
                     if (type != null) {
                         types.define(entry, type, alias)
                     } else {
-                        reportSemanticError(entry, "Unable to find ${path}/${name}")
+                        reportSemanticError(entry, "Unable to find $path/$name")
                     }
                 }
             }
