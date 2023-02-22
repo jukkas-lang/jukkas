@@ -17,11 +17,9 @@
 package net.ormr.jukkas.parser
 
 import net.ormr.jukkas.JukkasResult
-import net.ormr.jukkas.Position
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
 import net.ormr.jukkas.ast.*
-import net.ormr.jukkas.ast.FunctionDeclaration
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.lexer.TokenStream
@@ -29,11 +27,9 @@ import net.ormr.jukkas.lexer.TokenType
 import net.ormr.jukkas.lexer.TokenType.*
 import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
 import net.ormr.jukkas.parser.parselets.prefix.StringParselet
-import net.ormr.jukkas.type.Type
-import net.ormr.jukkas.type.TypeName
-import net.ormr.jukkas.type.UnknownType
 import net.ormr.jukkas.utils.identifierName
 import java.nio.file.Path
+import net.ormr.jukkas.type.TypeName as OldTypeName
 
 class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     private val tables = ArrayDeque<Table>()
@@ -160,24 +156,22 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         }
     }
 
-    fun parseTypeName(): TypeName {
+    private fun parseBasicTypeName(): BasicTypeName {
         val identifier = consumeIdentifier()
-        return TypeName(identifier.findPosition(), identifier.identifierName)
+        return BasicTypeName(identifier.identifierName) withPosition identifier
     }
 
     fun parseTypeDeclaration(separator: TokenType = COLON): TypeName {
         consume(separator)
-        return parseTypeName()
+        return parseBasicTypeName()
     }
 
-    fun parseOptionalTypeDeclaration(separator: TokenType = COLON): Type = when {
+    inline fun parseOptionalTypeDeclaration(
+        separator: TokenType = COLON,
+        defaultPosition: () -> Positionable,
+    ): TypeName = when {
         check(separator) -> parseTypeDeclaration(separator)
-        else -> UnknownType
-    }
-
-    fun createTypePosition(start: Positionable, type: Type): Position = when (type) {
-        is TypeName -> createSpan(start, type)
-        else -> start.findPosition()
+        else -> UndefinedTypeName() withPosition defaultPosition()
     }
 
     private fun parseFunction(): FunctionDeclaration = newBlock {
@@ -186,8 +180,8 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         consume(LEFT_PAREN)
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseDefaultArgument)
         val argEnd = consume(RIGHT_PAREN)
-        val returnType = parseOptionalTypeDeclaration(ARROW)
-        val returnTypePosition = (returnType as? TypeName)
+        val returnType = parseOptionalTypeDeclaration(ARROW) { createSpan(keyword, argEnd) }
+        val returnTypePosition = (returnType as? DefinedTypeName)
         val body = when {
             match(EQUAL) -> {
                 // TODO: give warning for structures like 'fun() = return;' ?
