@@ -149,7 +149,6 @@ class TypeResolutionPhase private constructor(
                 is BooleanLiteral -> builtinTypes.boolean
                 is IntLiteral -> builtinTypes.int32
                 is StringLiteral -> builtinTypes.string
-                is SymbolLiteral -> TODO()
             }
             is MemberAccessOperation -> resolveAccess(this)
             is Return -> resolveIfPossible(value) { builtinTypes.unit } // TODO: JukkasType.UNIT

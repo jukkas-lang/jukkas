@@ -31,7 +31,6 @@ import net.ormr.jukkas.parser.parselets.infix.BinaryOperationParselet
 import net.ormr.jukkas.parser.parselets.infix.InfixInvocationParselet
 import net.ormr.jukkas.parser.parselets.infix.InfixParselet
 import net.ormr.jukkas.parser.parselets.infix.MemberAccessOperationParselet
-import net.ormr.jukkas.parser.parselets.prefix.AnonymousFunctionParselet
 import net.ormr.jukkas.parser.parselets.prefix.BooleanParselet
 import net.ormr.jukkas.parser.parselets.prefix.FunctionLiteralParselet
 import net.ormr.jukkas.parser.parselets.prefix.IfParselet
@@ -41,7 +40,6 @@ import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
 import net.ormr.jukkas.parser.parselets.prefix.ReferenceParselet
 import net.ormr.jukkas.parser.parselets.prefix.ReturnParselet
 import net.ormr.jukkas.parser.parselets.prefix.StringParselet
-import net.ormr.jukkas.parser.parselets.prefix.SymbolParselet
 
 internal object Grammar {
     private val prefixParselets = hashMapOf<TokenType, PrefixParselet>()
@@ -49,9 +47,7 @@ internal object Grammar {
 
     init {
         prefix<IdentifierLike>(ReferenceParselet)
-        prefix(SYMBOL_LITERAL, SymbolParselet)
         prefix(RETURN, ReturnParselet)
-        prefix(FUN, AnonymousFunctionParselet)
         prefix(STRING_START, StringParselet)
         prefix(FALSE, BooleanParselet)
         prefix(TRUE, BooleanParselet)
