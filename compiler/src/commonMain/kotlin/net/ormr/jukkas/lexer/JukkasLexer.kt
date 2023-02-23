@@ -2,7 +2,7 @@ package net.ormr.jukkas.lexer
 
 typealias JukkasLexerState = FragmentMatchingLexerState<TokenType>
 
-@Suppress("VariableNaming")
+@Suppress("VariableNaming", "PrivatePropertyName")
 class JukkasLexer(source: String) : StatefulLexer<Token, TokenType>(source), FragmentBuilder {
 
     private val DIGIT = regex("[0-9]")

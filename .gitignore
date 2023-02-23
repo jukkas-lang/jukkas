@@ -1,3 +1,4 @@
 /.gradle/
-/.idea/
+/.idea/**
 **/build/
+!/.idea/IntelliLang.xml
