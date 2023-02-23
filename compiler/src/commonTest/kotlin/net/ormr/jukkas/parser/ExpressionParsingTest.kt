@@ -48,7 +48,7 @@ class ExpressionParsingTest : FunSpec({
         }
     }
 
-    test("'12345' should parse to IntLiteral(true)") {
+    test("'12345' should parse to IntLiteral(12345)") {
         parseExpression("12345") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo int(12345)
         }
@@ -60,7 +60,7 @@ class ExpressionParsingTest : FunSpec({
         }
     }
 
-    test("\"foo\" should parse to StringLiteral(\"foo\")") {
+    test("Parse basic string literal") {
         parseExpression("\"foo\"") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo string("foo")
         }
@@ -72,7 +72,7 @@ class ExpressionParsingTest : FunSpec({
         }
     }
 
-    test("\"foo {1 + 2} bar\" should parse to StringExpression(...)") {
+    test("Parse string with template expression") {
         parseExpression("\"foo \\{1 + 2} bar\"") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo StringTemplateExpression(
                 listOf(
@@ -97,7 +97,7 @@ class ExpressionParsingTest : FunSpec({
         }
     }
 
-    test("'foo.bar(1)' should parse to (foo.bar (1))") {
+    test("Parse member access operation") {
         parseExpression("foo.bar(1)") shouldBeSuccess { expr, _ ->
             expr shouldBeStructurallyEquivalentTo MemberAccessOperation(
                 reference("foo"),

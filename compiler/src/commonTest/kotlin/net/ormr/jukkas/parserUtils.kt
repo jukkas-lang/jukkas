@@ -17,6 +17,7 @@
 package net.ormr.jukkas
 
 import net.ormr.jukkas.ast.Expression
+import net.ormr.jukkas.ast.Import
 import net.ormr.jukkas.ast.Node
 import net.ormr.jukkas.ast.Statement
 import net.ormr.jukkas.parser.JukkasParser
@@ -31,3 +32,6 @@ fun parseStatement(source: String): JukkasResult<Statement> =
 
 fun parseExpression(source: String): JukkasResult<Expression> =
     JukkasParser.parse(Source.Text(source), JukkasParser::parseExpression)
+
+fun parseImport(source: String): JukkasResult<Import> =
+    JukkasParser.parse(Source.Text(source)) { parseImport() ?: (current() syntaxError "Failed to parse") }
