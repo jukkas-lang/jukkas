@@ -80,6 +80,11 @@ dependencies {
 detekt {
     config = rootProject.files("config/detekt/detekt.yml")
     buildUponDefaultConfig = true
+    // hacky way of making the 'detekt' task run for all the multiplatform sources, as Detekt has no inbuilt
+    // task for accomplishing this
+    val srcDirs = kotlin.sourceSets.flatMap { it.kotlin.sourceDirectories.files }.toTypedArray()
+    @Suppress("SpreadOperator")
+    source.from(*srcDirs)
 }
 
 tasks {
