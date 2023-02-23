@@ -144,7 +144,7 @@ abstract class Parser(private val tokens: TokenStream) {
         buffer.add(0, consumed.removeFirst())
     }
 
-    fun previous(@Suppress("IDENTIFIER_LENGTH") n: Int = 0): Token =
+    fun previous(n: Int = 0): Token =
         consumed.getOrElse(n) { throw IllegalArgumentException("No previous token found at index $n") }
 
     fun isAtEnd(): Boolean = !hasMore()
@@ -171,7 +171,7 @@ abstract class Parser(private val tokens: TokenStream) {
         throw JukkasParseException(error)
     }
 
-    protected inline fun synchronize(predicate: () -> Boolean) {
+    inline fun synchronize(predicate: () -> Boolean) {
         consume()
         while (hasMore()) {
             if (check(SEMICOLON)) break
@@ -182,7 +182,7 @@ abstract class Parser(private val tokens: TokenStream) {
         }
     }
 
-    protected inline fun <T> withSynchronization(
+    inline fun <T> withSynchronization(
         predicate: () -> Boolean,
         onFail: () -> T,
         action: () -> T,

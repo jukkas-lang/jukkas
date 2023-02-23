@@ -2,9 +2,6 @@ package net.ormr.jukkas.utils
 
 import net.ormr.jukkas.ast.Node
 
-// TODO: implement a manual escaper so we don't need to do this
-expect fun String.unescapeUnicode(): String
-
 inline fun <T> bothNullOrEquivalent(
     first: T?,
     second: T?,

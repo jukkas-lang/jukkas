@@ -69,11 +69,12 @@ sealed interface TokenType {
 
     // string literal
     object STRING_START : AbstractTokenType("\"")
-    object STRING_END : AbstractTokenType("\"")
-    object ESCAPE_SEQUENCE : AbstractTokenType("escape sequence")
-    object STRING_CONTENT : AbstractTokenType("string content")
-    object STRING_TEMPLATE_START : AbstractTokenType("\\{")
-    object STRING_TEMPLATE_END : AbstractTokenType("}")
+    object STRING_END : AbstractTokenType("\""), StringContentSynch
+    object ESCAPE_SEQUENCE : AbstractTokenType("escape sequence"), StringContentSynch
+    object STRING_CONTENT : AbstractTokenType("string content"), StringContentSynch
+    object STRING_TEMPLATE_START : AbstractTokenType("\\{"), StringContentSynch
+    object STRING_TEMPLATE_END : AbstractTokenType("}"), StringContentSynch
+    sealed interface StringContentSynch : TokenType
 
     // quote
     object QUOTE_START : AbstractTokenType("```")

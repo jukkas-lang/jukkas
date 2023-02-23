@@ -28,15 +28,18 @@ import net.ormr.jukkas.lexer.TokenType.STRING_CONTENT
 import net.ormr.jukkas.lexer.TokenType.STRING_END
 import net.ormr.jukkas.lexer.TokenType.STRING_TEMPLATE_END
 import net.ormr.jukkas.lexer.TokenType.STRING_TEMPLATE_START
+import net.ormr.jukkas.lexer.TokenType.StringContentSynch
 import net.ormr.jukkas.parser.JukkasParser
-import net.ormr.jukkas.utils.unescapeUnicode
 
 object StringParselet : PrefixParselet {
+    private const val UNICODE_ESCAPE_SEQUENCE_LENGTH = 6
+    private const val HEX_RADIX = 16
+
     @Suppress("UNCHECKED_CAST")
     override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
         val parts = buildList {
             while (!check(STRING_END) && hasMore()) {
-                add(parseLiteralOrTemplate(parser))
+                add(parseLiteralOrTemplate() ?: continue)
             }
         }
         val end = consume(STRING_END)
@@ -46,13 +49,17 @@ object StringParselet : PrefixParselet {
             // TODO: may be a good idea to also merge consecutive literals
             parts.all { it is StringTemplatePart.LiteralPart } -> {
                 val literalParts = parts as List<StringTemplatePart.LiteralPart>
-                StringLiteral(literalParts.joinToString("") { it.literal.value }) withPosition createSpan(token, end)
+                val content = literalParts.joinToString(separator = "") { it.literal.value }
+                StringLiteral(content) withPosition createSpan(token, end)
             }
             else -> StringTemplateExpression(parts) withPosition createSpan(token, end)
         }
     }
 
-    private fun parseLiteralOrTemplate(parser: JukkasParser): StringTemplatePart = parser with {
+    private fun JukkasParser.parseLiteralOrTemplate(): StringTemplatePart? = withSynchronization(
+        { check<StringContentSynch>() },
+        { null },
+    ) {
         when {
             match(STRING_CONTENT) -> {
                 val content = previous()
@@ -62,7 +69,7 @@ object StringParselet : PrefixParselet {
             }
             match(ESCAPE_SEQUENCE) -> {
                 val sequence = previous()
-                val text = previous().text.unescapeUnicode()
+                val text = parseEscapeSequence(sequence, sequence.text)
                 val literal = StringLiteral(text) withPosition sequence
                 StringTemplatePart.LiteralPart(literal) withPosition sequence
             }
@@ -75,4 +82,32 @@ object StringParselet : PrefixParselet {
             else -> consume() syntaxError "Unexpected token in string"
         }
     }
+
+    private fun JukkasParser.parseEscapeSequence(token: Token, text: String): String = when {
+        text.startsWith("\\u") -> parseUnicodeEscapeSequence(token, text)
+        else -> parseCharacterEscapeSequence(token, text)
+    }
+
+    private fun JukkasParser.parseUnicodeEscapeSequence(token: Token, text: String): String {
+        if (text.length != UNICODE_ESCAPE_SEQUENCE_LENGTH) invalidUnicodeEscapeSequence(token)
+        return try {
+            text.drop(2).toInt(HEX_RADIX).toChar().toString()
+        } catch (_: Exception) {
+            invalidUnicodeEscapeSequence(token)
+        }
+    }
+
+    private fun JukkasParser.parseCharacterEscapeSequence(token: Token, text: String): String = when (text.drop(1)) {
+        "\\" -> "\\"
+        "n" -> "\n"
+        "t" -> "\t"
+        "r" -> "\r"
+        "b" -> "\b"
+        "\"" -> "\""
+        "'" -> "'"
+        else -> token syntaxError "Unknown escape sequence"
+    }
+
+    private fun JukkasParser.invalidUnicodeEscapeSequence(token: Token): Nothing =
+        token syntaxError "Invalid unicode escape sequence"
 }
