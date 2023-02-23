@@ -57,7 +57,7 @@ class CliErrorReporter {
 
     // TODO: if token is end of line, we want to put the arrow after the faulty value
     private fun Terminal.printSource(source: Source, message: Message) {
-        val sourceText = fileSources.getOrPut(source) { source.reader().readLines() }
+        val sourceText = fileSources.getOrPut(source) { source.readContent().lines() }
         // TODO: we need to implement our own way of converting the indices we have to line:column
         val start = message.position.startPoint
         val end = message.position.endPoint

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LanguageInjectionConfiguration">
+    <injection language="RegExp" injector-id="kotlin">
+      <display-name>Lexer regex</display-name>
+      <single-file value="false" />
+      <place><![CDATA[kotlinParameter().ofFunction(0, kotlinFunction().withName("regex").definedInClass("net.ormr.jukkas.lexer.FragmentBuilder"))]]></place>
+    </injection>
+  </component>
+</project>
