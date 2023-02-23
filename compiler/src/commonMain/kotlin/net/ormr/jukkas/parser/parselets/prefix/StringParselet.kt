@@ -23,9 +23,9 @@ import net.ormr.jukkas.ast.StringTemplatePart
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
-import net.ormr.jukkas.lexer.TokenType
 import net.ormr.jukkas.lexer.TokenType.ESCAPE_SEQUENCE
 import net.ormr.jukkas.lexer.TokenType.STRING_CONTENT
+import net.ormr.jukkas.lexer.TokenType.STRING_END
 import net.ormr.jukkas.lexer.TokenType.STRING_TEMPLATE_END
 import net.ormr.jukkas.lexer.TokenType.STRING_TEMPLATE_START
 import net.ormr.jukkas.parser.JukkasParser
@@ -35,11 +35,11 @@ object StringParselet : PrefixParselet {
     @Suppress("UNCHECKED_CAST")
     override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
         val parts = buildList {
-            while (!check(TokenType.STRING_END) && hasMore()) {
+            while (!check(STRING_END) && hasMore()) {
                 add(parseLiteralOrTemplate(parser))
             }
         }
-        val end = consume(TokenType.STRING_END)
+        val end = consume(STRING_END)
 
         when {
             // If the string does not have any template variables, just join all parts into a single literal
@@ -72,7 +72,7 @@ object StringParselet : PrefixParselet {
                 val end = consume(STRING_TEMPLATE_END)
                 StringTemplatePart.ExpressionPart(expression withPosition createSpan(start, end))
             }
-            else -> error("Unexpected token in string: <${consume()}>")
+            else -> consume() syntaxError "Unexpected token in string"
         }
     }
 }
