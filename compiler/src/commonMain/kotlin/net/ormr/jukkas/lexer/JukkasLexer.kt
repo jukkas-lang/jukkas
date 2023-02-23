@@ -2,10 +2,10 @@ package net.ormr.jukkas.lexer
 
 import net.ormr.jukkas.lexer.TokenType.*
 
-typealias JukkasLexerState = FragmentMatchingLexerState<TokenType>
+typealias JukkasLexerState = FragmentMatchingLexerStateMatcher<TokenType>
 
 @Suppress("VariableNaming")
-class JukkasLexer(source: String) : StatefulLexer<Token, TokenType>(source), FragmentBuilder {
+class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.State>(source), FragmentBuilder {
     private val digit = regex("[0-9]")
     private val lineTerminator = regex("""(\r)?\n""")
     private val whitespace = lineTerminator or regex("""[ \t\f]""")
@@ -124,4 +124,20 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType>(source), Fra
 
     override fun createToken(match: StateMatchResult<TokenType>): Token =
         Token(match.type, match.fragment.token, match.fragment.span)
+
+    override fun pushState(matcher: LexerStateMatcher<TokenType>) {
+        stateStack.addFirst(State(matcher, templateStringBraceCount))
+        templateStringBraceCount = 0
+    }
+
+    override fun popState(): State {
+        val state = stateStack.removeFirst()
+        templateStringBraceCount = state.templateStringBraceCount
+        return state
+    }
+
+    data class State(
+        override val matcher: LexerStateMatcher<TokenType>,
+        val templateStringBraceCount: Int,
+    ) : LexerState<TokenType>
 }

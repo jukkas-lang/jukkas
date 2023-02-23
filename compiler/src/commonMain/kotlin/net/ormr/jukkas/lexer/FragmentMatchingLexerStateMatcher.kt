@@ -4,10 +4,10 @@ typealias LexerTokenTypeCallback<Type> = () -> Type?
 
 data class LexerStateFragment<Type>(val fragment: LexerFragment, val typeCallback: LexerTokenTypeCallback<Type>)
 
-class FragmentMatchingLexerState<Type>(
+class FragmentMatchingLexerStateMatcher<Type>(
     private val fragments: List<LexerStateFragment<Type>>,
-    private val extendedStates: List<LexerState<Type>> = emptyList(),
-) : LexerState<Type> {
+    private val extendedStates: List<LexerStateMatcher<Type>> = emptyList(),
+) : LexerStateMatcher<Type> {
     override fun match(scanner: LexerScanner): StateMatchResult<Type>? {
         outer@ while (scanner.hasMore) {
             for (stateFragment in fragments) {
