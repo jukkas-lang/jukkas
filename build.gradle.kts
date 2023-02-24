@@ -11,6 +11,7 @@ tasks {
     register("runDetekt") {
         finalizedBy(
             project(":compiler").tasks.getByPath("detekt"),
+            project(":cli").tasks.getByPath("detekt"),
         )
     }
 }
