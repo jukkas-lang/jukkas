@@ -17,11 +17,13 @@
 package net.ormr.jukkas.type.member
 
 import net.ormr.jukkas.ast.Visibility
+import net.ormr.jukkas.type.AsmMethodType
 import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.Type
 import net.ormr.krautils.reflection.isStatic
 
-class JvmMethod(val member: JavaMethod) : TypeMember.Function(), TypeMember.Getter, TypeMember.Setter, JvmTypeMember {
+class JvmMethod(val member: JavaMethod) : TypeMember.Function(), TypeMember.Getter, TypeMember.Setter,
+    JvmTypeMember.Executable {
     override val declaringType: Type by lazy { JvmType.of(member.declaringClass) }
 
     override val visibility: Visibility by lazy { getVisibility(member) }
@@ -34,6 +36,10 @@ class JvmMethod(val member: JavaMethod) : TypeMember.Function(), TypeMember.Gett
 
     override val isStatic: Boolean
         get() = member.isStatic
+
+    override fun findType(): Type = returnType
+
+    override fun toAsmMethodType(): AsmMethodType = AsmMethodType.of(member)
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true

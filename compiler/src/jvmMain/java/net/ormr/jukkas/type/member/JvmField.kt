@@ -40,6 +40,8 @@ class JvmField(val member: JavaField) : TypeMember.Property(), TypeMember.Getter
     override val isStatic: Boolean
         get() = member.isStatic
 
+    override fun findType(): Type = type
+
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is JvmField -> false

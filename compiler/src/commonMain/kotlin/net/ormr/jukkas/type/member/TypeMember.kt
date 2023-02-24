@@ -27,23 +27,33 @@ sealed interface TypeMember {
 
     val isStatic: Boolean // for java interop
 
-    abstract class Property : TypeMember {
+    sealed interface HasType : TypeMember {
+        fun findType(): Type
+    }
+
+    abstract class Property : TypeMember, HasType {
         abstract val getter: Getter
         abstract val setter: Setter?
 
         open val type: Type
             get() = getter.returnType
+
+        override fun findType(): Type = type
     }
 
-    interface Getter : TypeMember {
+    interface Getter : TypeMember, HasType {
         val returnType: Type
+
+        override fun findType(): Type = returnType
     }
 
     interface Setter : TypeMember
 
-    sealed interface Executable : TypeMember {
+    sealed interface Executable : TypeMember, HasType {
         val parameterTypes: List<Type>
         val returnType: Type
+
+        override fun findType(): Type = returnType
     }
 
     abstract class Function : Executable

@@ -17,10 +17,11 @@
 package net.ormr.jukkas.type.member
 
 import net.ormr.jukkas.ast.Visibility
+import net.ormr.jukkas.type.AsmMethodType
 import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.Type
 
-class JvmConstructor(val member: JavaConstructor<*>) : TypeMember.Constructor(), JvmTypeMember {
+class JvmConstructor(val member: JavaConstructor<*>) : TypeMember.Constructor(), JvmTypeMember.Executable {
     override val declaringType: Type by lazy { JvmType.of(member.declaringClass) }
 
     override val visibility: Visibility by lazy { getVisibility(member) }
@@ -29,6 +30,8 @@ class JvmConstructor(val member: JavaConstructor<*>) : TypeMember.Constructor(),
         get() = member.name
 
     override val parameterTypes: List<Type> by lazy { member.parameterTypes.map { JvmType.of(it) } }
+
+    override fun toAsmMethodType(): AsmMethodType = AsmMethodType.of(member)
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true

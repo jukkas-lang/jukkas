@@ -30,6 +30,7 @@ import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.flatMap
 import net.ormr.jukkas.type.isIncompatible
 import net.ormr.jukkas.type.member.TypeMember
+import net.ormr.jukkas.type.member.isPublic
 
 /**
  * Performs type resolution and type inference, and some light type checking.
@@ -231,7 +232,10 @@ class TypeResolutionPhase private constructor(
     ): TypeOrError = when {
         member.isPublic -> {
             action(member)
-            member.returnType
+            when (member) {
+                is TypeMember.HasType -> member.findType()
+                else -> errorType(position, "Can't get type from member <$member>")
+            }
         }
         else -> semanticErrorType(position, "Can't access non public member: ${member.name}")
     }
