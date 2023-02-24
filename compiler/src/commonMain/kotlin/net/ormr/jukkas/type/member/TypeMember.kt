@@ -16,17 +16,55 @@
 
 package net.ormr.jukkas.type.member
 
+import net.ormr.jukkas.ast.Visibility
 import net.ormr.jukkas.type.Type
 
 @Suppress("UnnecessaryAbstractClass")
 sealed interface TypeMember {
+    val declaringType: Type
+    val visibility: Visibility
     val name: String
-    val returnType: Type
-    val isPublic: Boolean
 
-    abstract class Property : TypeMember
+    val isStatic: Boolean // for java interop
 
-    sealed interface Executable : TypeMember
+    abstract class Property : TypeMember {
+        abstract val getter: Getter
+        abstract val setter: Setter?
+
+        open val type: Type
+            get() = getter.returnType
+    }
+
+    interface Getter : TypeMember {
+        val returnType: Type
+    }
+
+    interface Setter : TypeMember
+
+    sealed interface Executable : TypeMember {
+        val parameterTypes: List<Type>
+        val returnType: Type
+    }
 
     abstract class Function : Executable
+
+    abstract class Constructor : Executable {
+        override val isStatic: Boolean
+            get() = false
+
+        override val returnType: Type
+            get() = declaringType
+    }
 }
+
+val TypeMember.isPublic: Boolean
+    get() = visibility == Visibility.PUBLIC
+
+val TypeMember.isProtected: Boolean
+    get() = visibility == Visibility.PROTECTED
+
+val TypeMember.isPrivate: Boolean
+    get() = visibility == Visibility.PRIVATE
+
+val TypeMember.isPackagePrivate: Boolean
+    get() = visibility == Visibility.PACKAGE_PRIVATE

@@ -16,12 +16,12 @@
 
 package net.ormr.jukkas.type
 
-sealed interface Type : TypeOrError {
-    infix fun isCompatibleWith(other: Type): Boolean
+typealias AsmType = net.ormr.asmkt.types.Type
+typealias AsmArrayType = net.ormr.asmkt.types.ArrayType
+typealias AsmFieldType = net.ormr.asmkt.types.FieldType
+typealias AsmMethodType = net.ormr.asmkt.types.MethodType
+typealias AsmPrimitiveType = net.ormr.asmkt.types.PrimitiveType
+typealias AsmReferenceType = net.ormr.asmkt.types.ReferenceType
+typealias ObjectWebAsmType = org.objectweb.asm.Type
 
-    infix fun compareCompatibilityTo(other: Type): Int
-
-    infix fun isSameType(other: Type): Boolean = this == other || asString() == other.asString()
-}
-
-infix fun Type.isIncompatible(other: Type): Boolean = !isCompatibleWith(other)
+internal fun getDescriptor(clz: Class<*>): String = ObjectWebAsmType.getDescriptor(clz)

@@ -58,6 +58,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
+                implementation("net.ormr.krautils:krautils-core:0.2.0")
                 implementation("net.ormr.asmkt:asmkt:0.0.9")
             }
         }

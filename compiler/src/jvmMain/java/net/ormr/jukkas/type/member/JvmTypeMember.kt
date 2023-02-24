@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.type
+package net.ormr.jukkas.type.member
 
-sealed interface Type : TypeOrError {
-    infix fun isCompatibleWith(other: Type): Boolean
-
-    infix fun compareCompatibilityTo(other: Type): Int
-
-    infix fun isSameType(other: Type): Boolean = this == other || asString() == other.asString()
-}
-
-infix fun Type.isIncompatible(other: Type): Boolean = !isCompatibleWith(other)
+sealed interface JvmTypeMember

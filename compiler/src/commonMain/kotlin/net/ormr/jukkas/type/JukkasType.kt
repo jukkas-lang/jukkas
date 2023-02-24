@@ -16,12 +16,4 @@
 
 package net.ormr.jukkas.type
 
-sealed interface Type : TypeOrError {
-    infix fun isCompatibleWith(other: Type): Boolean
-
-    infix fun compareCompatibilityTo(other: Type): Int
-
-    infix fun isSameType(other: Type): Boolean = this == other || asString() == other.asString()
-}
-
-infix fun Type.isIncompatible(other: Type): Boolean = !isCompatibleWith(other)
+interface JukkasType : ContainerType

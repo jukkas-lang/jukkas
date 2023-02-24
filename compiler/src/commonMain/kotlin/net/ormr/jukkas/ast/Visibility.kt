@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.type
+package net.ormr.jukkas.ast
 
-sealed interface Type : TypeOrError {
-    infix fun isCompatibleWith(other: Type): Boolean
-
-    infix fun compareCompatibilityTo(other: Type): Int
-
-    infix fun isSameType(other: Type): Boolean = this == other || asString() == other.asString()
+// the order these entries are put in is important, as It's used for comparability
+enum class Visibility {
+    PUBLIC,
+    PACKAGE_PRIVATE, // only for interop with JVM
+    PROTECTED,
+    PRIVATE,
 }
-
-infix fun Type.isIncompatible(other: Type): Boolean = !isCompatibleWith(other)
