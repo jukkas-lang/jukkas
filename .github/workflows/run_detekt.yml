@@ -21,8 +21,7 @@ jobs:
       - name: Run Detekt
         uses: gradle/gradle-build-action@v2.3.3
         with:
-          # --continue so we can aggregate all errors
-          arguments: detekt --continue
+          arguments: runDetekt
       - name: Upload SARIF Report
         uses: github/codeql-action/upload-sarif@v2
         if: ${{ always() }}
