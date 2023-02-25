@@ -25,13 +25,13 @@ import net.ormr.jukkas.ast.BooleanLiteral
 import net.ormr.jukkas.ast.DefaultArgument
 import net.ormr.jukkas.ast.DefinedTypeName
 import net.ormr.jukkas.ast.DefinitionReference
-import net.ormr.jukkas.ast.Int32Literal
+import net.ormr.jukkas.ast.IntLiteral
 import net.ormr.jukkas.ast.InvocationArgument
 import net.ormr.jukkas.ast.StringLiteral
 
 fun boolean(value: Boolean): BooleanLiteral = BooleanLiteral(value)
 
-fun int(value: Int): Int32Literal = Int32Literal(value)
+fun int(value: Int): IntLiteral = IntLiteral(value)
 
 fun string(value: String): StringLiteral = StringLiteral(value)
 

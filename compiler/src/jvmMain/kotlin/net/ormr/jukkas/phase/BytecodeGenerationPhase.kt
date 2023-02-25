@@ -108,7 +108,7 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
             is LambdaDeclaration -> TODO("LambdaDeclaration")
             is Literal -> when (node) {
                 is BooleanLiteral -> pushBoolean(node.value)
-                is Int32Literal -> pushInt(node.value)
+                is IntLiteral -> pushInt(node.value)
                 is StringLiteral -> pushString(node.value)
             }
             is MemberAccessOperation -> {

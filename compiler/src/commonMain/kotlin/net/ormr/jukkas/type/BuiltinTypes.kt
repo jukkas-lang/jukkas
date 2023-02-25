@@ -23,10 +23,10 @@ interface BuiltinTypes {
     val string: ContainerType
     val boolean: ContainerType
     val char: ContainerType
-    val int8: ContainerType
-    val int16: ContainerType
-    val int32: ContainerType
-    val int64: ContainerType
-    val float32: ContainerType
-    val float64: ContainerType
+    val byte: ContainerType
+    val short: ContainerType
+    val int: ContainerType
+    val long: ContainerType
+    val float: ContainerType
+    val double: ContainerType
 }

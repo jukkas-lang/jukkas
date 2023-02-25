@@ -28,12 +28,12 @@ internal object JvmBuiltinTypes : BuiltinTypes {
     // TODO: we should cast the primitives to our own wrapper types in some manner
     override val boolean: ContainerType = primitive<Boolean>()
     override val char: ContainerType = primitive<Char>()
-    override val int8: ContainerType = primitive<Byte>()
-    override val int16: ContainerType = primitive<Short>()
-    override val int32: ContainerType = primitive<Int>()
-    override val int64: ContainerType = primitive<Long>()
-    override val float32: ContainerType = primitive<Float>()
-    override val float64: ContainerType = primitive<Double>()
+    override val byte: ContainerType = primitive<Byte>()
+    override val short: ContainerType = primitive<Short>()
+    override val int: ContainerType = primitive<Int>()
+    override val long: ContainerType = primitive<Long>()
+    override val float: ContainerType = primitive<Float>()
+    override val double: ContainerType = primitive<Double>()
 
     private inline fun <reified T : Any> reference(): JvmType = JvmType.of(T::class.javaObjectType)
 
