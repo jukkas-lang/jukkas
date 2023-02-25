@@ -167,6 +167,8 @@ class TypeResolutionPhase private constructor(
                 )
             }
             // TODO: check if we can even access the member
+            // TODO: this will most likely break for something like 'System.out!!.println' as
+            //       'out' would be parsed into something like 'UnaryOperation'
             when (val right = right) {
                 is FunctionInvocation -> {
                     val name = right.name
@@ -174,6 +176,7 @@ class TypeResolutionPhase private constructor(
                     if (params.any { it is ErrorType }) return@flatMap noSuchFunction(right, name, params)
                     when (val function = targetType.findFunction(name, params as List<Type>)) {
                         null -> noSuchFunction(right, name, params)
+                        // TODO: move the assigning of members out of the type resolution phase?
                         else -> useIfPublic(right, function) {
                             this.member = it
                             right.member = it
@@ -190,24 +193,20 @@ class TypeResolutionPhase private constructor(
                         }
                     }.updateNode(right)
                 }
-                else -> errorType(right, "Expected invocation or reference")
             }
         }
     }
 
     private fun resolveReference(node: DefinitionReference): TypeOrError = node resolveIfNeeded {
-        when (val definition = findDefinition(this)) {
+        when (val definition = findDefinition(node)) {
             null -> {
+                val name = node.name
                 // if no direct definition could be found then we check the type cache for any matching type names
-                val type = types.find(name)
-                // if a matching type name was found, that means that we're accessing a static reference
-                // TODO: this behavior is only true until we've implemented 'object' containers, as those
-                //       look like static references, but need to be handled completely differently
-                //       it might be better to have different types of `DefinitionReference` later on
-                if (type != null) {
-                    isStaticReference = true
+                when (val type = types.find(name)) {
+                    // if no type is found, check through the imported members for a match
+                    null -> TODO("import of properties and functions")
+                    else -> type
                 }
-                type ?: unresolvedReference(this, name)
             }
             else -> resolveDefinition(definition)
         }
@@ -308,7 +307,7 @@ class TypeResolutionPhase private constructor(
         if (node is HasType) {
             when (node) {
                 is Definition -> node.findTypeName().resolvedType = this
-                is Expression -> node.resolvedType = this
+                is AbstractExpression -> node.resolvedType = this
             }
         }
     }
@@ -327,20 +326,6 @@ class TypeResolutionPhase private constructor(
         expected: Type,
         got: Type,
     ): ErrorType = errorType(position, formatIncompatibleTypes(expected, got))
-
-    private fun findDefinition(reference: DefinitionReference): NamedDefinition? {
-        val parent = reference.parent
-        if (parent == null) {
-            reportSemanticError(reference, "Node has no parent")
-            return null
-        }
-        val table = parent.getClosestTableOrNull()
-        if (table == null) {
-            reportSemanticError(reference, "Node is not connected to any table container")
-            return null
-        }
-        return reference.find(table)
-    }
 
     companion object {
         fun run(unit: CompilationUnit, compilerContext: CompilerContext): JukkasResult<CompilationUnit> =

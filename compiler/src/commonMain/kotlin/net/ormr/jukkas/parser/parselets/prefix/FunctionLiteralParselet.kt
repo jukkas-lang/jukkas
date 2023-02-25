@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas.parser.parselets.prefix
 
+import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.LambdaDeclaration
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
@@ -43,7 +44,7 @@ import net.ormr.jukkas.parser.JukkasParser
  * ```
  */
 object FunctionLiteralParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): LambdaDeclaration = parser with {
+    override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
         newBlock {
             // TODO: we're using || to separate arguments for now, remove this at a later point,
             //       will require arbitrary lookahead tho

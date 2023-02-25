@@ -18,6 +18,7 @@ package net.ormr.jukkas.parser.parselets.infix
 
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.MemberAccessOperation
+import net.ormr.jukkas.ast.MemberAccessOperationPart
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -26,6 +27,9 @@ import net.ormr.jukkas.parser.JukkasParser
 import net.ormr.jukkas.parser.Precedence
 
 object MemberAccessOperationParselet : InfixParselet {
+    // TODO: better error message
+    private const val FAULTY_MEMBER = "Expected invocation or definition reference"
+
     override val precedence: Int
         get() = Precedence.POSTFIX
 
@@ -40,7 +44,8 @@ object MemberAccessOperationParselet : InfixParselet {
             else -> token syntaxError "Unknown call operator"
         }
         val right = parseExpression(precedence)
-        // TODO: createSpan(token, value.findPosition().startPoint.end) or something?
+        if (left !is MemberAccessOperationPart) left syntaxError FAULTY_MEMBER
+        if (right !is MemberAccessOperationPart) right syntaxError FAULTY_MEMBER
         MemberAccessOperation(left, right, isSafe) withPosition createSpan(left, right)
     }
 }

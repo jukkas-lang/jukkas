@@ -17,13 +17,14 @@
 package net.ormr.jukkas.type.member
 
 import net.ormr.jukkas.ast.Visibility
+import net.ormr.jukkas.type.ContainerType
 import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.Type
 import net.ormr.krautils.reflection.isFinal
 import net.ormr.krautils.reflection.isStatic
 
 class JvmField(val member: JavaField) : TypeMember.Property(), TypeMember.Getter, TypeMember.Setter, JvmTypeMember {
-    override val declaringType: Type by lazy { JvmType.of(member.declaringClass) }
+    override val declaringType: ContainerType by lazy { JvmType.of(member.declaringClass) }
 
     override val visibility: Visibility by lazy { getVisibility(member) }
 

@@ -27,6 +27,8 @@ sealed interface JvmType : ContainerType {
 
     fun toAsmType(): AsmFieldType = AsmFieldType.of(clz)
 
+    fun toJvmDescriptor(): String = getDescriptor(clz)
+
     companion object {
         private val cache = hashMapOf<String, JvmType>()
 

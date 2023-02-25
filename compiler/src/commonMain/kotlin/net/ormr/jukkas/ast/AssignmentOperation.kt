@@ -24,7 +24,7 @@ class AssignmentOperation(
     left: Expression,
     val operator: AssignmentOperator,
     value: Expression,
-) : Expression() {
+) : AbstractExpression() {
     var left: Expression by child(left)
     var value: Expression by child(value)
 

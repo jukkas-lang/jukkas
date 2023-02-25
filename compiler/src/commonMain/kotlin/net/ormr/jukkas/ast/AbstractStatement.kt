@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.parser.parselets.prefix
+package net.ormr.jukkas.ast
 
-import net.ormr.jukkas.ast.Expression
-import net.ormr.jukkas.ast.Return
-import net.ormr.jukkas.ast.withPosition
-import net.ormr.jukkas.createSpan
-import net.ormr.jukkas.lexer.Token
-import net.ormr.jukkas.parser.JukkasParser
-
-object ReturnParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
-        // TODO: warn/error for structures like 'return return'
-        val expr = parseExpressionOrNull()
-        Return(expr) withPosition (expr?.let { createSpan(token, it) } ?: token)
-    }
-}
+sealed class AbstractStatement : ChildNode(), Statement

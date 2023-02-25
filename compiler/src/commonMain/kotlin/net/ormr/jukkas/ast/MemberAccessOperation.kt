@@ -21,12 +21,12 @@ import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.member.TypeMember
 
 class MemberAccessOperation(
-    left: Expression,
-    right: Expression,
+    left: MemberAccessOperationPart,
+    right: MemberAccessOperationPart,
     val isSafe: Boolean,
-) : Expression() {
-    var left: Expression by child(left)
-    var right: Expression by child(right)
+) : AbstractExpression() {
+    var left: MemberAccessOperationPart by child(left)
+    var right: MemberAccessOperationPart by child(right)
     var member: TypeMember? = null
 
     // TODO: do we want to check for type here?
@@ -46,3 +46,4 @@ class MemberAccessOperation(
 
     operator fun component3(): TypeOrError? = resolvedType
 }
+

@@ -15,7 +15,7 @@ sealed class StringTemplatePart : ChildNode() {
     }
 }
 
-class StringTemplateExpression(parts: List<StringTemplatePart>) : Expression() {
+class StringTemplateExpression(parts: List<StringTemplatePart>) : AbstractExpression() {
     val parts: MutableNodeList<StringTemplatePart> = parts.toMutableNodeList(this)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =

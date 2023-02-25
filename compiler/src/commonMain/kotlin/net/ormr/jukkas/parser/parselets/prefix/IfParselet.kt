@@ -17,6 +17,7 @@
 package net.ormr.jukkas.parser.parselets.prefix
 
 import net.ormr.jukkas.ast.ConditionalBranch
+import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -29,7 +30,7 @@ import net.ormr.jukkas.parser.JukkasParser
 
 object IfParselet : PrefixParselet {
     // TODO: the way we're currently doing this means that if statements will need to have a ; at the end
-    override fun parse(parser: JukkasParser, token: Token): ConditionalBranch = parser with {
+    override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
         consume(LEFT_PAREN)
         val condition = parseExpression()
         consume(RIGHT_PAREN)

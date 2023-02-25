@@ -19,7 +19,7 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.TypeOrError
 
-class InvocationArgument(value: Expression, val name: String?) : Expression() {
+class InvocationArgument(value: Expression, val name: String?) : AbstractExpression() {
     var value: Expression by child(value)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =

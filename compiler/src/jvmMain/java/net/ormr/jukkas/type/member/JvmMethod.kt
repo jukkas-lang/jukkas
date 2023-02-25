@@ -18,13 +18,17 @@ package net.ormr.jukkas.type.member
 
 import net.ormr.jukkas.ast.Visibility
 import net.ormr.jukkas.type.AsmMethodType
+import net.ormr.jukkas.type.ContainerType
 import net.ormr.jukkas.type.JvmType
 import net.ormr.jukkas.type.Type
 import net.ormr.krautils.reflection.isStatic
 
-class JvmMethod(val member: JavaMethod) : TypeMember.Function(), TypeMember.Getter, TypeMember.Setter,
+class JvmMethod(val member: JavaMethod) :
+    TypeMember.Function(),
+    TypeMember.Getter,
+    TypeMember.Setter,
     JvmTypeMember.Executable {
-    override val declaringType: Type by lazy { JvmType.of(member.declaringClass) }
+    override val declaringType: ContainerType by lazy { JvmType.of(member.declaringClass) }
 
     override val visibility: Visibility by lazy { getVisibility(member) }
 

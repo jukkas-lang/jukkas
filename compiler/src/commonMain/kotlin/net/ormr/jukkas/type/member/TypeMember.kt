@@ -17,11 +17,12 @@
 package net.ormr.jukkas.type.member
 
 import net.ormr.jukkas.ast.Visibility
+import net.ormr.jukkas.type.ContainerType
 import net.ormr.jukkas.type.Type
 
 @Suppress("UnnecessaryAbstractClass")
 sealed interface TypeMember {
-    val declaringType: Type
+    val declaringType: ContainerType
     val visibility: Visibility
     val name: String
 

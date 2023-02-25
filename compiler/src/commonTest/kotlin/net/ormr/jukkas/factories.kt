@@ -16,6 +16,7 @@
 
 package net.ormr.jukkas
 
+import net.ormr.jukkas.ast.AbstractExpression
 import net.ormr.jukkas.ast.BasicArgument
 import net.ormr.jukkas.ast.BasicTypeName
 import net.ormr.jukkas.ast.BinaryOperation
@@ -24,7 +25,6 @@ import net.ormr.jukkas.ast.BooleanLiteral
 import net.ormr.jukkas.ast.DefaultArgument
 import net.ormr.jukkas.ast.DefinedTypeName
 import net.ormr.jukkas.ast.DefinitionReference
-import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.IntLiteral
 import net.ormr.jukkas.ast.InvocationArgument
 import net.ormr.jukkas.ast.StringLiteral
@@ -37,14 +37,14 @@ fun string(value: String): StringLiteral = StringLiteral(value)
 
 fun reference(name: String): DefinitionReference = DefinitionReference(name)
 
-fun binary(left: Expression, operator: BinaryOperator, right: Expression): BinaryOperation =
+fun binary(left: AbstractExpression, operator: BinaryOperator, right: AbstractExpression): BinaryOperation =
     BinaryOperation(left, operator, right)
 
-fun invArg(value: Expression, name: String? = null): InvocationArgument = InvocationArgument(value, name)
+fun invArg(value: AbstractExpression, name: String? = null): InvocationArgument = InvocationArgument(value, name)
 
 fun arg(name: String, type: DefinedTypeName): BasicArgument = BasicArgument(name, type)
 
-fun arg(name: String, type: DefinedTypeName, default: Expression): DefaultArgument =
+fun arg(name: String, type: DefinedTypeName, default: AbstractExpression): DefaultArgument =
     DefaultArgument(name, type, default)
 
 fun typeName(name: String): BasicTypeName = BasicTypeName(name)

@@ -16,4 +16,10 @@
 
 package net.ormr.jukkas.type.member
 
-sealed interface JvmTypeMember
+import net.ormr.jukkas.type.AsmMethodType
+
+sealed interface JvmTypeMember {
+    sealed interface Executable : JvmTypeMember {
+        fun toAsmMethodType(): AsmMethodType
+    }
+}
