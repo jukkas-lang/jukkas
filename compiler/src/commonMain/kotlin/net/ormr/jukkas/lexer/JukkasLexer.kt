@@ -2,10 +2,21 @@ package net.ormr.jukkas.lexer
 
 import net.ormr.jukkas.lexer.TokenType.*
 
-typealias JukkasLexerState = FragmentMatchingLexerStateMatcher<TokenType>
+typealias JukkasMatcher = LexerMatcher<TokenType, JukkasLexerContext>
 
-@Suppress("VariableNaming")
-class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.State>(source), FragmentBuilder {
+class JukkasLexerContext {
+    private val stateStack = ArrayDeque(listOf(JukkasLexerRules.defaultMatcher))
+    var templateStringBraceCount = 0
+
+    val currentMatcher: JukkasMatcher
+        get() = stateStack.first()
+
+    fun pushMatcher(state: JukkasMatcher) = stateStack.addFirst(state)
+
+    fun popMatcher() = stateStack.removeFirst()
+}
+
+object JukkasLexerRules : FragmentBuilder {
     private val digit = regex("[0-9]")
     private val lineTerminator = regex("""(\r)?\n""")
     private val whitespace = lineTerminator or regex("""[ \t\f]""")
@@ -25,7 +36,7 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.
     private val templateStart = literal("""\{""")
     private val unexpectedCharacter = regex("""[\s\S]""")
 
-    private val defaultState: JukkasLexerState = State {
+    val defaultMatcher: JukkasMatcher = Matcher {
         whitespace to { null }
         intLiteral to { INT_LITERAL }
 
@@ -72,7 +83,7 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.
         ":" to { COLON }
         "," to { COMMA }
         "\"" to {
-            pushState(stringState)
+            pushMatcher(stringMatcher)
             STRING_START
         }
 
@@ -80,15 +91,15 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.
         unexpectedCharacter to { UNEXPECTED_CHARACTER }
     }
 
-    private val stringState: JukkasLexerState = State {
+    val stringMatcher: JukkasMatcher = Matcher {
         templateStart to {
-            pushState(stringTemplateState)
+            pushMatcher(stringTemplateMatcher)
             STRING_TEMPLATE_START
         }
         escapeSequence to { ESCAPE_SEQUENCE }
         stringContent to { STRING_CONTENT }
         "\"" to {
-            popState()
+            popMatcher()
             STRING_END
         }
 
@@ -96,8 +107,8 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.
         unexpectedCharacter to { UNEXPECTED_CHARACTER }
     }
 
-    private val stringTemplateState: JukkasLexerState = State {
-        extending(defaultState)
+    val stringTemplateMatcher: JukkasMatcher = Matcher {
+        extending(defaultMatcher)
         "{" to {
             templateStringBraceCount++
             LEFT_BRACE
@@ -105,7 +116,7 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.
         "}" to {
             when (templateStringBraceCount) {
                 0 -> {
-                    popState()
+                    popMatcher()
                     STRING_TEMPLATE_END
                 }
                 else -> {
@@ -115,29 +126,15 @@ class JukkasLexer(source: String) : StatefulLexer<Token, TokenType, JukkasLexer.
             }
         }
     }
+}
 
-    private var templateStringBraceCount = 0
+@Suppress("VariableNaming")
+class JukkasLexer(source: String) : GenericLexer<Token, TokenType, JukkasMatcher, JukkasLexerContext>(source) {
+    override val context: JukkasLexerContext = JukkasLexerContext()
 
-    init {
-        pushState(defaultState)
-    }
+    override val matcher: JukkasMatcher
+        get() = context.currentMatcher
 
-    override fun createToken(match: StateMatchResult<TokenType>): Token =
+    override fun createToken(match: LexerMatcher.Result<TokenType>): Token =
         Token(match.type, match.fragment.token, match.fragment.span)
-
-    override fun pushState(matcher: LexerStateMatcher<TokenType>) {
-        stateStack.addFirst(State(matcher, templateStringBraceCount))
-        templateStringBraceCount = 0
-    }
-
-    override fun popState(): State {
-        val state = stateStack.removeFirst()
-        templateStringBraceCount = state.templateStringBraceCount
-        return state
-    }
-
-    data class State(
-        override val matcher: LexerStateMatcher<TokenType>,
-        val templateStringBraceCount: Int,
-    ) : LexerState<TokenType>
 }

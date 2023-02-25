@@ -26,14 +26,14 @@ class LexerScanner(val source: String) {
 
     fun advance(amount: Int) = repeat(amount) { advance() }
 
-    private fun consume(string: String): FragmentMatchResult {
+    private fun consume(string: String): LexerFragment.Result {
         val start = getCurrentPoint()
         advance(string.length)
         val end = getCurrentPoint()
-        return FragmentMatchResult(Span(start, end), string)
+        return LexerFragment.Result(Span(start, end), string)
     }
 
-    fun tryConsumeSegment(amount: Int, predicate: (String) -> Boolean): FragmentMatchResult? {
+    fun tryConsumeSegment(amount: Int, predicate: (String) -> Boolean): LexerFragment.Result? {
         if (offset + amount > source.length) {
             return null
         }
@@ -44,7 +44,7 @@ class LexerScanner(val source: String) {
         return consume(segment)
     }
 
-    fun tryConsumeRegex(regex: Regex): FragmentMatchResult? {
+    fun tryConsumeRegex(regex: Regex): LexerFragment.Result? {
         val result = regex.matchAt(source, offset) ?: return null
         return consume(result.value)
     }
