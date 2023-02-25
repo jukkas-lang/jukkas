@@ -34,7 +34,7 @@ import net.ormr.jukkas.parser.parselets.infix.MemberAccessOperationParselet
 import net.ormr.jukkas.parser.parselets.prefix.BooleanParselet
 import net.ormr.jukkas.parser.parselets.prefix.FunctionLiteralParselet
 import net.ormr.jukkas.parser.parselets.prefix.IfParselet
-import net.ormr.jukkas.parser.parselets.prefix.IntParselet
+import net.ormr.jukkas.parser.parselets.prefix.IntLiteralParselet
 import net.ormr.jukkas.parser.parselets.prefix.ParenthesizedExpressionParselet
 import net.ormr.jukkas.parser.parselets.prefix.PrefixParselet
 import net.ormr.jukkas.parser.parselets.prefix.ReferenceParselet
@@ -51,7 +51,7 @@ internal object Grammar {
         prefix(STRING_START, StringParselet)
         prefix(FALSE, BooleanParselet)
         prefix(TRUE, BooleanParselet)
-        prefix(INT_LITERAL, IntParselet)
+        prefix(INT_LITERAL, IntLiteralParselet)
         prefix(IF, IfParselet)
         prefix(LEFT_BRACE, FunctionLiteralParselet)
         prefix(LEFT_PAREN, ParenthesizedExpressionParselet)

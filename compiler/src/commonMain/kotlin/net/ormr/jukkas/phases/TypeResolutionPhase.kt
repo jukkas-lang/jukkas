@@ -147,7 +147,7 @@ class TypeResolutionPhase private constructor(
             is InvocationArgument -> resolve(value)
             is Literal -> when (this) {
                 is BooleanLiteral -> builtinTypes.boolean
-                is IntLiteral -> builtinTypes.int32
+                is Int32Literal -> builtinTypes.int32
                 is StringLiteral -> builtinTypes.string
             }
             is MemberAccessOperation -> resolveAccess(this)

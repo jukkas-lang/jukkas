@@ -20,11 +20,11 @@ import net.ormr.jukkas.StructurallyComparable
 
 sealed class Literal : AbstractExpression()
 
-class IntLiteral(val value: Int) : Literal() {
+class Int32Literal(val value: Int) : Literal() {
     override fun toString(): String = value.toString()
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is IntLiteral && value == other.value
+        other is Int32Literal && value == other.value
 }
 
 class BooleanLiteral(val value: Boolean) : Literal() {
