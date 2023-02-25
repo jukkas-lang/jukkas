@@ -18,7 +18,7 @@ package net.ormr.jukkas.parser.parselets.infix
 
 import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.MemberAccessOperation
-import net.ormr.jukkas.ast.MemberAccessOperationPart
+import net.ormr.jukkas.ast.MemberAccessOperationRhs
 import net.ormr.jukkas.ast.withPosition
 import net.ormr.jukkas.createSpan
 import net.ormr.jukkas.lexer.Token
@@ -44,8 +44,7 @@ object MemberAccessOperationParselet : InfixParselet {
             else -> token syntaxError "Unknown call operator"
         }
         val right = parseExpression(precedence)
-        if (left !is MemberAccessOperationPart) left syntaxError FAULTY_MEMBER
-        if (right !is MemberAccessOperationPart) right syntaxError FAULTY_MEMBER
+        if (right !is MemberAccessOperationRhs) right syntaxError FAULTY_MEMBER
         MemberAccessOperation(left, right, isSafe) withPosition createSpan(left, right)
     }
 }

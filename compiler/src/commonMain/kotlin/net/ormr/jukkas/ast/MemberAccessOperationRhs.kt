@@ -17,4 +17,4 @@
 package net.ormr.jukkas.ast
 
 // TODO: better name?
-sealed interface MemberAccessOperationPart : Expression
+sealed interface MemberAccessOperationRhs : Expression

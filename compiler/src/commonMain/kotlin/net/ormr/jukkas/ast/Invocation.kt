@@ -48,7 +48,7 @@ class InfixInvocation(
 class FunctionInvocation(
     val name: String,
     arguments: List<InvocationArgument>,
-) : Invocation(), MemberAccessOperationPart {
+) : Invocation(), MemberAccessOperationRhs {
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
     var member: TypeMember.Executable? = null
 

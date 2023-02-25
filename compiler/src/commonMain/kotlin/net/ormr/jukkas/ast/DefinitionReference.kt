@@ -20,7 +20,7 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.member.TypeMember
 
-class DefinitionReference(val name: String) : AbstractExpression(), MemberAccessOperationPart {
+class DefinitionReference(val name: String) : AbstractExpression(), MemberAccessOperationRhs {
     var member: TypeMember.Property? = null
 
     fun find(table: Table): NamedDefinition? = table.find(name)
