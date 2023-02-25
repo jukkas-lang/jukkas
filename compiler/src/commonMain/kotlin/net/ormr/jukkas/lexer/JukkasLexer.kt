@@ -29,7 +29,7 @@ object JukkasLexerRules : FragmentBuilder {
     private val decimalIntLiteral = regex("0|([1-9][0-9_]*)")
     private val hexIntLiteral = regex("0[xX][_0-9A-Fa-f]+")
     private val binIntLiteral = regex("0[bB][_01]+")
-    private val intLiteral = decimalIntLiteral or hexIntLiteral or binIntLiteral
+    private val intLiteral = decimalIntLiteral or hexIntLiteral or binIntLiteral then optional(regex("[lL]"))
 
     private val escapeSequence = regex("""\\u([0-9-A-Fa-f]{4}|\{[\w_]*\})""")
     private val stringContent = regex("""[^\\"]+""")
