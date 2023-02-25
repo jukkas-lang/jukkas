@@ -115,7 +115,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
     }
 
     fun parseExpression(precedence: Int = 0): Expression =
-        parseExpressionOrNull(precedence) ?: (current() syntaxError "Expecting expression got ${previous().type}")
+        parseExpressionOrNull(precedence) ?: (current() syntaxError "Expecting expression got ${current().type}")
 
     fun parseImport(): Import? = withSynchronization(
         { check<TopSynch>() },
