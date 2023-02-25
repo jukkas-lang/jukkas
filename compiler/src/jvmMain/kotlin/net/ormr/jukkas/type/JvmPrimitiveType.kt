@@ -26,10 +26,10 @@ enum class JvmPrimitiveType(
 ) : EmptyJvmType {
     VOID(primitive<Void>(), "java.lang.Void", "Unit"),
     BOOLEAN(primitive<Boolean>(), "java.lang.Boolean", "Boolean"),
-    CHAR(primitive<Char>(), "java.lang.Char", "Char"),
+    CHAR(primitive<Char>(), "java.lang.Character", "Char"),
     BYTE(primitive<Byte>(), "java.lang.Byte", "Int8"),
     SHORT(primitive<Short>(), "java.lang.Short", "Int16"),
-    INT(primitive<Int>(), "java.lang.Int", "Int32"),
+    INT(primitive<Int>(), "java.lang.Integer", "Int32"),
     LONG(primitive<Long>(), "java.lang.Long", "Int64"),
     FLOAT(primitive<Float>(), "java.lang.Float", "Float32"),
     DOUBLE(primitive<Double>(), "java.lang.Double", "Float64");
