@@ -22,8 +22,7 @@ internal object JvmBuiltinTypes : BuiltinTypes {
     override val any: ContainerType = reference<Any>()
     override val nothing: ContainerType
         get() = TODO("Builtin type for 'Nothing'")
-    override val unit: ContainerType
-        get() = TODO("Builtin type for 'Unit'")
+    override val unit: ContainerType = primitive<Void>() // TODO: is this sound?
     override val string: ContainerType = reference<String>()
 
     // TODO: we should cast the primitives to our own wrapper types in some manner
