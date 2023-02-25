@@ -20,16 +20,8 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.type.member.TypeMember
 
-class DefinitionReference(val name: String) : Expression() {
-    // TODO: support references to property members too
+class DefinitionReference(val name: String) : AbstractExpression(), MemberAccessOperationRhs {
     var member: TypeMember.Property? = null
-
-    /**
-     * Whether `this` represents a static reference.
-     *
-     * A static reference is something like `System.out` where `System` is just a type name.
-     */
-    var isStaticReference: Boolean = false
 
     fun find(table: Table): NamedDefinition? = table.find(name)
 

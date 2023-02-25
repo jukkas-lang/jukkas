@@ -101,7 +101,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
 
     private fun JsonObjectBuilder.includeNode(node: Node) {
         put("nodeType", node.javaClass.simpleName)
-        if (node is Expression) {
+        if (node is AbstractExpression) {
             put("type", toJson(node.resolvedType))
         } else if (node is Definition) {
             put("type", toJson(node.findTypeName().resolvedType))

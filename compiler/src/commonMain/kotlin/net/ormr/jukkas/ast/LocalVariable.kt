@@ -25,7 +25,7 @@ class LocalVariable(
     override val name: String,
     type: TypeName,
     initializer: Expression?,
-) : Statement(), Variable {
+) : AbstractStatement(), Variable {
     override val type: TypeName by child(type)
     override var initializer: Expression? by child(initializer)
     var index: Int = -1

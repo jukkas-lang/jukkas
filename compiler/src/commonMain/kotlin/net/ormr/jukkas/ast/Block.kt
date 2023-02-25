@@ -19,11 +19,10 @@ package net.ormr.jukkas.ast
 import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Block(override val table: Table, statements: List<Statement>) : Expression(), TableContainer {
+class Block(override val table: Table, statements: List<Statement>) : AbstractExpression(), TableContainer {
     val statements: MutableNodeList<Statement> =
         statements.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
-        other is Block &&
-            checkStructuralEquivalence(statements, other.statements)
+        other is Block && checkStructuralEquivalence(statements, other.statements)
 }

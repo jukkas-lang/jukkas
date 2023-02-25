@@ -252,7 +252,7 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
 
     private fun parseVariable(): LocalVariable = TODO("parseVariable")
 
-    fun parseStatement(): Statement = when {
+    fun parseStatement(): AbstractStatement = when {
         check(FUN) -> parseFunction()
         check(PROPERTIES) -> parseVariable()
         else -> parseExpressionStatement()

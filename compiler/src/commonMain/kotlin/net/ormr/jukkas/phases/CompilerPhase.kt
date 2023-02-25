@@ -18,7 +18,10 @@ package net.ormr.jukkas.phases
 
 import net.ormr.jukkas.Positionable
 import net.ormr.jukkas.Source
+import net.ormr.jukkas.ast.DefinitionReference
+import net.ormr.jukkas.ast.NamedDefinition
 import net.ormr.jukkas.ast.Node
+import net.ormr.jukkas.ast.getClosestTableOrNull
 import net.ormr.jukkas.ast.reportSemanticError
 import net.ormr.jukkas.reporter.MessageReporter
 import net.ormr.jukkas.reporter.MessageType
@@ -26,7 +29,8 @@ import net.ormr.jukkas.type.Type
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
 
-sealed class CompilerPhase(private val source: Source) {
+@Suppress("UnnecessaryAbstractClass")
+abstract class CompilerPhase(private val source: Source) {
     protected val reporter: MessageReporter = MessageReporter()
 
     protected fun reportSemanticError(position: Positionable, message: String) {
@@ -48,4 +52,20 @@ sealed class CompilerPhase(private val source: Source) {
 
     protected inline fun <reified T : Any> unreachable(): Nothing =
         error("Branch for <${T::class}> should never be reached")
+
+    // TODO: instead of using this thing, have a earlier phase where we assign each reference a
+    //       definition property so it's properly cached?
+    protected fun findDefinition(reference: DefinitionReference): NamedDefinition? {
+        val parent = reference.parent
+        if (parent == null) {
+            reportSemanticError(reference, "Node has no parent")
+            return null
+        }
+        val table = parent.getClosestTableOrNull()
+        if (table == null) {
+            reportSemanticError(reference, "Node is not connected to any table container")
+            return null
+        }
+        return reference.find(table)
+    }
 }

@@ -25,7 +25,7 @@ class FunctionDeclaration(
     body: Block?,
     returnType: TypeName,
     override val table: Table,
-) : Statement(), Invokable<NamedArgument>, NamedDefinition, TableContainer, TopLevel {
+) : AbstractStatement(), Invokable<NamedArgument>, NamedDefinition, TableContainer, TopLevel {
     override val arguments: MutableNodeList<NamedArgument> =
         arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     val returnType: TypeName by child(returnType)

@@ -18,7 +18,7 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.StructurallyComparable
 
-sealed class Literal : Expression()
+sealed class Literal : AbstractExpression()
 
 class IntLiteral(val value: Int) : Literal() {
     override fun toString(): String = value.toString()

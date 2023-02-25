@@ -40,7 +40,7 @@ object AssignmentParselet : InfixParselet {
         parser: JukkasParser,
         left: Expression,
         token: Token,
-    ): AssignmentOperation = parser with {
+    ): Expression = parser with {
         val operator =
             AssignmentOperator.fromSymbolOrNull(token.text) ?: (token syntaxError "Unknown assignment operator")
         val value = parseExpression(precedence - 1) // left to right

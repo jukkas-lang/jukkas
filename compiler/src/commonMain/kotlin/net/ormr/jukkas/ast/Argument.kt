@@ -26,9 +26,7 @@ sealed class NamedArgument : Argument(), NamedDefinition {
     abstract val type: DefinedTypeName
     var index: Int = -1
 
-    override fun findTypeName(): TypeName {
-        TODO("Not yet implemented")
-    }
+    override fun findTypeName(): TypeName = type
 
     operator fun component1(): String = name
 

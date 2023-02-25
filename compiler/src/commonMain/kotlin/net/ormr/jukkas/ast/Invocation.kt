@@ -20,7 +20,7 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.member.TypeMember
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-sealed class Invocation : Expression()
+sealed class Invocation : AbstractExpression()
 
 class InfixInvocation(
     left: Expression,
@@ -45,7 +45,10 @@ class InfixInvocation(
     operator fun component3(): Expression = right
 }
 
-class FunctionInvocation(val name: String, arguments: List<InvocationArgument>) : Invocation() {
+class FunctionInvocation(
+    val name: String,
+    arguments: List<InvocationArgument>,
+) : Invocation(), MemberAccessOperationRhs {
     val arguments: MutableNodeList<InvocationArgument> = arguments.toMutableNodeList(this)
     var member: TypeMember.Executable? = null
 
@@ -54,8 +57,7 @@ class FunctionInvocation(val name: String, arguments: List<InvocationArgument>) 
             name == other.name &&
             checkStructuralEquivalence(arguments, other.arguments)
 
-    override fun toString(): String =
-        "FunctionInvocation(name='$name', arguments=$arguments, member=$member)"
+    override fun toString(): String = "FunctionInvocation(name='$name', arguments=$arguments)"
 
     operator fun component1(): String = name
 

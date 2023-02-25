@@ -27,6 +27,7 @@ class Table(val parent: Table? = null) {
 
     fun define(name: String, value: NamedDefinition) {
         if (name in entries) {
+            // TODO: rework this, we're not really keeping a reporter on the CompilationUnit anymore
             value.reportSemanticError(value, "Redefined name: '$name'")
         } else {
             entries[name] = value

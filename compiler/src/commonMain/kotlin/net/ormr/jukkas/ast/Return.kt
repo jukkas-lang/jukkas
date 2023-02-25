@@ -20,7 +20,7 @@ import net.ormr.jukkas.StructurallyComparable
 import net.ormr.jukkas.type.TypeOrError
 import net.ormr.jukkas.utils.checkStructuralEquivalence
 
-class Return(value: Expression?) : Expression() {
+class Return(value: Expression?) : AbstractExpression() {
     var value: Expression? by child(value)
 
     override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =

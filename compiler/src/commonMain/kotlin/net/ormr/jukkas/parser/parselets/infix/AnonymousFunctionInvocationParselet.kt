@@ -34,7 +34,7 @@ object AnonymousFunctionInvocationParselet : InfixParselet {
         parser: JukkasParser,
         left: Expression,
         token: Token,
-    ): AnonymousFunctionInvocation = parser with {
+    ): Expression = parser with {
         val arguments = parseArguments(COMMA, RIGHT_PAREN, ::parseInvocationArgument)
         val end = consume(RIGHT_PAREN)
         AnonymousFunctionInvocation(left, arguments) withPosition createSpan(token, end)

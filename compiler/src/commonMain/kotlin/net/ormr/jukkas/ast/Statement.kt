@@ -16,4 +16,4 @@
 
 package net.ormr.jukkas.ast
 
-sealed class Statement : ChildNode()
+sealed interface Statement : Node

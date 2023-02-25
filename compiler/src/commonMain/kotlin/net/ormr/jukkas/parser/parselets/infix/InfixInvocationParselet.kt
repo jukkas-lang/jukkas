@@ -32,7 +32,7 @@ object InfixInvocationParselet : InfixParselet {
         parser: JukkasParser,
         left: Expression,
         token: Token,
-    ): InfixInvocation = parser with {
+    ): Expression = parser with {
         val right = parseExpression(precedence)
         InfixInvocation(left, token.text, right) withPosition createSpan(left, right)
     }

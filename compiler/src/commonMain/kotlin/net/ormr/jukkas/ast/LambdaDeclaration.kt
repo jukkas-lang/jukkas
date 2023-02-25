@@ -23,7 +23,7 @@ class LambdaDeclaration(
     arguments: List<Argument>,
     body: Block,
     override val table: Table,
-) : Expression(), Invokable<Argument>, TableContainer {
+) : AbstractExpression(), Invokable<Argument>, TableContainer {
     override val arguments: MutableNodeList<Argument> =
         arguments.toMutableNodeList(this, ::handleAddChild, ::handleRemoveChild)
     override var body: Block by child(body)

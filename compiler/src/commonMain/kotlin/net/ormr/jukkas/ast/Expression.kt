@@ -18,6 +18,12 @@ package net.ormr.jukkas.ast
 
 import net.ormr.jukkas.type.TypeOrError
 
-sealed class Expression : Statement(), HasType {
-    open var resolvedType: TypeOrError? = null
+sealed interface Expression : Statement, HasType {
+    var resolvedType: TypeOrError?
 }
+
+/**
+ * Returns `true` if `this` expression is being used as a statement, otherwise `false`.
+ */
+val Expression.isExpressionStatement: Boolean
+    get() = parent is ExpressionStatement

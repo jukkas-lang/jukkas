@@ -27,4 +27,8 @@ sealed class ChildNode : AbstractNode() {
         get() = parent?.compilationUnit ?: error("No 'compilationUnit' found for $this")
 }
 
-infix fun <T : ChildNode> T.withPosition(position: Positionable): T = apply { this.position = position.findPosition() }
+// TODO: this is ugly and very unsafe
+infix fun <T : Node> T.withPosition(position: Positionable): T = apply {
+    require(this is ChildNode) { "Can't set position of  none ChildNode <$this>" }
+    this.position = position.findPosition()
+}
