@@ -67,7 +67,7 @@ class CliErrorReporter {
             return
         }
         // TODO: trim away useless leading indent from source
-        val content = sourceText[start.line]
+        val content = sourceText[start.line - 1]
         print(INDENT)
         println(italic(content))
         print(INDENT)
