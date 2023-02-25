@@ -22,32 +22,35 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import net.ormr.jukkas.JvmCompilerContext
 import net.ormr.jukkas.cli.CliErrorReporter
+import net.ormr.jukkas.flatMap
+import net.ormr.jukkas.getOrElse
+import net.ormr.jukkas.parser.JukkasParser
+import net.ormr.jukkas.phase.BytecodeGenerationPhase
+import net.ormr.jukkas.phases.TypeCheckingPhase
+import net.ormr.jukkas.phases.TypeResolutionPhase
+import net.ormr.jukkas.type.JvmTypeResolver
+import net.ormr.krautils.lang.ifNotNull
+import net.ormr.krautils.reflection.isStatic
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeBytes
 
 @Suppress("UnusedPrivateMember")
 class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true) {
     private val reporter = CliErrorReporter()
     private val file by argument("file", "The file to read input from")
         .path(mustExist = true, canBeDir = false, mustBeReadable = true)
-
     private val output by option("-o", "--output")
         .help("The directory to output the class files to")
         .path(canBeFile = false)
-
-    // TODO: this is temporary for now
     private val runClass by option("-r", "--run")
         .help("Should the class be ran after compilation")
-        .flag()
+        .flag() // TODO: this is temporary for now
 
     override fun run() {
-        error("Not implemented for now")
-        /*val terminal = currentContext.terminal
-        val context = buildCompilationContext {
-            types {
-                resolver(JvmTypeResolver)
-            }
-        }
-
+        val terminal = currentContext.terminal
+        val context = JvmCompilerContext(listOf(JvmTypeResolver))
         val classes = JukkasParser
             .parseFile(file)
             .flatMap { TypeResolutionPhase.run(it.value, context) }
@@ -69,7 +72,7 @@ class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true
             val clz = loader.defineClass(name, bytes)
             val method = clz.methods.single { it.isStatic && it.name == "main" }
             method.invoke(null)
-        }*/
+        }
     }
 
     class ByteClassLoader(
