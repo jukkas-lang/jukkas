@@ -27,6 +27,13 @@ class IntLiteral(val value: Int) : Literal() {
         other is IntLiteral && value == other.value
 }
 
+class LongLiteral(val value: Long) : Literal() {
+    override fun toString(): String = value.toString()
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is LongLiteral && value == other.value
+}
+
 class BooleanLiteral(val value: Boolean) : Literal() {
     override fun toString(): String = value.toString()
 
