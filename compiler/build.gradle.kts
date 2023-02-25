@@ -44,6 +44,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
+                implementation("com.ionspin.kotlin:bignum:0.3.8")
                 implementation(kotlin("reflect"))
             }
         }
