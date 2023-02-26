@@ -8,7 +8,12 @@ interface LexerFragment {
     data class Result(val span: Span, val token: String)
 }
 
-class LexerFragmentLiteral(literal: String) : LexerFragment {
+class LexerFragmentLiteral(val literal: String) : LexerFragment {
+    override fun match(scanner: LexerScanner): LexerFragment.Result? =
+        scanner.tryConsumeSegment(literal.length) { it == literal }
+}
+
+class LexerFragmentKeyword(literal: String) : LexerFragment {
     val regex = Regex(Regex.escape(literal) + """\b""")
     override fun match(scanner: LexerScanner): LexerFragment.Result? = scanner.tryConsumeRegex(regex)
 }

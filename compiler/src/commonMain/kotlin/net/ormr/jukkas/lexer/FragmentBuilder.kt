@@ -11,6 +11,9 @@ interface FragmentBuilder {
     fun regex(regex: Regex) = LexerFragmentRegex(regex)
 
     @LexerBuilderDsl
+    fun keyword(keyword: String) = LexerFragmentKeyword(keyword)
+
+    @LexerBuilderDsl
     fun zeroOrMore(fragment: LexerFragment) = LexerFragmentZeroOrMore(fragment)
 
     @LexerBuilderDsl
