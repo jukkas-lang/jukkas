@@ -18,19 +18,32 @@ class JukkasLexerContext {
 
 object JukkasLexerRules : FragmentBuilder {
     private val digit = regex("[0-9]")
+    private val digitOrUnderscore = regex("[_0-9]")
+    private val digits = regex("[0-9][_0-9]*")
     private val lineTerminator = regex("""(\r)?\n""")
     private val whitespace = lineTerminator or regex("""[ \t\f]""")
 
     private val letter = regex("[a-zA-Z_]")
     private val identifierPart = digit or letter
-    private val identifier = letter then zeroOrMore(identifierPart)
-    private val escapedIdentifier = literal("`") then oneOrMore(identifierPart)
+    private val identifier = letter + zeroOrMore(identifierPart)
+    private val escapedIdentifier = literal("`") + oneOrMore(identifierPart)
 
     private val zero = literal("0")
     private val decimalIntLiteral = regex("([1-9][0-9_]*)")
     private val hexIntLiteral = regex("0[xX][_0-9A-Fa-f]+")
     private val binIntLiteral = regex("0[bB][_01]+")
-    private val intLiteral = zero or decimalIntLiteral or hexIntLiteral or binIntLiteral then optional(regex("[lL]"))
+    private val intLiteral = zero or decimalIntLiteral or hexIntLiteral or binIntLiteral + optional(regex("[lL]"))
+
+    private val dot = literal(".")
+    private val floatPostfix = regex("[Ff]")
+    private val exponentPart = regex("""[Ee][+\-]?""") + zeroOrMore(digitOrUnderscore)
+    private val floatingPointLiteral1 =
+        digits + dot + oneOrMore(digit) + optional(exponentPart) + optional(floatPostfix)
+    private val floatingPointLiteral2 = dot + digits + optional(exponentPart) + optional(floatPostfix)
+    private val floatingPointLiteral3 = digits + exponentPart + optional(floatPostfix)
+    private val floatingPointLiteral4 = digits + floatPostfix
+    private val doubleLiteral =
+        floatingPointLiteral1 or floatingPointLiteral2 or floatingPointLiteral3 or floatingPointLiteral4
 
     private val escapeSequence = regex("""\\u([0-9-A-Fa-f]{4}|\{[\w_]*\})""")
     private val stringContent = regex("""[^\\"]+""")
@@ -39,6 +52,7 @@ object JukkasLexerRules : FragmentBuilder {
 
     val defaultMatcher: JukkasMatcher = Matcher {
         whitespace to { null }
+        doubleLiteral to { DOUBLE_LITERAL }
         intLiteral to { INT_LITERAL }
 
         keyword("fun") to { FUN }

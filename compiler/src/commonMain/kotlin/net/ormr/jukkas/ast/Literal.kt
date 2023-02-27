@@ -34,6 +34,20 @@ class LongLiteral(val value: Long) : Literal() {
         other is LongLiteral && value == other.value
 }
 
+class FloatLiteral(val value: Float) : Literal() {
+    override fun toString(): String = "FloatLiteral(value=$value)"
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is FloatLiteral && value == other.value
+}
+
+class DoubleLiteral(val value: Double) : Literal() {
+    override fun toString(): String = "DoubleLiteral(value=$value)"
+
+    override fun isStructurallyEquivalent(other: StructurallyComparable): Boolean =
+        other is DoubleLiteral && value == other.value
+}
+
 class BooleanLiteral(val value: Boolean) : Literal() {
     override fun toString(): String = "BooleanLiteral(value=$value)"
 

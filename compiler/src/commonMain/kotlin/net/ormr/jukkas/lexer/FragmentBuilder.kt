@@ -26,5 +26,8 @@ interface FragmentBuilder {
     infix fun LexerFragment.then(second: LexerFragment) = LexerFragmentComposite(this, second)
 
     @LexerBuilderDsl
+    operator fun LexerFragment.plus(second: LexerFragment) = then(second)
+
+    @LexerBuilderDsl
     infix fun LexerFragment.or(other: LexerFragment) = LexerFragmentAlternative(this, other)
 }

@@ -110,6 +110,8 @@ class BytecodeGenerationPhase private constructor(source: Source) : CompilerPhas
                 is BooleanLiteral -> pushBoolean(node.value)
                 is IntLiteral -> pushInt(node.value)
                 is LongLiteral -> pushLong(node.value)
+                is FloatLiteral -> pushFloat(node.value)
+                is DoubleLiteral -> pushDouble(node.value)
                 is StringLiteral -> pushString(node.value)
             }
             is MemberAccessOperation -> {

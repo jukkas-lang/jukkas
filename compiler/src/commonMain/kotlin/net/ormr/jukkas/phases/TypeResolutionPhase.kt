@@ -149,6 +149,8 @@ class TypeResolutionPhase private constructor(
                 is BooleanLiteral -> builtinTypes.boolean
                 is IntLiteral -> builtinTypes.int
                 is LongLiteral -> builtinTypes.long
+                is FloatLiteral -> builtinTypes.float
+                is DoubleLiteral -> builtinTypes.double
                 is StringLiteral -> builtinTypes.string
             }
             is MemberAccessOperation -> resolveAccess(this)
