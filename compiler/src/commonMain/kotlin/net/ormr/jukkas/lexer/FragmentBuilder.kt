@@ -20,6 +20,9 @@ interface FragmentBuilder {
     fun oneOrMore(fragment: LexerFragment) = LexerFragmentOneOrMore(fragment)
 
     @LexerBuilderDsl
+    fun optional(fragment: LexerFragment) = LexerFragmentOptional(fragment)
+
+    @LexerBuilderDsl
     infix fun LexerFragment.then(second: LexerFragment) = LexerFragmentComposite(this, second)
 
     @LexerBuilderDsl

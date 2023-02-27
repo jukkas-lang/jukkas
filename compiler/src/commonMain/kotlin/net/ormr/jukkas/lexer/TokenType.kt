@@ -62,8 +62,8 @@ sealed interface TokenType {
 
     // literals
     object INT_LITERAL : AbstractTokenType("int literal")
+    object DOUBLE_LITERAL : AbstractTokenType("double literal")
     object CHAR_LITERAL : AbstractTokenType("char literal")
-    object SYMBOL_LITERAL : AbstractTokenType("symbol literal")
     object MAP_LITERAL_START : AbstractTokenType("#{")
     object TUPLE_LITERAL_START : AbstractTokenType("#(")
 
@@ -162,8 +162,8 @@ sealed interface TokenType {
             EQUAL_EQUAL,
             BANG_EQUAL,
             INT_LITERAL,
+            DOUBLE_LITERAL,
             CHAR_LITERAL,
-            SYMBOL_LITERAL,
             MAP_LITERAL_START,
             TUPLE_LITERAL_START,
             STRING_START,

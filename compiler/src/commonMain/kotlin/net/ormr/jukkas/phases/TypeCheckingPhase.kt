@@ -82,9 +82,7 @@ class TypeCheckingPhase private constructor(source: Source) : CompilerPhase(sour
             is BasicArgument -> {}
             is PatternArgument -> {}
             is DefinitionReference -> {}
-            is BooleanLiteral -> {}
-            is IntLiteral -> {}
-            is StringLiteral -> {}
+            is Literal -> {}
             is InvocationArgument -> {}
             // type checking of return expressions is done where they're placed
             is Return -> {}

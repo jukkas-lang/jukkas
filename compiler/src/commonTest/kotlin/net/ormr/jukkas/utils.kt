@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package net.ormr.jukkas.parser.parselets.prefix
+package net.ormr.jukkas
 
-import net.ormr.jukkas.ast.Expression
-import net.ormr.jukkas.ast.IntLiteral
-import net.ormr.jukkas.ast.withPosition
-import net.ormr.jukkas.lexer.Token
-import net.ormr.jukkas.parser.JukkasParser
+// these are needed because the output of Float and Double values 'toString' function are *not* the same
+// across all platforms of Kotlin, thanks JetBrains, very cool!
 
-object IntParselet : PrefixParselet {
-    override fun parse(parser: JukkasParser, token: Token): Expression = parser with {
-        val value = token.text.toInt()
-        IntLiteral(value) withPosition token
-    }
+fun stringify(value: Float): String {
+    val string = value.toString()
+    return if ('.' !in string) "$string.0" else string
+}
+
+fun stringify(value: Double): String {
+    val string = value.toString()
+    return if ('.' !in string) "$string.0" else string
 }

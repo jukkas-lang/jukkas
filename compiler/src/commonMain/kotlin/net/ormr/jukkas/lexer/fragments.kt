@@ -91,3 +91,14 @@ class LexerFragmentOneOrMore(val fragment: LexerFragment) : LexerFragment {
         return LexerFragment.Result(span, segment)
     }
 }
+
+class LexerFragmentOptional(val fragment: LexerFragment) : LexerFragment {
+    override fun match(scanner: LexerScanner): LexerFragment.Result = when (val result = fragment.match(scanner)) {
+        null -> {
+            val point = scanner.getCurrentPoint()
+            val span = Span(point, point)
+            LexerFragment.Result(span, "")
+        }
+        else -> result
+    }
+}

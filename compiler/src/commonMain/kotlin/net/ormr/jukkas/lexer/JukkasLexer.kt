@@ -18,6 +18,8 @@ class JukkasLexerContext {
 
 object JukkasLexerRules : FragmentBuilder {
     private val digit = regex("[0-9]")
+    private val digitOrUnderscore = regex("[_0-9]")
+    private val digits = regex("[0-9][_0-9]*")
     private val lineTerminator = regex("""(\r)?\n""")
     private val whitespace = lineTerminator or regex("""[ \t\f]""")
 
@@ -26,10 +28,19 @@ object JukkasLexerRules : FragmentBuilder {
     private val identifier = letter then zeroOrMore(identifierPart)
     private val escapedIdentifier = literal("`") then oneOrMore(identifierPart)
 
-    private val decimalIntLiteral = regex("0|([1-9][0-9_]*)")
+    private val zero = literal("0")
+    private val decimalIntLiteral = regex("([1-9][0-9_]*)")
     private val hexIntLiteral = regex("0[xX][_0-9A-Fa-f]+")
     private val binIntLiteral = regex("0[bB][_01]+")
-    private val intLiteral = decimalIntLiteral or hexIntLiteral or binIntLiteral
+    private val intLiteral = zero or decimalIntLiteral or hexIntLiteral or binIntLiteral then optional(regex("[lL]"))
+
+    private val dot = literal(".")
+    private val floatPostfix = regex("[Ff]")
+    private val exponentPart = regex("""[Ee][+\-]?""") then zeroOrMore(digitOrUnderscore)
+    private val floatingPointLiteral1 =
+        digits then dot then oneOrMore(digit) then optional(exponentPart) then optional(floatPostfix)
+    private val floatingPointLiteral2 = digits then exponentPart then optional(floatPostfix)
+    private val doubleLiteral = floatingPointLiteral1 or floatingPointLiteral2
 
     private val escapeSequence = regex("""\\u([0-9-A-Fa-f]{4}|\{[\w_]*\})""")
     private val stringContent = regex("""[^\\"]+""")
@@ -38,6 +49,7 @@ object JukkasLexerRules : FragmentBuilder {
 
     val defaultMatcher: JukkasMatcher = Matcher {
         whitespace to { null }
+        doubleLiteral to { DOUBLE_LITERAL }
         intLiteral to { INT_LITERAL }
 
         keyword("fun") to { FUN }
