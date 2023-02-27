@@ -287,10 +287,11 @@ class JukkasParser private constructor(tokens: TokenStream) : Parser(tokens) {
         internal val IDENTIFIERS = TokenType.setOf<IdentifierLike>()
         internal val PROPERTIES = hashSetOf(VAL, VAR)
 
+        internal fun createTokenStream(source: Source): TokenStream = TokenStream.from(source)
+
         @PublishedApi
         internal fun of(source: Source): JukkasParser {
-            val tokens = TokenStream.from(source)
-            return JukkasParser(tokens)
+            return JukkasParser(createTokenStream(source))
         }
 
         inline fun <T> parse(source: Source, crossinline action: JukkasParser.() -> T): JukkasResult<T> {

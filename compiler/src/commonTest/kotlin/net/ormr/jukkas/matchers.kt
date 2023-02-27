@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
+@file:Suppress("MatchingDeclarationName")
+
 package net.ormr.jukkas
 
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
 import net.ormr.jukkas.ast.Node
+import net.ormr.jukkas.lexer.Token
+import net.ormr.jukkas.lexer.TokenType
 import net.ormr.jukkas.reporter.Message
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+data class TokenSpec(val token: String, val type: TokenType)
+
 infix fun Node.shouldBeStructurallyEquivalentTo(other: Node) {
     this should beStructurallyEquivalentTo(other)
+}
+
+infix fun List<Token>.shouldMatchTokenSpec(other: List<TokenSpec>) {
+    this should haveTheSameTokenSpec(other)
 }
 
 // JukkasResult.Failure
@@ -62,6 +72,14 @@ fun beStructurallyEquivalentTo(other: Node) = object : Matcher<Node> {
         value.isStructurallyEquivalent(other),
         { "<$value> should be equivalent to <$other>" },
         { "<$value> should not be structurally equivalent to <$other>" },
+    )
+}
+
+fun haveTheSameTokenSpec(other: List<TokenSpec>) = object : Matcher<List<Token>> {
+    override fun test(value: List<Token>): MatcherResult = MatcherResult(
+        value.size == other.size && value.zip(other).all { (a, b) -> a.text == b.token && a.type == b.type },
+        { "<$value> should match the spec of <$other>" },
+        { "<$value> should not match the spec of <$other>" },
     )
 }
 

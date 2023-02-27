@@ -20,6 +20,7 @@ import net.ormr.jukkas.ast.Expression
 import net.ormr.jukkas.ast.Import
 import net.ormr.jukkas.ast.Node
 import net.ormr.jukkas.ast.Statement
+import net.ormr.jukkas.lexer.Token
 import net.ormr.jukkas.parser.JukkasParser
 
 inline fun <T : Node> parseNode(
@@ -35,3 +36,10 @@ fun parseExpression(source: String): JukkasResult<Expression> =
 
 fun parseImport(source: String): JukkasResult<Import> =
     JukkasParser.parse(Source.Text(source)) { parseImport() ?: (current() syntaxError "Failed to parse") }
+
+fun parseTokens(source: String): List<Token> {
+    val tokenStream = JukkasParser.createTokenStream(Source.Text(source))
+    return tokenStream.asSequence()
+        .takeWhile { tokenStream.hasNext() }
+        .toList()
+}

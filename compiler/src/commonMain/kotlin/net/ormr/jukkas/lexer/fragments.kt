@@ -13,6 +13,11 @@ class LexerFragmentLiteral(val literal: String) : LexerFragment {
         scanner.tryConsumeSegment(literal.length) { it == literal }
 }
 
+class LexerFragmentKeyword(literal: String) : LexerFragment {
+    val regex = Regex(Regex.escape(literal) + """\b""")
+    override fun match(scanner: LexerScanner): LexerFragment.Result? = scanner.tryConsumeRegex(regex)
+}
+
 class LexerFragmentRegex(val regex: Regex) : LexerFragment {
     override fun match(scanner: LexerScanner): LexerFragment.Result? = scanner.tryConsumeRegex(regex)
 }
@@ -31,7 +36,18 @@ class LexerFragmentComposite(val first: LexerFragment, val second: LexerFragment
 }
 
 class LexerFragmentAlternative(val first: LexerFragment, val second: LexerFragment) : LexerFragment {
-    override fun match(scanner: LexerScanner): LexerFragment.Result? = first.match(scanner) ?: second.match(scanner)
+    override fun match(scanner: LexerScanner): LexerFragment.Result? {
+        val scannerSnapshot1 = scanner.snapshot()
+        val firstMatch = first.match(scannerSnapshot1)?.to(scannerSnapshot1)
+
+        val scannerSnapshot2 = scanner.snapshot()
+        val secondMatch = second.match(scannerSnapshot2)?.to(scannerSnapshot2)
+
+        val matches = listOfNotNull(firstMatch, secondMatch)
+        val longestMatch = matches.maxByOrNull { it.first.token.length } ?: return null
+        scanner.resumeFromSnapshot(longestMatch.second)
+        return longestMatch.first
+    }
 }
 
 class LexerFragmentZeroOrMore(val fragment: LexerFragment) : LexerFragment {
