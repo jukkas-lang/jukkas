@@ -211,6 +211,7 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
             val value = when (node) {
                 is BooleanLiteral -> JsonPrimitive(node.value)
                 is IntLiteral -> JsonPrimitive(node.value)
+                is LongLiteral -> JsonPrimitive(node.value)
                 is StringLiteral -> JsonPrimitive(node.value)
             }
             put("value", value)
