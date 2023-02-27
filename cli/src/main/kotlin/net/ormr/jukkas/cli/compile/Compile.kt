@@ -23,7 +23,6 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import net.ormr.jukkas.JvmCompilerContext
-import net.ormr.jukkas.Source
 import net.ormr.jukkas.cli.CliErrorReporter
 import net.ormr.jukkas.flatMap
 import net.ormr.jukkas.getOrElse
@@ -50,11 +49,6 @@ class Compile : CliktCommand(help = "Compile stuff", printHelpOnEmptyArgs = true
         .flag() // TODO: this is temporary for now
 
     override fun run() {
-        val result = JukkasParser
-            .parse(Source.Text("0b0101010101"), JukkasParser::parseExpression)
-            .getOrElse { error(it.messages.joinToString(prefix = "[", postfix = "]") { m -> "\"${m.message}\"" }) }
-        println(result)
-        return
         val terminal = currentContext.terminal
         val context = JvmCompilerContext(listOf(JvmTypeResolver))
         val classes = JukkasParser
