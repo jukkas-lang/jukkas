@@ -46,4 +46,3 @@ class MemberAccessOperation(
 
     operator fun component3(): TypeOrError? = resolvedType
 }
-
