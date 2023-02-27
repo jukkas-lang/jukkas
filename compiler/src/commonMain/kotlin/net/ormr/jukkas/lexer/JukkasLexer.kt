@@ -40,21 +40,21 @@ object JukkasLexerRules : FragmentBuilder {
         whitespace to { null }
         intLiteral to { INT_LITERAL }
 
-        "fun" to { FUN }
-        "val" to { VAL }
-        "var" to { VAR }
-        "false" to { FALSE }
-        "true" to { TRUE }
-        "return" to { RETURN }
-        "if" to { IF }
-        "else" to { ELSE }
-        "and" to { AND }
-        "or" to { OR }
-        "not" to { NOT }
-        "as" to { AS }
-        "import" to { IMPORT }
-        "set" to { SET }
-        "get" to { GET }
+        keyword("fun") to { FUN }
+        keyword("val") to { VAL }
+        keyword("var") to { VAR }
+        keyword("false") to { FALSE }
+        keyword("true") to { TRUE }
+        keyword("return") to { RETURN }
+        keyword("if") to { IF }
+        keyword("else") to { ELSE }
+        keyword("and") to { AND }
+        keyword("or") to { OR }
+        keyword("not") to { NOT }
+        keyword("as") to { AS }
+        keyword("import") to { IMPORT }
+        keyword("set") to { SET }
+        keyword("get") to { GET }
 
         identifier to { IDENTIFIER }
         escapedIdentifier to { ESCAPED_IDENTIFIER }
