@@ -212,6 +212,8 @@ class Ast : CliktCommand(help = "Ast stuff", printHelpOnEmptyArgs = true) {
                 is BooleanLiteral -> JsonPrimitive(node.value)
                 is IntLiteral -> JsonPrimitive(node.value)
                 is LongLiteral -> JsonPrimitive(node.value)
+                is FloatLiteral -> JsonPrimitive(node.value)
+                is DoubleLiteral -> JsonPrimitive(node.value)
                 is StringLiteral -> JsonPrimitive(node.value)
             }
             put("value", value)
