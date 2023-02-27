@@ -39,10 +39,8 @@ object JukkasLexerRules : FragmentBuilder {
     private val exponentPart = regex("""[Ee][+\-]?""") then zeroOrMore(digitOrUnderscore)
     private val floatingPointLiteral1 =
         digits then dot then oneOrMore(digit) then optional(exponentPart) then optional(floatPostfix)
-    private val floatingPointLiteral2 = dot then digits then optional(exponentPart) then optional(floatPostfix)
-    private val floatingPointLiteral3 = digits then exponentPart then optional(floatPostfix)
-    private val doubleLiteral =
-        floatingPointLiteral1 or floatingPointLiteral2 or floatingPointLiteral3
+    private val floatingPointLiteral2 = digits then exponentPart then optional(floatPostfix)
+    private val doubleLiteral = floatingPointLiteral1 or floatingPointLiteral2
 
     private val escapeSequence = regex("""\\u([0-9-A-Fa-f]{4}|\{[\w_]*\})""")
     private val stringContent = regex("""[^\\"]+""")
