@@ -18,7 +18,6 @@ package net.ormr.jukkas.parser
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.nonNegativeInt
 import io.kotest.property.arbitrary.numericFloat
 import io.kotest.property.checkAll
 import net.ormr.jukkas.float
@@ -31,14 +30,6 @@ class FloatLiteralParsingTest : FunSpec({
         checkAll(Arb.numericFloat(min = 0.1F)) { float ->
             parseExpression("${float}F") shouldBeSuccess { expr, _ ->
                 expr shouldBeStructurallyEquivalentTo float(float)
-            }
-        }
-    }
-
-    test("Parse positive float form 4") {
-        checkAll(Arb.nonNegativeInt()) { value ->
-            parseExpression("${value}F") shouldBeSuccess { expr, _ ->
-                expr shouldBeStructurallyEquivalentTo float(value.toFloat())
             }
         }
     }
