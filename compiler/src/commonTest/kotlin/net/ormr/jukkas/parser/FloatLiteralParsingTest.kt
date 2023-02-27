@@ -24,11 +24,12 @@ import net.ormr.jukkas.float
 import net.ormr.jukkas.parseExpression
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
+import net.ormr.jukkas.stringify
 
 class FloatLiteralParsingTest : FunSpec({
     test("Parse positive float form 1") {
         checkAll(Arb.numericFloat(min = 0.1F)) { float ->
-            parseExpression("${float}F") shouldBeSuccess { expr, _ ->
+            parseExpression("${stringify(float)}F") shouldBeSuccess { expr, _ ->
                 expr shouldBeStructurallyEquivalentTo float(float)
             }
         }

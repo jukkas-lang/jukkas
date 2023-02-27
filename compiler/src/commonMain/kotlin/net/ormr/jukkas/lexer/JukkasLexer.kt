@@ -51,8 +51,8 @@ object JukkasLexerRules : FragmentBuilder {
 
     val defaultMatcher: JukkasMatcher = Matcher {
         whitespace to { null }
-        intLiteral to { INT_LITERAL }
         doubleLiteral to { DOUBLE_LITERAL }
+        intLiteral to { INT_LITERAL }
 
         keyword("fun") to { FUN }
         keyword("val") to { VAL }

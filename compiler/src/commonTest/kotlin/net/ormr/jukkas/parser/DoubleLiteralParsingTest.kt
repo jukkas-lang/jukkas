@@ -24,11 +24,12 @@ import net.ormr.jukkas.double
 import net.ormr.jukkas.parseExpression
 import net.ormr.jukkas.shouldBeStructurallyEquivalentTo
 import net.ormr.jukkas.shouldBeSuccess
+import net.ormr.jukkas.stringify
 
 class DoubleLiteralParsingTest : FunSpec({
     test("Parse positive double form 1") {
         checkAll(Arb.numericDouble(min = 0.1)) { double ->
-            parseExpression(double.toString()) shouldBeSuccess { expr, _ ->
+            parseExpression(stringify(double)) shouldBeSuccess { expr, _ ->
                 expr shouldBeStructurallyEquivalentTo double(double)
             }
         }
